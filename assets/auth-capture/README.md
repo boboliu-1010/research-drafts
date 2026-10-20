@@ -8,6 +8,7 @@
 
 | 图 | 内容 | 图源 |
 | --- | --- | --- |
+| [14 公开链支付验证](14-public-validation.svg) | 两种 Collector、授权扣款与 charge、真实分账与 SDK 问题 | [SVG](14-public-validation.svg) |
 | [13 实测余额变化](13-validation-results.svg) | 从本地 fork 的真实执行记录生成；含分账、释放和退款后的余额 | [SVG](13-validation-results.svg) |
 | [12 项目关系](12-project-layers.png) | Coinbase Payments 与 x402 auth-capture 分别使用 Commerce Payments；不表示 Shopify 使用 x402 | [SVG](12-project-layers.svg) |
 | [08 三种支付方式](08-auth-capture-overview.png) | exact 以 ERC-3009 默认直付为例；另两列为 delegated 的 escrow / authorization 路径 | [SVG](08-auth-capture-overview.svg) |
@@ -27,4 +28,4 @@
 | [04 分账简图](04-fee-split.png) | 只看 6=5.94+0.06；完整调用说明以图 10 为准 | [Mermaid](04-fee-split.mmd) |
 | [06 故障恢复](06-failure-recovery.png) | 区分仅签名、已广播不明、已托管和已扣款 | [Mermaid](06-failure-recovery.mmd) |
 
-SVG 和 Mermaid 是可编辑的图源，正文用 PNG 在 GitHub 展示。Mermaid 图使用同目录的 mermaid-config.json；修改图源后，需要重新渲染 PNG，并检查文字、金额、箭头和适用模式。
+SVG 和 Mermaid 是可编辑的图源；实测图直接使用 SVG，其余正文配图使用 PNG。Mermaid 图使用同目录的 mermaid-config.json；修改图源后，需要重新渲染 PNG，并检查文字、金额、箭头和适用模式。

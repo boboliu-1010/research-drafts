@@ -60,7 +60,7 @@ settlementHooks 的 before-handler 不追加商户扣款签名。authorize 成�
 
 after-handler 为 sync escrow 构造 capture，为 authorization 路径补齐 charge。deferred escrow 则保留已托管结果，不在请求结束时扣款。cancel 会为可代办生命周期的 escrow 路径构造 void。
 
-这些操作由 SDK 发起，合约不会到时自动执行。业务前后的顺序按 scheme hooks 及其测试说明，未逐行展开全部 core HTTP middleware。
+这些操作由 SDK 发起，合约不会到时自动执行。HTTP 实测发现 sync 后的本地账本更新遗漏，见[公开测试网验证](#124-公开测试网与-http-支付)。
 
 | extra 主要参数 | 对应意义 |
 | --- | --- |
@@ -188,6 +188,8 @@ AuthorizedPaymentStorage.update 要求原子条件修改。默认内存实现的
 
 ## 10 SDK 测试
 
+固定提交下，auth-capture 的 15 个单测文件、472 项测试全部通过，0 失败、0 跳过。[结果](../demos/auth-capture/results/sdk-summary.json) · [重跑命令](#125-重跑-sdk-与公开链验证)
+
 | 测试文件 | 覆盖内容 |
 | --- | --- |
 | [pendingSettlement.test.ts](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/unit/auth-capture/pendingSettlement.test.ts) | 交易回执超时返回 pending，命中缓存后不重复广播 |
@@ -304,7 +306,9 @@ npm run report
 
 15 项检查包含错误操作人、收款人被篡改、重复 authorize、零金额、费用越界、超额 capture、退款缺 allowance、超额 refund，以及到期条件。其中回滚用例通过本地 USDC blacklister 临时封禁商家，发送一笔 capture：交易失败、日志清空，费用方余额、订单余额和 clone 部署均未改变。
 
-这是合约执行演示，调用者直接扮演 operator。x402 的商家操作签名、facilitator 认证和 HTTP 请求链路尚未端到端验证；Permit2 的公共测试网收款也未验证。
+这段本地演示直接调用合约，适合查看回滚和调用树。真正的 SDK、HTTP 与公开测试网结果见 12.4。
+
+![本地 fork 的资金与账本变化](../assets/auth-capture/13-validation-results.svg)
 
 ### 12.3 跑官方合约测试
 
@@ -321,6 +325,66 @@ COMMERCE_SOURCE=/path/to/commerce-payments \
 FORGE_BIN=/path/to/foundry-v1.3.6/forge npm run test:official
 ```
 
-实测 112 项全部通过。Foundry v1.8.5 的 Permit2/ERC-6492 用例有兼容性失败，复现说明见[合约测试](auth-capture-solidity-walkthrough.md#17-合约测试)。SDK 第 10 节列出的 TypeScript 单元测试尚未运行。
+实测 112 项全部通过。Foundry v1.8.5 的 Permit2/ERC-6492 用例有兼容性失败，复现说明见[合约测试](auth-capture-solidity-walkthrough.md#17-合约测试)。SDK 的运行结果见第 10 节。
+
+### 12.4 公开测试网与 HTTP 支付
+
+演示直接使用上面的官方部署，没有重新部署一套支付合约。付款人和 operator 使用本地已有的两个测试钱包；商家与费用方也分为两个地址。给 operator 准备了 0.0001 测试 ETH 和 0.05 测试 USDC，退款 allowance 限为 0.05 USDC，Permit2 allowance 限为 0.02 USDC。
+
+客户端、Express 业务服务和 facilitator 使用固定提交的官方 SDK，分别通过 HTTP 通信。业务服务持有临时 receiverAuthorizer，自己签署 capture / charge / void / refund 操作授权；facilitator 配置 refundFunding=true，退款从 operator 的测试 USDC 余额支付。
+
+| 业务路由 | 实际执行 | 公开回执 |
+| --- | --- | --- |
+| /erc3009/deferred | authorize 0.01 → capture 0.006 → void 0.004 → refund 0.002 + 0.004 | [capture](https://sepolia.basescan.org/tx/0x35ccaced4b751ed4a930d9883860f1955ece4c910cf9dd0d1fe7857d3e1307b3) · [refund](https://sepolia.basescan.org/tx/0x96f3c7ef107198ca95635ba2ae8a88b141923ce3dfdbdc27e133b29d245c8047) |
+| /permit2/deferred | 同样完成授权、扣款、释放与两次退款 | [capture](https://sepolia.basescan.org/tx/0x3223f61304d059b755532d02a9638c043b7b4a86fc1850334dbb8d9ada2db9c0) |
+| /erc3009/charge | 业务结束时 charge 0.006，再 refund 0.006 | [charge](https://sepolia.basescan.org/tx/0x6675f9bfb19baabf0e8438a35726d939e22ab37f7fb806ac5fe74a6017fa29af) |
+| /permit2/charge | 同样实际收 0.006，再 refund 0.006 | [charge](https://sepolia.basescan.org/tx/0x3912fcacd6dfc033b74ec98f8535acf49c5c1ea3f8eed14191497ff913cdfe10) |
+| /erc3009/sync | authorize → capture → 自动 void 均成功；SDK 退款被拒，改由 operator 直接调用 | [恢复退款](https://sepolia.basescan.org/tx/0x58eab556af86cf365a12fc28d18afce3c4a09b942908c9ee57abc55bf228ca81) |
+| /erc3009/reclaim | 先授权，等公共区块时间超过截止时间，再由 payer reclaim | [reclaim](https://sepolia.basescan.org/tx/0x27bbe66bbe52a9ea809aeaa0cca8b1b3dae233087aa0d9a72c64548c8b8d5834) |
+
+六条路由均实际返回 402，客户端按 PAYMENT-REQUIRED 签名并携 PAYMENT-SIGNATURE 重试，最终收到 200 和 PAYMENT-RESPONSE。escrow 在业务前 authorize；charge 在业务结束后按 60% 的实际金额结算。路由名由演示程序定义。
+
+收款回执还印证了 Collector 的区别：ERC-3009 charge 的 Transfer 是 **0.01 → 退 0.004 → 入托管 0.006 → 分账 0.00006 / 0.00594**；Permit2 直接按 requestedAmount 拉取 0.006，再做两次分账。
+
+收尾后，六笔订单的可扣与可退额度均为 0，TokenStore 和两个付款 Collector 的余额也为 0。不含给 operator 预充值的 0.05 USDC，payer 在六笔支付中的净支出为 0；operator 出资退款 0.03 USDC，商家合计收到 0.0297，费用方收到 0.0003。退款没有从商家或费用方扣回。演示最后撤销了这次设置的两笔 allowance。[逐笔数据](../demos/auth-capture/results/public-demo.json) · [两个独立 RPC 的复核结果](../demos/auth-capture/results/public-audit.json)
+
+**sync 路径发现了一个 SDK 问题。** 链上可扣 / 可退已是 0 / 0.006，本地 storage 仍是 0.01 / 0；随后 lifecycle.refund 返回 invalid_auth_capture_evm_unexpected_payment_state，未广播退款交易。
+
+原因在两处代码衔接：[core](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/core/src/server/x402ResourceServer.ts#L1389) 把 enriched settlePayload 发给 facilitator，但 afterSettle 收到的是原始 context；[auth-capture 回调](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/server/settlementHooks.ts#L210)只有看到 type="capture" 才更新余额，因此漏了这一步。
+
+SDK 源码没有改动。另做了一个不连接区块链的最小复现，得到相同的存储差异。[复现脚本](../demos/auth-capture/sdk-sync-regression.mjs) · [结果](../demos/auth-capture/results/sdk-sync-regression.json)。公开链那笔退款由 operator 直接调用 Escrow 完成；接入前仍需修复 SDK 的回调数据传递，并补上这条端到端回归。
+
+这次公开链验证使用 EOA、商家自己签名的授权模式。智能钱包、custom operator 和 facilitator 代持商家授权私钥的模式，需要分别做集成验证；官方单测通过不能替代这些验证。
+
+### 12.5 重跑 SDK 与公开链验证
+
+需要 Node.js 22+、pnpm 11.1.1。在演示目录执行：
+
+```bash
+npm run test:sdk
+```
+
+脚本拉取固定提交、安装锁定依赖，构建 core / evm / Express / fetch 并执行 472 项 auth-capture 单测。已有固定版本的 SDK 源码时，可设置 X402_SDK_DIR。
+
+公开链演示需要两个带测试币的钱包和两个不同的商家、费用地址。钱包模块只导出 loadAccounts()，返回 payer、operator 两个 signer，以及 merchant、fee 公开地址。已有密钥管理器可通过该模块接入；[wallet-stdin.mjs](../demos/auth-capture/wallet-stdin.mjs)也支持从标准输入读取 JSON，字段为 payerKey、operatorKey、merchant、fee。私钥不要写进命令参数、日志或仓库。
+
+```bash
+PUBLIC_BASE_SEPOLIA_DEMO=1 \
+X402_SDK_DIR=/path/to/pinned-x402 \
+DEMO_WALLET_MODULE=/absolute/path/to/wallet-module.mjs \
+npm run demo:public
+npm run verify:public
+npm run report
+```
+
+脚本仅允许 chainId=84532，单笔授权固定为 0.01 USDC，扣款固定为 0.006；设置有限 allowance 和 gas 预算，结果逐步落盘。等待 reclaim 使用公开链时间。遇到上述 sync 问题会记录拒绝结果，再由 operator 直接 refund，不把这一步算作 SDK 成功。
+
+脚本默认保留已有结果。重跑前先备份 results/public-demo.json，或用 PUBLIC_DEMO_RESULTS 指定新的结果文件；verify:public 和演示页面默认读取 results/public-demo.json。
+
+只复现 sync 账本问题、不发交易：
+
+```bash
+X402_SDK_DIR=/path/to/pinned-x402 npm run repro:sdk-sync
+```
 
 [返回分享主稿](auth-capture-contract-analysis.md) · [合约测试](auth-capture-solidity-walkthrough.md#17-合约测试) · [源码版本](auth-capture-contract-analysis.md#10-源码版本)

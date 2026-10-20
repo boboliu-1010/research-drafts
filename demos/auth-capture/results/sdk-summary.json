@@ -1,0 +1,121 @@
+{
+  "sourceCommit": "faa1c694c66a3732aaabbce93bdae140e521a67d",
+  "generatedAt": "2026-10-20T13:25:34.668Z",
+  "node": "v25.6.0",
+  "command": "pnpm exec vitest run test/unit/auth-capture --reporter=json --outputFile=<raw-results.json>",
+  "success": true,
+  "counts": {
+    "passed": 472,
+    "failed": 0,
+    "skipped": 0,
+    "total": 472,
+    "files": 15
+  },
+  "files": [
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/abi.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "passed": 2,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/client.test.ts",
+      "status": "passed",
+      "tests": 27,
+      "passed": 27,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/collect.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "passed": 1,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/delegatedAuth.test.ts",
+      "status": "passed",
+      "tests": 19,
+      "passed": 19,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/extra.test.ts",
+      "status": "passed",
+      "tests": 28,
+      "passed": 28,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/facilitator-utils.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "passed": 5,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/facilitator.test.ts",
+      "status": "passed",
+      "tests": 166,
+      "passed": 166,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/lifecycleFacilitator.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "passed": 8,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/lifecyclePayload.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "passed": 12,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/nonce.test.ts",
+      "status": "passed",
+      "tests": 25,
+      "passed": 25,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/pendingSettlement.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "passed": 15,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/server.test.ts",
+      "status": "passed",
+      "tests": 99,
+      "passed": 99,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/settlementHooks.test.ts",
+      "status": "passed",
+      "tests": 19,
+      "passed": 19,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/types.test.ts",
+      "status": "passed",
+      "tests": 40,
+      "passed": 40,
+      "failed": []
+    },
+    {
+      "file": "packages/mechanisms/evm/test/unit/auth-capture/utils.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "passed": 6,
+      "failed": []
+    }
+  ]
+}

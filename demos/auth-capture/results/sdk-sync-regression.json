@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-10-20T13:28:05.672Z",
+  "sdkCommit": "faa1c694c66a3732aaabbce93bdae140e521a67d",
+  "mode": "local SDK integration with stub facilitator; no RPC, no transactions",
+  "reproduced": true,
+  "settleCalls": [
+    {
+      "type": "collect",
+      "amount": "10000",
+      "hasPaymentInfo": false
+    },
+    {
+      "type": "capture",
+      "amount": "6000",
+      "hasPaymentInfo": true
+    }
+  ],
+  "storedAfterAuthorize": {
+    "capturable": "10000",
+    "refundable": "0"
+  },
+  "storedAfterSyncCapture": {
+    "capturable": "10000",
+    "refundable": "0"
+  },
+  "expectedAfterCaptureAndVoid": {
+    "capturable": "0",
+    "refundable": "6000"
+  },
+  "cause": "x402ResourceServer settles enriched settlePayload, then constructs resultContext from original context. AuthCaptureSettlementHooks.handleAfterSettle expects type=capture on that original payload and skips storage update."
+}

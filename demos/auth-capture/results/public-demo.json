@@ -1,0 +1,2137 @@
+{
+  "mode": "public-base-sepolia",
+  "generatedAt": "2026-10-20T13:17:58.446Z",
+  "chainId": 84532,
+  "sdkCommit": "faa1c694c66a3732aaabbce93bdae140e521a67d",
+  "sourceCommit": "b748fdd7a830a655a19a530edcf2a94b9dc7d25f",
+  "rpc": "https://sepolia.base.org",
+  "contracts": {
+    "escrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c",
+    "erc3009": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+    "permit2Collector": "0xD69831Aed5bfe262067ec4c751f4F830EcdD446e",
+    "refundCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486",
+    "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+    "permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3"
+  },
+  "actors": {
+    "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+    "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+    "merchant": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+    "fee": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+    "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77"
+  },
+  "tokenStore": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+  "unit": "USDC base units (6 decimals)",
+  "maxPayment": "10000",
+  "actualPayment": "6000",
+  "feeBps": 100,
+  "setup": [
+    {
+      "label": "approve refund collector 0.05 USDC",
+      "hash": "0x5b0278ea912b4c08c0f8df3430707fe5537d8f111c3230b6fd42d25b9f6369d0",
+      "explorer": "https://sepolia.basescan.org/tx/0x5b0278ea912b4c08c0f8df3430707fe5537d8f111c3230b6fd42d25b9f6369d0",
+      "status": "success",
+      "blockNumber": "48366997",
+      "blockHash": "0x0ef8ef63cdf48611bb5ca12371dd081a5c2d8069828455d34985fe2203755268",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+      "gasUsed": "55425",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "90",
+      "transfers": [],
+      "events": [],
+      "preconfirmationBlockHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "label": "approve Permit2 0.02 USDC",
+      "hash": "0x7f255bf663f1a621ff33fc52d2e2b8485fe9daa34fc32433a3326dcb4f344f21",
+      "explorer": "https://sepolia.basescan.org/tx/0x7f255bf663f1a621ff33fc52d2e2b8485fe9daa34fc32433a3326dcb4f344f21",
+      "status": "success",
+      "blockNumber": "48367000",
+      "blockHash": "0x56d4531d5a000df2323f8329a6b785f1a1c1c987dbd345b8c933b31ebe877e7e",
+      "from": "0x90c92904cec7051dc5dd759bdf75863f7b19d529",
+      "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+      "gasUsed": "55365",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "90",
+      "transfers": [],
+      "events": [],
+      "preconfirmationBlockHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "label": "revoke Permit2 allowance",
+      "hash": "0x0b8fb71d7f3d3823445e60330364c7aa64b4f8d0a52e084042bdfb3595459c1f",
+      "explorer": "https://sepolia.basescan.org/tx/0x0b8fb71d7f3d3823445e60330364c7aa64b4f8d0a52e084042bdfb3595459c1f",
+      "status": "success",
+      "blockNumber": "48367219",
+      "blockHash": "0x865822932bbb07436f1df49a263505d942ab38bb172c8160f2911736a8a9bd67",
+      "from": "0x90c92904cec7051dc5dd759bdf75863f7b19d529",
+      "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+      "gasUsed": "33441",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "90",
+      "transfers": [],
+      "events": [],
+      "preconfirmationBlockHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "label": "revoke refund allowance",
+      "hash": "0x89064b52584ad398e6552c16520de6a52a6cc84de6d878ec99613b6f723b6421",
+      "explorer": "https://sepolia.basescan.org/tx/0x89064b52584ad398e6552c16520de6a52a6cc84de6d878ec99613b6f723b6421",
+      "status": "success",
+      "blockNumber": "48367222",
+      "blockHash": "0xf40ca8deb67abb44341f1bddd95a24bf9453dbd67d743612fee04048f368645b",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+      "gasUsed": "33501",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "90",
+      "transfers": [],
+      "events": [],
+      "preconfirmationBlockHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "transactions": [
+    {
+      "label": "settle escrow",
+      "hash": "0xd470245a7eb676284d1b90aa713f9c0ce6f5b46d35067206beca148545315812",
+      "explorer": "https://sepolia.basescan.org/tx/0xd470245a7eb676284d1b90aa713f9c0ce6f5b46d35067206beca148545315812",
+      "status": "success",
+      "blockNumber": "48367004",
+      "blockHash": "0x16fcfc063cbf108f0a625a394ccf33f60a5c7d0a9da16282c69716623c0016c4",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "161699",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "299",
+      "transfers": [
+        {
+          "from": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "to": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+          "value": "10000",
+          "usdc": "0.01"
+        },
+        {
+          "from": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "10000",
+          "usdc": "0.01"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentAuthorized",
+          "args": {
+            "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+            "paymentInfo": {
+              "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+              "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "maxAmount": "10000",
+              "preApprovalExpiry": 1792502352,
+              "authorizationExpiry": 1792503480,
+              "refundExpiry": 1792505880,
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "salt": "74887710694610478615324338273623847336803388268128517425375630643873373744652"
+            },
+            "amount": "10000",
+            "tokenCollector": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle capture",
+      "hash": "0x35ccaced4b751ed4a930d9883860f1955ece4c910cf9dd0d1fe7857d3e1307b3",
+      "explorer": "https://sepolia.basescan.org/tx/0x35ccaced4b751ed4a930d9883860f1955ece4c910cf9dd0d1fe7857d3e1307b3",
+      "status": "success",
+      "blockNumber": "48367008",
+      "blockHash": "0x3339303f597abd4ebbc22948dec27acbe35335129619ccb05b20860b6d320f7e",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "140727",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "228",
+      "transfers": [
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+          "value": "60",
+          "usdc": "0.00006"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+          "value": "5940",
+          "usdc": "0.00594"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentCaptured",
+          "args": {
+            "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+            "amount": "6000",
+            "feeAmount": "60",
+            "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14"
+          }
+        },
+        {
+          "name": "TokenStoreCreated",
+          "args": {
+            "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+            "tokenStore": "0x2Df595535F99F87293Fb944B194157Fd50a1b629"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle void",
+      "hash": "0xded3d2c3132606d17ab721e4143cb2e5e43a8ff074d6c32dd689316e38a806bd",
+      "explorer": "https://sepolia.basescan.org/tx/0xded3d2c3132606d17ab721e4143cb2e5e43a8ff074d6c32dd689316e38a806bd",
+      "status": "success",
+      "blockNumber": "48367012",
+      "blockHash": "0xf150d70f9d7de4626c8056029b27e47b357ef2ae1b2bb6df8c1aac67ab38d0d9",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "61472",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "210",
+      "transfers": [
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "4000",
+          "usdc": "0.004"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentVoided",
+          "args": {
+            "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+            "amount": "4000"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle refund",
+      "hash": "0x96f3c7ef107198ca95635ba2ae8a88b141923ce3dfdbdc27e133b29d245c8047",
+      "explorer": "https://sepolia.basescan.org/tx/0x96f3c7ef107198ca95635ba2ae8a88b141923ce3dfdbdc27e133b29d245c8047",
+      "status": "success",
+      "blockNumber": "48367016",
+      "blockHash": "0x9f7cf2d1c542c0a69be38f3ac204a6a253deaec90c94c3dbe57aa1f36231c1ae",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "92207",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "247",
+      "transfers": [
+        {
+          "from": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "2000",
+          "usdc": "0.002"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "2000",
+          "usdc": "0.002"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentRefunded",
+          "args": {
+            "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+            "amount": "2000",
+            "tokenCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle refund",
+      "hash": "0xee43d9e882bea255c0becb078bbbf44dd8f2ba17587ae253bcb04a4441ef5c6c",
+      "explorer": "https://sepolia.basescan.org/tx/0xee43d9e882bea255c0becb078bbbf44dd8f2ba17587ae253bcb04a4441ef5c6c",
+      "status": "success",
+      "blockNumber": "48367019",
+      "blockHash": "0x00c5013b7de0a0fd38de50e792252ee6096ad69781269c2f64671b7ef146229a",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "92207",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "247",
+      "transfers": [
+        {
+          "from": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "4000",
+          "usdc": "0.004"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "4000",
+          "usdc": "0.004"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentRefunded",
+          "args": {
+            "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+            "amount": "4000",
+            "tokenCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle authorization",
+      "hash": "0x6675f9bfb19baabf0e8438a35726d939e22ab37f7fb806ac5fe74a6017fa29af",
+      "explorer": "https://sepolia.basescan.org/tx/0x6675f9bfb19baabf0e8438a35726d939e22ab37f7fb806ac5fe74a6017fa29af",
+      "status": "success",
+      "blockNumber": "48367023",
+      "blockHash": "0x06189c09442d0731ca595a27474bdc7c9dc1eac6ce6b365176bd44748335d99e",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "177717",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "314",
+      "transfers": [
+        {
+          "from": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "to": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+          "value": "10000",
+          "usdc": "0.01"
+        },
+        {
+          "from": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "4000",
+          "usdc": "0.004"
+        },
+        {
+          "from": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "6000",
+          "usdc": "0.006"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+          "value": "60",
+          "usdc": "0.00006"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+          "value": "5940",
+          "usdc": "0.00594"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentCharged",
+          "args": {
+            "paymentInfoHash": "0xbf764a56d0d04fbe2526875ade58b902e6acb8b10b043154ba4cd51555f8c58c",
+            "paymentInfo": {
+              "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+              "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "maxAmount": "10000",
+              "preApprovalExpiry": 1792502390,
+              "authorizationExpiry": 1792503480,
+              "refundExpiry": 1792505880,
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "salt": "79086064911674565854450546034633858022960666915952699947146007412728371518152"
+            },
+            "amount": "6000",
+            "tokenCollector": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+            "feeAmount": "60",
+            "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle refund",
+      "hash": "0x17f7b0724ac2b1dc77b8170b55c72ed97ed80cb4ffc31f4c072fb0cfc7b4b943",
+      "explorer": "https://sepolia.basescan.org/tx/0x17f7b0724ac2b1dc77b8170b55c72ed97ed80cb4ffc31f4c072fb0cfc7b4b943",
+      "status": "success",
+      "blockNumber": "48367027",
+      "blockHash": "0xefc0117d3d041a03d86c34c9480ae2ab6aeb97193dd774ea00b01e5704ec4647",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "92195",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "247",
+      "transfers": [
+        {
+          "from": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "6000",
+          "usdc": "0.006"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "6000",
+          "usdc": "0.006"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentRefunded",
+          "args": {
+            "paymentInfoHash": "0xbf764a56d0d04fbe2526875ade58b902e6acb8b10b043154ba4cd51555f8c58c",
+            "amount": "6000",
+            "tokenCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle escrow",
+      "hash": "0x7f67be17521b6fa32aa68cf0227c6987d8779a315fd4f0f03b79a699fccb7b49",
+      "explorer": "https://sepolia.basescan.org/tx/0x7f67be17521b6fa32aa68cf0227c6987d8779a315fd4f0f03b79a699fccb7b49",
+      "status": "success",
+      "blockNumber": "48367030",
+      "blockHash": "0x9f60d992e557caa42c5a3c58d513539b88820820d2f0e4c378c333adb3a684d3",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "156960",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "299",
+      "transfers": [
+        {
+          "from": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "10000",
+          "usdc": "0.01"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentAuthorized",
+          "args": {
+            "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+            "paymentInfo": {
+              "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+              "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "maxAmount": "10000",
+              "preApprovalExpiry": 1792502405,
+              "authorizationExpiry": 1792503540,
+              "refundExpiry": 1792505940,
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "salt": "95790142600723163572188454172294214738415771665091167048326976876382752075725"
+            },
+            "amount": "10000",
+            "tokenCollector": "0xD69831Aed5bfe262067ec4c751f4F830EcdD446e"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle capture",
+      "hash": "0x3223f61304d059b755532d02a9638c043b7b4a86fc1850334dbb8d9ada2db9c0",
+      "explorer": "https://sepolia.basescan.org/tx/0x3223f61304d059b755532d02a9638c043b7b4a86fc1850334dbb8d9ada2db9c0",
+      "status": "success",
+      "blockNumber": "48367034",
+      "blockHash": "0x5c48330336bdb61577b12d9f007267a775add67775f309371174d95a2dfe15ec",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "80970",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "228",
+      "transfers": [
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+          "value": "60",
+          "usdc": "0.00006"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+          "value": "5940",
+          "usdc": "0.00594"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentCaptured",
+          "args": {
+            "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+            "amount": "6000",
+            "feeAmount": "60",
+            "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle void",
+      "hash": "0x4f7cf67fc7ef18a99e88694a8502cec0ad33ac3cbca056b11068e5ed4a7988b1",
+      "explorer": "https://sepolia.basescan.org/tx/0x4f7cf67fc7ef18a99e88694a8502cec0ad33ac3cbca056b11068e5ed4a7988b1",
+      "status": "success",
+      "blockNumber": "48367038",
+      "blockHash": "0xd3c3d8fdc1ae132e5cf34bee029affc9eedf02db6eb034c4f75bbc30a6faa269",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "61472",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "210",
+      "transfers": [
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "4000",
+          "usdc": "0.004"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentVoided",
+          "args": {
+            "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+            "amount": "4000"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle refund",
+      "hash": "0x8e1b1fff0a325e7699b43dcfc0a622bd4ca70295827bc8a5c31c997ba14da99a",
+      "explorer": "https://sepolia.basescan.org/tx/0x8e1b1fff0a325e7699b43dcfc0a622bd4ca70295827bc8a5c31c997ba14da99a",
+      "status": "success",
+      "blockNumber": "48367041",
+      "blockHash": "0x6c751673276bd98279be59118bff342be0559f299f032f00c87cb615e3ca226a",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "92207",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "247",
+      "transfers": [
+        {
+          "from": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "2000",
+          "usdc": "0.002"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "2000",
+          "usdc": "0.002"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentRefunded",
+          "args": {
+            "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+            "amount": "2000",
+            "tokenCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle refund",
+      "hash": "0x5ec8c04239e1e48af11ed225d548236a8d2ecc397891a98b8975228d91e22138",
+      "explorer": "https://sepolia.basescan.org/tx/0x5ec8c04239e1e48af11ed225d548236a8d2ecc397891a98b8975228d91e22138",
+      "status": "success",
+      "blockNumber": "48367044",
+      "blockHash": "0xd1c1d868c9134b447d399f11dec1abd9627daa6c31be0f9bb8e4b463b7fb9f1d",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "92207",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "247",
+      "transfers": [
+        {
+          "from": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "4000",
+          "usdc": "0.004"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "4000",
+          "usdc": "0.004"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentRefunded",
+          "args": {
+            "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+            "amount": "4000",
+            "tokenCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle authorization",
+      "hash": "0x3912fcacd6dfc033b74ec98f8535acf49c5c1ea3f8eed14191497ff913cdfe10",
+      "explorer": "https://sepolia.basescan.org/tx/0x3912fcacd6dfc033b74ec98f8535acf49c5c1ea3f8eed14191497ff913cdfe10",
+      "status": "success",
+      "blockNumber": "48367048",
+      "blockHash": "0xf63dd1bab12744dd91dd2ecd454e0bb67815d4ad51c1e0dfb25e9d4f157a52e1",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "167137",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "314",
+      "transfers": [
+        {
+          "from": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "6000",
+          "usdc": "0.006"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+          "value": "60",
+          "usdc": "0.00006"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+          "value": "5940",
+          "usdc": "0.00594"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentCharged",
+          "args": {
+            "paymentInfoHash": "0x600de36db42ca2e2a41acb1e1f3282f2768c02ba7c2d00248d86b3773af38bf3",
+            "paymentInfo": {
+              "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+              "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "maxAmount": "10000",
+              "preApprovalExpiry": 1792502440,
+              "authorizationExpiry": 1792503540,
+              "refundExpiry": 1792505940,
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "salt": "6023313049154785460394046514332033304764237326295394008382386152960828434957"
+            },
+            "amount": "6000",
+            "tokenCollector": "0xD69831Aed5bfe262067ec4c751f4F830EcdD446e",
+            "feeAmount": "60",
+            "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle refund",
+      "hash": "0x6ef2c522cbccd83e8cd1d53e6b57c59e8782f3b8e47ba237c4e92bebda6d8b28",
+      "explorer": "https://sepolia.basescan.org/tx/0x6ef2c522cbccd83e8cd1d53e6b57c59e8782f3b8e47ba237c4e92bebda6d8b28",
+      "status": "success",
+      "blockNumber": "48367052",
+      "blockHash": "0x46791c3a0daa63eb7becaac34bb1207b071e5655c76ee09218d579c999bb74b2",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "92207",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "247",
+      "transfers": [
+        {
+          "from": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "6000",
+          "usdc": "0.006"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "6000",
+          "usdc": "0.006"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentRefunded",
+          "args": {
+            "paymentInfoHash": "0x600de36db42ca2e2a41acb1e1f3282f2768c02ba7c2d00248d86b3773af38bf3",
+            "amount": "6000",
+            "tokenCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle escrow",
+      "hash": "0x7927ffa56fb750ef954185c0e25be87e14dc6f1626173185d54586359042be36",
+      "explorer": "https://sepolia.basescan.org/tx/0x7927ffa56fb750ef954185c0e25be87e14dc6f1626173185d54586359042be36",
+      "status": "success",
+      "blockNumber": "48367055",
+      "blockHash": "0x488c0d4eb612822a1fc9233d5fbdbee85df9a40c654f1aad382a420ab0884b31",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "161711",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "299",
+      "transfers": [
+        {
+          "from": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "to": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+          "value": "10000",
+          "usdc": "0.01"
+        },
+        {
+          "from": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "10000",
+          "usdc": "0.01"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentAuthorized",
+          "args": {
+            "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+            "paymentInfo": {
+              "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+              "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "maxAmount": "10000",
+              "preApprovalExpiry": 1792502455,
+              "authorizationExpiry": 1792503540,
+              "refundExpiry": 1792505940,
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "salt": "38465065066759120695760743937470700961560007221244131549045911436713205869742"
+            },
+            "amount": "10000",
+            "tokenCollector": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88"
+          }
+        }
+      ]
+    },
+    {
+      "label": "settle capture",
+      "hash": "0xc273f2528025f7fa184d45350ba0d34396f3b8cf7c934a317532f25191e99b1c",
+      "explorer": "https://sepolia.basescan.org/tx/0xc273f2528025f7fa184d45350ba0d34396f3b8cf7c934a317532f25191e99b1c",
+      "status": "success",
+      "blockNumber": "48367058",
+      "blockHash": "0xce8f43e80dfc87e478be302797736723fc1c24bd50306be4a515599f8ebc9431",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "80970",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "228",
+      "transfers": [
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+          "value": "60",
+          "usdc": "0.00006"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+          "value": "5940",
+          "usdc": "0.00594"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentCaptured",
+          "args": {
+            "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+            "amount": "6000",
+            "feeAmount": "60",
+            "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14"
+          }
+        }
+      ]
+    },
+    {
+      "label": "sync automatic void remainder",
+      "hash": "0xd03eb7626f357352d07468424dcf2c2767b099d26d602e92829473821221dd30",
+      "explorer": "https://sepolia.basescan.org/tx/0xd03eb7626f357352d07468424dcf2c2767b099d26d602e92829473821221dd30",
+      "status": "success",
+      "blockNumber": "48367060",
+      "blockHash": "0x655a3378c60f4d9194ea65cf868e0c27c64e59a47e268d8a2006bd0d285bd340",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "61472",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "210",
+      "transfers": [
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "4000",
+          "usdc": "0.004"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentVoided",
+          "args": {
+            "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+            "amount": "4000"
+          }
+        }
+      ]
+    },
+    {
+      "label": "sync refund recovery: direct operator call",
+      "hash": "0x58eab556af86cf365a12fc28d18afce3c4a09b942908c9ee57abc55bf228ca81",
+      "explorer": "https://sepolia.basescan.org/tx/0x58eab556af86cf365a12fc28d18afce3c4a09b942908c9ee57abc55bf228ca81",
+      "status": "success",
+      "blockNumber": "48367126",
+      "blockHash": "0x900ca557582b452c17e952e39a3605925726d2a7d11127c7f4f7691ea251980f",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "92207",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "144",
+      "transfers": [
+        {
+          "from": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "6000",
+          "usdc": "0.006"
+        },
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "6000",
+          "usdc": "0.006"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentRefunded",
+          "args": {
+            "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+            "amount": "6000",
+            "tokenCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486"
+          }
+        }
+      ],
+      "preconfirmationBlockHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "label": "settle escrow",
+      "hash": "0xa08df1be8892d5360ae3e8e61a982a43cc2bab0973da97117dd7f0864cc40fae",
+      "explorer": "https://sepolia.basescan.org/tx/0xa08df1be8892d5360ae3e8e61a982a43cc2bab0973da97117dd7f0864cc40fae",
+      "status": "success",
+      "blockNumber": "48367129",
+      "blockHash": "0xc11bb55731e45d2bee84c549211abb20c7dcad37c66cfa9da51e8df928930df3",
+      "from": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "161679",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "298",
+      "transfers": [
+        {
+          "from": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "to": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+          "value": "10000",
+          "usdc": "0.01"
+        },
+        {
+          "from": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+          "to": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "value": "10000",
+          "usdc": "0.01"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentAuthorized",
+          "args": {
+            "paymentInfoHash": "0x2346804eb1aa69fb910349e6307becad6cf9393fe800e2d94a9618f1f20ad55f",
+            "paymentInfo": {
+              "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+              "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "maxAmount": "10000",
+              "preApprovalExpiry": 1792502602,
+              "authorizationExpiry": 1792502700,
+              "refundExpiry": 1792506120,
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "salt": "64323925553208759389764561742052237825740635669373328415252521655346257840849"
+            },
+            "amount": "10000",
+            "tokenCollector": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88"
+          }
+        }
+      ]
+    },
+    {
+      "label": "payer reclaim after public deadline",
+      "hash": "0x27bbe66bbe52a9ea809aeaa0cca8b1b3dae233087aa0d9a72c64548c8b8d5834",
+      "explorer": "https://sepolia.basescan.org/tx/0x27bbe66bbe52a9ea809aeaa0cca8b1b3dae233087aa0d9a72c64548c8b8d5834",
+      "status": "success",
+      "blockNumber": "48367209",
+      "blockHash": "0x5f0a9927f1dd175ce5c72ac5bdfe93ec016e8a94238c406094e24d61830ad042",
+      "from": "0x90c92904cec7051dc5dd759bdf75863f7b19d529",
+      "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+      "gasUsed": "61540",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "90",
+      "transfers": [
+        {
+          "from": "0x2Df595535F99F87293Fb944B194157Fd50a1b629",
+          "to": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "value": "10000",
+          "usdc": "0.01"
+        }
+      ],
+      "events": [
+        {
+          "name": "PaymentReclaimed",
+          "args": {
+            "paymentInfoHash": "0x2346804eb1aa69fb910349e6307becad6cf9393fe800e2d94a9618f1f20ad55f",
+            "amount": "10000"
+          }
+        }
+      ],
+      "preconfirmationBlockHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "requests": [
+    {
+      "side": "resource",
+      "path": "/erc3009/deferred",
+      "signedRequest": false,
+      "status": 402,
+      "paymentRequired": {
+        "x402Version": 2,
+        "error": "Payment required",
+        "resource": {
+          "url": "http://127.0.0.1:52269/erc3009/deferred",
+          "description": "Base Sepolia auth-capture verification",
+          "mimeType": "application/json"
+        },
+        "accepts": [
+          {
+            "scheme": "auth-capture",
+            "network": "eip155:84532",
+            "amount": "10000",
+            "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+            "payTo": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+            "maxTimeoutSeconds": 60,
+            "extra": {
+              "captureAuthorizer": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "feeRecipient": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "name": "USDC",
+              "version": "2",
+              "operatorType": "delegated",
+              "paymentFlow": "escrow",
+              "assetTransferMethod": "eip3009",
+              "captureMode": "deferred",
+              "captureDeadline": 1792503480,
+              "refundDeadline": 1792505880,
+              "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+              "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "collect",
+      "flow": "escrow",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": true,
+        "transaction": "0xd470245a7eb676284d1b90aa713f9c0ce6f5b46d35067206beca148545315812",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "10000"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/erc3009/deferred",
+      "signedRequest": true,
+      "status": 200,
+      "settlement": {
+        "success": true,
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "transaction": "0xd470245a7eb676284d1b90aa713f9c0ce6f5b46d35067206beca148545315812",
+        "network": "eip155:84532",
+        "amount": "10000"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "capture",
+      "flow": "escrow",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": true,
+        "transaction": "0x35ccaced4b751ed4a930d9883860f1955ece4c910cf9dd0d1fe7857d3e1307b3",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "6000"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "void",
+      "flow": "escrow",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": true,
+        "transaction": "0xded3d2c3132606d17ab721e4143cb2e5e43a8ff074d6c32dd689316e38a806bd",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "0"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "refund",
+      "flow": "escrow",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": true,
+        "transaction": "0x96f3c7ef107198ca95635ba2ae8a88b141923ce3dfdbdc27e133b29d245c8047",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "2000"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "refund",
+      "flow": "escrow",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": true,
+        "transaction": "0xee43d9e882bea255c0becb078bbbf44dd8f2ba17587ae253bcb04a4441ef5c6c",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "4000"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/erc3009/charge",
+      "signedRequest": false,
+      "status": 402,
+      "paymentRequired": {
+        "x402Version": 2,
+        "error": "Payment required",
+        "resource": {
+          "url": "http://127.0.0.1:52269/erc3009/charge",
+          "description": "Base Sepolia auth-capture verification",
+          "mimeType": "application/json"
+        },
+        "accepts": [
+          {
+            "scheme": "auth-capture",
+            "network": "eip155:84532",
+            "amount": "10000",
+            "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+            "payTo": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+            "maxTimeoutSeconds": 60,
+            "extra": {
+              "captureAuthorizer": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "feeRecipient": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "name": "USDC",
+              "version": "2",
+              "operatorType": "delegated",
+              "paymentFlow": "authorization",
+              "assetTransferMethod": "eip3009",
+              "captureDeadline": 1792503480,
+              "refundDeadline": 1792505880,
+              "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+              "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "verify",
+      "type": "collect",
+      "flow": "authorization",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "isValid": true,
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "collect",
+      "flow": "authorization",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": true,
+        "transaction": "0x6675f9bfb19baabf0e8438a35726d939e22ab37f7fb806ac5fe74a6017fa29af",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "6000"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/erc3009/charge",
+      "signedRequest": true,
+      "status": 200,
+      "settlement": {
+        "success": true,
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "transaction": "0x6675f9bfb19baabf0e8438a35726d939e22ab37f7fb806ac5fe74a6017fa29af",
+        "network": "eip155:84532",
+        "amount": "6000"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "refund",
+      "flow": "authorization",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": true,
+        "transaction": "0x17f7b0724ac2b1dc77b8170b55c72ed97ed80cb4ffc31f4c072fb0cfc7b4b943",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "6000"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/permit2/deferred",
+      "signedRequest": false,
+      "status": 402,
+      "paymentRequired": {
+        "x402Version": 2,
+        "error": "Payment required",
+        "resource": {
+          "url": "http://127.0.0.1:52269/permit2/deferred",
+          "description": "Base Sepolia auth-capture verification",
+          "mimeType": "application/json"
+        },
+        "accepts": [
+          {
+            "scheme": "auth-capture",
+            "network": "eip155:84532",
+            "amount": "10000",
+            "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+            "payTo": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+            "maxTimeoutSeconds": 60,
+            "extra": {
+              "captureAuthorizer": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "feeRecipient": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "name": "USDC",
+              "version": "2",
+              "operatorType": "delegated",
+              "paymentFlow": "escrow",
+              "assetTransferMethod": "permit2",
+              "captureMode": "deferred",
+              "captureDeadline": 1792503540,
+              "refundDeadline": 1792505940,
+              "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+              "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "collect",
+      "flow": "escrow",
+      "assetTransferMethod": "permit2",
+      "result": {
+        "success": true,
+        "transaction": "0x7f67be17521b6fa32aa68cf0227c6987d8779a315fd4f0f03b79a699fccb7b49",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "10000"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/permit2/deferred",
+      "signedRequest": true,
+      "status": 200,
+      "settlement": {
+        "success": true,
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "transaction": "0x7f67be17521b6fa32aa68cf0227c6987d8779a315fd4f0f03b79a699fccb7b49",
+        "network": "eip155:84532",
+        "amount": "10000"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "capture",
+      "flow": "escrow",
+      "assetTransferMethod": "permit2",
+      "result": {
+        "success": true,
+        "transaction": "0x3223f61304d059b755532d02a9638c043b7b4a86fc1850334dbb8d9ada2db9c0",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "6000"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "void",
+      "flow": "escrow",
+      "assetTransferMethod": "permit2",
+      "result": {
+        "success": true,
+        "transaction": "0x4f7cf67fc7ef18a99e88694a8502cec0ad33ac3cbca056b11068e5ed4a7988b1",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "0"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "refund",
+      "flow": "escrow",
+      "assetTransferMethod": "permit2",
+      "result": {
+        "success": true,
+        "transaction": "0x8e1b1fff0a325e7699b43dcfc0a622bd4ca70295827bc8a5c31c997ba14da99a",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "2000"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "refund",
+      "flow": "escrow",
+      "assetTransferMethod": "permit2",
+      "result": {
+        "success": true,
+        "transaction": "0x5ec8c04239e1e48af11ed225d548236a8d2ecc397891a98b8975228d91e22138",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "4000"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/permit2/charge",
+      "signedRequest": false,
+      "status": 402,
+      "paymentRequired": {
+        "x402Version": 2,
+        "error": "Payment required",
+        "resource": {
+          "url": "http://127.0.0.1:52269/permit2/charge",
+          "description": "Base Sepolia auth-capture verification",
+          "mimeType": "application/json"
+        },
+        "accepts": [
+          {
+            "scheme": "auth-capture",
+            "network": "eip155:84532",
+            "amount": "10000",
+            "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+            "payTo": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+            "maxTimeoutSeconds": 60,
+            "extra": {
+              "captureAuthorizer": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "feeRecipient": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "name": "USDC",
+              "version": "2",
+              "operatorType": "delegated",
+              "paymentFlow": "authorization",
+              "assetTransferMethod": "permit2",
+              "captureDeadline": 1792503540,
+              "refundDeadline": 1792505940,
+              "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+              "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "verify",
+      "type": "collect",
+      "flow": "authorization",
+      "assetTransferMethod": "permit2",
+      "result": {
+        "isValid": true,
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "collect",
+      "flow": "authorization",
+      "assetTransferMethod": "permit2",
+      "result": {
+        "success": true,
+        "transaction": "0x3912fcacd6dfc033b74ec98f8535acf49c5c1ea3f8eed14191497ff913cdfe10",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "6000"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/permit2/charge",
+      "signedRequest": true,
+      "status": 200,
+      "settlement": {
+        "success": true,
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "transaction": "0x3912fcacd6dfc033b74ec98f8535acf49c5c1ea3f8eed14191497ff913cdfe10",
+        "network": "eip155:84532",
+        "amount": "6000"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "refund",
+      "flow": "authorization",
+      "assetTransferMethod": "permit2",
+      "result": {
+        "success": true,
+        "transaction": "0x6ef2c522cbccd83e8cd1d53e6b57c59e8782f3b8e47ba237c4e92bebda6d8b28",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "6000"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/erc3009/sync",
+      "signedRequest": false,
+      "status": 402,
+      "paymentRequired": {
+        "x402Version": 2,
+        "error": "Payment required",
+        "resource": {
+          "url": "http://127.0.0.1:52269/erc3009/sync",
+          "description": "Base Sepolia auth-capture verification",
+          "mimeType": "application/json"
+        },
+        "accepts": [
+          {
+            "scheme": "auth-capture",
+            "network": "eip155:84532",
+            "amount": "10000",
+            "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+            "payTo": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+            "maxTimeoutSeconds": 60,
+            "extra": {
+              "captureAuthorizer": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "feeRecipient": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "name": "USDC",
+              "version": "2",
+              "operatorType": "delegated",
+              "paymentFlow": "escrow",
+              "assetTransferMethod": "eip3009",
+              "captureMode": "sync",
+              "captureDeadline": 1792503540,
+              "refundDeadline": 1792505940,
+              "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+              "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "collect",
+      "flow": "escrow",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": true,
+        "transaction": "0x7927ffa56fb750ef954185c0e25be87e14dc6f1626173185d54586359042be36",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "10000"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "capture",
+      "flow": "escrow",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": true,
+        "transaction": "0xc273f2528025f7fa184d45350ba0d34396f3b8cf7c934a317532f25191e99b1c",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "6000"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/erc3009/sync",
+      "signedRequest": true,
+      "status": 200,
+      "settlement": {
+        "success": true,
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "transaction": "0xc273f2528025f7fa184d45350ba0d34396f3b8cf7c934a317532f25191e99b1c",
+        "network": "eip155:84532",
+        "amount": "6000"
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "refund",
+      "flow": "escrow",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": false,
+        "errorReason": "invalid_auth_capture_evm_unexpected_payment_state",
+        "transaction": "",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/erc3009/reclaim",
+      "signedRequest": false,
+      "status": 402,
+      "paymentRequired": {
+        "x402Version": 2,
+        "error": "Payment required",
+        "resource": {
+          "url": "http://127.0.0.1:52572/erc3009/reclaim",
+          "description": "Base Sepolia auth-capture verification",
+          "mimeType": "application/json"
+        },
+        "accepts": [
+          {
+            "scheme": "auth-capture",
+            "network": "eip155:84532",
+            "amount": "10000",
+            "asset": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+            "payTo": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+            "maxTimeoutSeconds": 60,
+            "extra": {
+              "captureAuthorizer": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+              "feeRecipient": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+              "minFeeBps": 100,
+              "maxFeeBps": 100,
+              "name": "USDC",
+              "version": "2",
+              "operatorType": "delegated",
+              "paymentFlow": "escrow",
+              "assetTransferMethod": "eip3009",
+              "captureMode": "deferred",
+              "captureDeadline": 1792502700,
+              "refundDeadline": 1792506120,
+              "receiverAuthorizer": "0x6A5654A6a137E0c127ecB5ef609e54Abb14E55B1",
+              "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "side": "facilitator",
+      "operation": "settle",
+      "type": "collect",
+      "flow": "escrow",
+      "assetTransferMethod": "eip3009",
+      "result": {
+        "success": true,
+        "transaction": "0xa08df1be8892d5360ae3e8e61a982a43cc2bab0973da97117dd7f0864cc40fae",
+        "network": "eip155:84532",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "amount": "10000"
+      }
+    },
+    {
+      "side": "resource",
+      "path": "/erc3009/reclaim",
+      "signedRequest": true,
+      "status": 200,
+      "settlement": {
+        "success": true,
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "transaction": "0xa08df1be8892d5360ae3e8e61a982a43cc2bab0973da97117dd7f0864cc40fae",
+        "network": "eip155:84532",
+        "amount": "10000"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "10000",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "label": "erc3009: payer cannot capture",
+      "method": "public RPC eth_call (no broadcast)",
+      "expectedError": "InvalidSender",
+      "observedError": "InvalidSender",
+      "stateUnchanged": true,
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "4000",
+        "refundable": "6000"
+      },
+      "passed": true
+    },
+    {
+      "label": "erc3009: excessive capture",
+      "method": "public RPC eth_call (no broadcast)",
+      "expectedError": "InsufficientAuthorization",
+      "observedError": "InsufficientAuthorization",
+      "stateUnchanged": true,
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "4000"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "label": "erc3009: over-refund",
+      "method": "public RPC eth_call (no broadcast)",
+      "expectedError": "RefundExceedsCapture",
+      "observedError": "RefundExceedsCapture",
+      "stateUnchanged": true,
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xbf764a56d0d04fbe2526875ade58b902e6acb8b10b043154ba4cd51555f8c58c",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000"
+      },
+      "passed": true
+    },
+    {
+      "label": "erc3009: charge has no void remainder",
+      "method": "public RPC eth_call (no broadcast)",
+      "expectedError": "ZeroAuthorization",
+      "observedError": "ZeroAuthorization",
+      "stateUnchanged": true,
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xbf764a56d0d04fbe2526875ade58b902e6acb8b10b043154ba4cd51555f8c58c",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "10000",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "label": "permit2: payer cannot capture",
+      "method": "public RPC eth_call (no broadcast)",
+      "expectedError": "InvalidSender",
+      "observedError": "InvalidSender",
+      "stateUnchanged": true,
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "4000",
+        "refundable": "6000"
+      },
+      "passed": true
+    },
+    {
+      "label": "permit2: excessive capture",
+      "method": "public RPC eth_call (no broadcast)",
+      "expectedError": "InsufficientAuthorization",
+      "observedError": "InsufficientAuthorization",
+      "stateUnchanged": true,
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "4000"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "label": "permit2: over-refund",
+      "method": "public RPC eth_call (no broadcast)",
+      "expectedError": "RefundExceedsCapture",
+      "observedError": "RefundExceedsCapture",
+      "stateUnchanged": true,
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x600de36db42ca2e2a41acb1e1f3282f2768c02ba7c2d00248d86b3773af38bf3",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000"
+      },
+      "passed": true
+    },
+    {
+      "label": "permit2: charge has no void remainder",
+      "method": "public RPC eth_call (no broadcast)",
+      "expectedError": "ZeroAuthorization",
+      "observedError": "ZeroAuthorization",
+      "stateUnchanged": true,
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x600de36db42ca2e2a41acb1e1f3282f2768c02ba7c2d00248d86b3773af38bf3",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xbf764a56d0d04fbe2526875ade58b902e6acb8b10b043154ba4cd51555f8c58c",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x600de36db42ca2e2a41acb1e1f3282f2768c02ba7c2d00248d86b3773af38bf3",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x2346804eb1aa69fb910349e6307becad6cf9393fe800e2d94a9618f1f20ad55f",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "10000",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "label": "payer reclaim before deadline",
+      "method": "public RPC eth_call (no broadcast)",
+      "expectedError": "BeforeAuthorizationExpiry",
+      "observedError": "BeforeAuthorizationExpiry",
+      "stateUnchanged": true,
+      "passed": true
+    },
+    {
+      "label": "operator cannot capture after deadline",
+      "method": "public RPC eth_call (no broadcast)",
+      "expectedError": "AfterAuthorizationExpiry",
+      "observedError": "AfterAuthorizationExpiry",
+      "stateUnchanged": true,
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x2346804eb1aa69fb910349e6307becad6cf9393fe800e2d94a9618f1f20ad55f",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xbf764a56d0d04fbe2526875ade58b902e6acb8b10b043154ba4cd51555f8c58c",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x600de36db42ca2e2a41acb1e1f3282f2768c02ba7c2d00248d86b3773af38bf3",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "paymentInfoHash": "0x2346804eb1aa69fb910349e6307becad6cf9393fe800e2d94a9618f1f20ad55f",
+      "expectedState": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0"
+      },
+      "passed": true
+    },
+    {
+      "label": "All six HTTP paths, six lifecycle events, split transfers and final token conservation",
+      "passed": true
+    }
+  ],
+  "payments": [
+    {
+      "path": "/erc3009/deferred",
+      "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+      "paymentInfo": {
+        "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000",
+        "preApprovalExpiry": 1792502352,
+        "authorizationExpiry": 1792503480,
+        "refundExpiry": 1792505880,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+        "salt": "0xa590f1333188ce1a16db94a15724d31820eec2fe505a1dfbb31bd7d8e453ee0c"
+      },
+      "saltNonce": "0x512e9520f501bf5873b37411fa37cc9b4210981d729e4393b0d1ee691104bd57",
+      "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+      "policy": "0x0000000000000000000000000000000000000000",
+      "network": "eip155:84532",
+      "capturableAmount": "10000",
+      "refundableAmount": "0",
+      "collectTransaction": "0xd470245a7eb676284d1b90aa713f9c0ce6f5b46d35067206beca148545315812",
+      "createdAt": 1792502300599,
+      "name": "USDC",
+      "version": "2",
+      "paymentFlow": "escrow",
+      "operatorType": "delegated",
+      "assetTransferMethod": "eip3009",
+      "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+    },
+    {
+      "path": "/erc3009/charge",
+      "paymentInfoHash": "0xbf764a56d0d04fbe2526875ade58b902e6acb8b10b043154ba4cd51555f8c58c",
+      "paymentInfo": {
+        "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000",
+        "preApprovalExpiry": 1792502390,
+        "authorizationExpiry": 1792503480,
+        "refundExpiry": 1792505880,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+        "salt": "0xaed920600a5cdeca98c20595fed963859022517fa5c46300ba6bb1de6d4e9ac8"
+      },
+      "saltNonce": "0xa67ab3a86840553ccb776a3080654a17ec773ffa19917e4e5d23f1a6f00b9296",
+      "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+      "policy": "0x0000000000000000000000000000000000000000",
+      "network": "eip155:84532",
+      "capturableAmount": "0",
+      "refundableAmount": "6000",
+      "collectTransaction": "0x6675f9bfb19baabf0e8438a35726d939e22ab37f7fb806ac5fe74a6017fa29af",
+      "createdAt": 1792502338530,
+      "name": "USDC",
+      "version": "2",
+      "paymentFlow": "authorization",
+      "operatorType": "delegated",
+      "assetTransferMethod": "eip3009",
+      "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+    },
+    {
+      "path": "/permit2/deferred",
+      "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+      "paymentInfo": {
+        "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000",
+        "preApprovalExpiry": 1792502405,
+        "authorizationExpiry": 1792503540,
+        "refundExpiry": 1792505940,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+        "salt": "0xd3c74ca5192894822832ae24955d33e2a973c34aa88adba1ea5ed6fe9dbfefcd"
+      },
+      "saltNonce": "0xa30206f42c40fe211c280da4ac50721388349c14d44832df762be876859c5628",
+      "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+      "policy": "0x0000000000000000000000000000000000000000",
+      "network": "eip155:84532",
+      "capturableAmount": "10000",
+      "refundableAmount": "0",
+      "collectTransaction": "0x7f67be17521b6fa32aa68cf0227c6987d8779a315fd4f0f03b79a699fccb7b49",
+      "createdAt": 1792502352512,
+      "name": "USDC",
+      "version": "2",
+      "paymentFlow": "escrow",
+      "operatorType": "delegated",
+      "assetTransferMethod": "permit2",
+      "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+    },
+    {
+      "path": "/permit2/charge",
+      "paymentInfoHash": "0x600de36db42ca2e2a41acb1e1f3282f2768c02ba7c2d00248d86b3773af38bf3",
+      "paymentInfo": {
+        "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000",
+        "preApprovalExpiry": 1792502440,
+        "authorizationExpiry": 1792503540,
+        "refundExpiry": 1792505940,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+        "salt": "0x0d51130a182b14cb4051d48db84954a531cd173c4757f07d1f22ae8dc95cea0d"
+      },
+      "saltNonce": "0x78fe4359fdfb51bb0dba988bf74dda583cbbfa4c6446960332dd389b1fd2f197",
+      "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+      "policy": "0x0000000000000000000000000000000000000000",
+      "network": "eip155:84532",
+      "capturableAmount": "0",
+      "refundableAmount": "6000",
+      "collectTransaction": "0x3912fcacd6dfc033b74ec98f8535acf49c5c1ea3f8eed14191497ff913cdfe10",
+      "createdAt": 1792502388454,
+      "name": "USDC",
+      "version": "2",
+      "paymentFlow": "authorization",
+      "operatorType": "delegated",
+      "assetTransferMethod": "permit2",
+      "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+    },
+    {
+      "path": "/erc3009/sync",
+      "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+      "paymentInfo": {
+        "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000",
+        "preApprovalExpiry": 1792502455,
+        "authorizationExpiry": 1792503540,
+        "refundExpiry": 1792505940,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+        "salt": "0x550a748f52784a7a0129ad9c912917b658ccee5ef014fe92fbe3ab6d3296acae"
+      },
+      "saltNonce": "0x11f401135d741be4f50f4bb233ecfaffed0f675abbaf5806e8524cc99548ca4b",
+      "receiverAuthorizer": "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+      "policy": "0x0000000000000000000000000000000000000000",
+      "network": "eip155:84532",
+      "capturableAmount": "10000",
+      "refundableAmount": "0",
+      "collectTransaction": "0x7927ffa56fb750ef954185c0e25be87e14dc6f1626173185d54586359042be36",
+      "createdAt": 1792502401310,
+      "name": "USDC",
+      "version": "2",
+      "paymentFlow": "escrow",
+      "operatorType": "delegated",
+      "assetTransferMethod": "eip3009",
+      "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+    },
+    {
+      "path": "/erc3009/reclaim",
+      "paymentInfoHash": "0x2346804eb1aa69fb910349e6307becad6cf9393fe800e2d94a9618f1f20ad55f",
+      "paymentInfo": {
+        "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+        "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+        "receiver": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000",
+        "preApprovalExpiry": 1792502602,
+        "authorizationExpiry": 1792502700,
+        "refundExpiry": 1792506120,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+        "salt": "0x8e360d3afbb4201c8387c60733cc95b7ad8614cf9e3757b31e0bf04e44b1cad1"
+      },
+      "saltNonce": "0x819882ac19837b70ddfa3107c3f444f0f0cfc8ce8c161b7fb2b5931af9575c74",
+      "receiverAuthorizer": "0x6A5654A6a137E0c127ecB5ef609e54Abb14E55B1",
+      "policy": "0x0000000000000000000000000000000000000000",
+      "network": "eip155:84532",
+      "capturableAmount": "10000",
+      "refundableAmount": "0",
+      "collectTransaction": "0xa08df1be8892d5360ae3e8e61a982a43cc2bab0973da97117dd7f0864cc40fae",
+      "createdAt": 1792502550288,
+      "name": "USDC",
+      "version": "2",
+      "paymentFlow": "escrow",
+      "operatorType": "delegated",
+      "assetTransferMethod": "eip3009",
+      "authCaptureEscrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c"
+    }
+  ],
+  "complete": true,
+  "initialBalances": {
+    "payer": "19948992",
+    "operator": "51000",
+    "merchant": "18",
+    "fee": "0",
+    "tokenStore": "0",
+    "erc3009": "0",
+    "permit2Collector": "0"
+  },
+  "initialEth": {
+    "payer": "9899262899973504",
+    "operator": "100000000000000"
+  },
+  "baselineBalances": {
+    "payer": "19948992",
+    "operator": "51000",
+    "merchant": "18",
+    "fee": "0",
+    "tokenStore": "0",
+    "erc3009": "0",
+    "permit2Collector": "0"
+  },
+  "issues": [
+    {
+      "id": "sync-storage-after-settle",
+      "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+      "sdkCommit": "faa1c694c66a3732aaabbce93bdae140e521a67d",
+      "observedError": "invalid_auth_capture_evm_unexpected_payment_state",
+      "stored": {
+        "capturableAmount": "10000",
+        "refundableAmount": "0"
+      },
+      "onchain": {
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000"
+      },
+      "cause": "core sends the enriched settlePayload to facilitator but passes the original context.paymentPayload to afterSettle; the auth-capture hook therefore does not see type=capture and does not update stored balances.",
+      "recovery": "Operator calls canonical Escrow.refund directly after checking the public chain state. This bypasses the stale SDK storage, not the contract permissions.",
+      "recoveryTransaction": "0x58eab556af86cf365a12fc28d18afce3c4a09b942908c9ee57abc55bf228ca81"
+    }
+  ],
+  "receiverAuthorizers": [
+    "0xb7284E7Cbba5c9d9f3ef70f7eA6DFcc0fFa89A77",
+    "0x6A5654A6a137E0c127ecB5ef609e54Abb14E55B1",
+    "0xb5EB6A79f1503a0B666a9fA7c5468540a48b0e63"
+  ],
+  "finalBalances": {
+    "payer": "19948992",
+    "operator": "21000",
+    "merchant": "29718",
+    "fee": "300",
+    "tokenStore": "0",
+    "erc3009": "0",
+    "permit2Collector": "0"
+  },
+  "balanceDeltas": {
+    "payer": "0",
+    "operator": "-30000",
+    "merchant": "29700",
+    "fee": "300",
+    "tokenStore": "0",
+    "erc3009": "0",
+    "permit2Collector": "0"
+  },
+  "finalEth": {
+    "payer": "9898360823973114",
+    "operator": "86749905994954"
+  },
+  "sdkEndToEndWithoutWorkarounds": false,
+  "finishedAt": "2026-10-20T13:25:35.074Z"
+}

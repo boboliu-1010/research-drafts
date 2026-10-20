@@ -109,24 +109,26 @@ escrow 的 captureMode="sync" 默认在请求结束阶段扣款，"deferred" 则
 
 ## 9 实际验证和演示
 
-验证日期：2026 年 10 月 20 日。Base Sepolia 取区块 **48,366,193**，合约使用官方 v1.1 部署；本地演示直接 fork 这个区块，没有替换支付合约代码。
+2026 年 10 月 20 日，用本地已有的测试钱包，在 **Base Sepolia 官方 v1.1 合约**上完成了 20 笔生命周期交易。付款人与 operator 分开，用 0.01 USDC 授权、0.006 USDC 扣款，费用为 1%。
 
-| 验证 | 实际结果 |
+| 验证 | 结果 |
 | --- | --- |
-| Base Sepolia 部署 | Escrow、三个 Collector、TokenStore 模板均存在代码，Collector 和模板绑定的 Escrow 正确；同时核实了测试 USDC |
-| 源码和字节码 | 五个支付合约重新编译，归一化构造时写入的 immutable 后，执行代码一致；Collector 的末尾编译元数据另有差异，原始哈希已保留 |
-| 官方合约测试 | Foundry v1.3.6、Solidity 0.8.28：112 项通过，0 项失败；其中 94 项 fuzz 测试共执行 24,064 轮，排除了上游 Base 主网 fork 集成测试 |
-| 本地 fork 演示 | authorize、capture、charge、void、refund、reclaim 六种操作，9 笔生命周期交易成功，15 项拒绝 / 回滚检查通过 |
+| 部署和源码 | Escrow、三个 Collector、TokenStore 模板均有代码，绑定关系正确；重新编译后执行字节码匹配，Collector 编译元数据差异单独保留 |
+| 官方 Solidity 测试 | 112 项通过；Foundry v1.3.6、Solidity 0.8.28，其中 94 项 fuzz 测试共 24,064 轮；不含上游 Base 主网 fork 集成测试 |
+| 官方 SDK 单测 | 15 个文件、472 项通过，0 失败、0 跳过 |
+| 公开测试网 | ERC-3009 / Permit2 的 authorize、capture、void、charge、refund 均实际执行；payer 等公共链期限到达后发出 reclaim |
+| HTTP 支付 | 六条业务路由均走过 402 → 客户端签名 → 重试 → 200；sync 后的退款发现一个 SDK 账本问题，见下文 |
+| 本地故障验证 | 固定区块 fork 上另跑 9 笔生命周期交易、15 项拒绝与回滚检查 |
 
-演示给 payer 100、operator 20 测试 USDC 作为初始余额。
+![Base Sepolia 公开验证的两条收款路径](../assets/auth-capture/14-public-validation.svg)
 
-![本地 fork 实测的余额变化](../assets/auth-capture/13-validation-results.svg)
+**分账可以直接看[这笔 capture 回执](https://sepolia.basescan.org/tx/0x35ccaced4b751ed4a930d9883860f1955ece4c910cf9dd0d1fe7857d3e1307b3)**：TokenStore 同时转出 0.00006 USDC 给费用方、0.00594 USDC 给商家。[refund 回执](https://sepolia.basescan.org/tx/0x96f3c7ef107198ca95635ba2ae8a88b141923ce3dfdbdc27e133b29d245c8047)则从 operator 新收退款，商家和费用方保留原到账金额。两种 Collector 的 deferred 和 charge 路径，收款与退款均经过官方 SDK。
 
-演示里先锁 10，再扣 6：费用方收到 0.06，商家收到 5.94，剩余 4 经 void 退回。之后 refund 2，钱从 operator 新收，商家和费用方余额不变。另一笔订单直接 charge 6，实际 Transfer 记录是收 10、退 4、存入 6、再分账。第三笔订单等到授权截止，由 payer reclaim。
+**实测也发现了问题：sync 收款成功后，SDK 的本地账本仍停在授权状态。** 链上已经扣款并释放余款，本地却显示“可扣 0.01、可退 0”，后续 refund helper 因状态不符而拒绝。这笔退款最后由 operator 直接调用 Escrow 完成，不能算 SDK 退款通过。[原因与复现](auth-capture-official-code-walkthrough.md#124-公开测试网与-http-支付)
 
-回滚测试中，把商家加入测试 USDC 黑名单，第二次转账失败，前面的手续费、订单余额和 TokenStore clone 部署一起回滚。权限错误、篡改收款人、重复收款、费用越界、退款缺少 allowance、过早 reclaim 等也都验证了。
+本地 fork 还验证了商家转账失败时，手续费、订单余额和 TokenStore 部署一起回滚。公开测试网没有修改 USDC 管理权限。Foundry v1.8.5 的一个 Permit2/ERC-6492 用例失败，官方 CI 固定的 v1.3.6 全部通过。
 
-本地交易没有广播到公共测试网，测试资金通过 fork 的管理接口准备。演示走 EOA + ERC-3009 和标准退款 Collector，未跑 x402 HTTP 端到端流程或 Permit2 的测试网收款。Foundry v1.8.5 下还有一个 Permit2/ERC-6492 用例失败，复现时需按官方 CI 固定 v1.3.6。[运行命令和部署地址](auth-capture-official-code-walkthrough.md#12-运行验证与演示) · [原始结果](../demos/auth-capture/results/demo.json) · [演示页面源码](../demos/auth-capture/report.html)
+[运行命令和公开交易](auth-capture-official-code-walkthrough.md#12-运行验证与演示) · [公开链原始记录](../demos/auth-capture/results/public-demo.json) · [两家 RPC 复核](../demos/auth-capture/results/public-audit.json) · [演示页面源码](../demos/auth-capture/report.html)
 
 ## 10 源码版本
 
@@ -135,7 +137,7 @@ escrow 的 captureMode="sync" 默认在请求结束阶段扣款，"deferred" 则
 | [x402-foundation/x402](https://github.com/x402-foundation/x402/tree/faa1c694c66a3732aaabbce93bdae140e521a67d) | faa1c694c66a3732aaabbce93bdae140e521a67d，2026-10-15 UTC | TypeScript SDK、规范、示例与测试源码 |
 | [base/commerce-payments](https://github.com/base/commerce-payments/tree/b748fdd7a830a655a19a530edcf2a94b9dc7d25f) | b748fdd7a830a655a19a530edcf2a94b9dc7d25f，2026-09-03 UTC | Commerce Payments v1.1 合约与测试源码 |
 
-合约测试和本地 fork 结果见上一节。SDK 单元测试与 HTTP 端到端流程尚未执行；TRON 尚未完成编译、合约测试或部署验证，生产退款交易及用量也未核实。函数链接指向上述源码提交，main 中的功能不一定已发布到 npm。
+EVM 合约、SDK 与公开测试网结果见上一节。公开链演示使用 EOA 和商家自行签署操作授权；TRON 尚未完成编译、测试或部署验证，生产退款用量也未核实。函数链接指向上述源码提交，main 中的功能不一定已发布到 npm。
 
 EVM 部分以 v1.1 的 feeAmount 为准，v1.0 使用 feeBps。切换版本时，部署地址、Collector、ABI 和操作签名都要配套，不能只改参数名称。
 

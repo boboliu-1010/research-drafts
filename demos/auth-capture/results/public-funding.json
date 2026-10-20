@@ -1,0 +1,53 @@
+{
+  "chainId": 84532,
+  "generatedAt": "2026-10-20T13:17:12.701Z",
+  "actors": {
+    "payer": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+    "operator": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+    "merchant": "0x6d361463Ad6Df90bC34aF65f4970d3271aa83535",
+    "fee": "0x0f2AA81140BAC3E9A4a7f6212c1B4eC005ea4C14",
+    "receiverAuthorizer": "0x9d7104553E266e3dA7E12Cc65c6a8ea7769e689B"
+  },
+  "transactions": [
+    {
+      "label": "fund operator 0.0001 test ETH",
+      "hash": "0xc426475035395726943f024b0a5852e580bbaed832497efe4892fccc5c9c246c",
+      "explorer": "https://sepolia.basescan.org/tx/0xc426475035395726943f024b0a5852e580bbaed832497efe4892fccc5c9c246c",
+      "status": "success",
+      "blockNumber": "48366975",
+      "blockHash": "0xee83b25929a984054858aa5c29ae18ca6d12a81329acb2f39550878f87ad2d6d",
+      "from": "0x90c92904cec7051dc5dd759bdf75863f7b19d529",
+      "to": "0x48a5e6ed4a7b3213a803615c0af15f811abdf48f",
+      "gasUsed": "21000",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "127",
+      "transfers": [],
+      "events": [],
+      "preconfirmationBlockHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "label": "fund operator 0.05 test USDC for refunds",
+      "hash": "0xdbd337bf56c407cc56cd2a86ad66a3c2ef2b84dc13759fa640a3ecd0b55cff1d",
+      "explorer": "https://sepolia.basescan.org/tx/0xdbd337bf56c407cc56cd2a86ad66a3c2ef2b84dc13759fa640a3ecd0b55cff1d",
+      "status": "success",
+      "blockNumber": "48366978",
+      "blockHash": "0x4da0e5a3ce5118f114cd2bda2f7ce46a82bddd85a27ceb7d21e3818d3735077b",
+      "from": "0x90c92904cec7051dc5dd759bdf75863f7b19d529",
+      "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+      "gasUsed": "45047",
+      "effectiveGasPrice": "6000000",
+      "l1Fee": "9742",
+      "transfers": [
+        {
+          "from": "0x90c92904cec7051dc5Dd759bDF75863F7b19D529",
+          "to": "0x48A5e6ED4A7B3213a803615C0af15f811ABdF48F",
+          "value": "50000",
+          "usdc": "0.05"
+        }
+      ],
+      "events": [],
+      "preconfirmationBlockHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "note": "Operator funded by the test payer before the public lifecycle demonstration."
+}

@@ -8,7 +8,11 @@
     "report": "node render-report.mjs",
     "verify:source": "node verify-source.mjs",
     "test:official": "bash run-official-tests.sh",
-    "test:summary": "node summarize-tests.mjs"
+    "test:summary": "node summarize-tests.mjs",
+    "demo:public": "node public-demo.mjs",
+    "test:sdk": "bash run-sdk-tests.sh",
+    "verify:public": "node verify-public-results.mjs",
+    "repro:sdk-sync": "node sdk-sync-regression.mjs"
   },
   "dependencies": {
     "solc": "0.8.28",

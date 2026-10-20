@@ -1,0 +1,261 @@
+{
+  "generatedAt": "2026-10-20T13:29:47.924Z",
+  "chainId": 84532,
+  "blockNumber": "48367349",
+  "blockHash": "0x5eb0aa2fe1fb7225bb5a1d91e6ea86db0dddfdf2759f604c5001f9f8c53f0e1b",
+  "rpcProviders": [
+    "sepolia.base.org",
+    "base-sepolia-rpc.publicnode.com"
+  ],
+  "lifecycleReceipts": [
+    {
+      "hash": "0xd470245a7eb676284d1b90aa713f9c0ce6f5b46d35067206beca148545315812",
+      "functionName": "authorize",
+      "bothRpcStatus": "success",
+      "blockHash": "0x16fcfc063cbf108f0a625a394ccf33f60a5c7d0a9da16282c69716623c0016c4",
+      "transferCount": 2
+    },
+    {
+      "hash": "0x35ccaced4b751ed4a930d9883860f1955ece4c910cf9dd0d1fe7857d3e1307b3",
+      "functionName": "capture",
+      "bothRpcStatus": "success",
+      "blockHash": "0x3339303f597abd4ebbc22948dec27acbe35335129619ccb05b20860b6d320f7e",
+      "transferCount": 2
+    },
+    {
+      "hash": "0xded3d2c3132606d17ab721e4143cb2e5e43a8ff074d6c32dd689316e38a806bd",
+      "functionName": "void",
+      "bothRpcStatus": "success",
+      "blockHash": "0xf150d70f9d7de4626c8056029b27e47b357ef2ae1b2bb6df8c1aac67ab38d0d9",
+      "transferCount": 1
+    },
+    {
+      "hash": "0x96f3c7ef107198ca95635ba2ae8a88b141923ce3dfdbdc27e133b29d245c8047",
+      "functionName": "refund",
+      "bothRpcStatus": "success",
+      "blockHash": "0x9f7cf2d1c542c0a69be38f3ac204a6a253deaec90c94c3dbe57aa1f36231c1ae",
+      "transferCount": 2
+    },
+    {
+      "hash": "0xee43d9e882bea255c0becb078bbbf44dd8f2ba17587ae253bcb04a4441ef5c6c",
+      "functionName": "refund",
+      "bothRpcStatus": "success",
+      "blockHash": "0x00c5013b7de0a0fd38de50e792252ee6096ad69781269c2f64671b7ef146229a",
+      "transferCount": 2
+    },
+    {
+      "hash": "0x6675f9bfb19baabf0e8438a35726d939e22ab37f7fb806ac5fe74a6017fa29af",
+      "functionName": "charge",
+      "bothRpcStatus": "success",
+      "blockHash": "0x06189c09442d0731ca595a27474bdc7c9dc1eac6ce6b365176bd44748335d99e",
+      "transferCount": 5
+    },
+    {
+      "hash": "0x17f7b0724ac2b1dc77b8170b55c72ed97ed80cb4ffc31f4c072fb0cfc7b4b943",
+      "functionName": "refund",
+      "bothRpcStatus": "success",
+      "blockHash": "0xefc0117d3d041a03d86c34c9480ae2ab6aeb97193dd774ea00b01e5704ec4647",
+      "transferCount": 2
+    },
+    {
+      "hash": "0x7f67be17521b6fa32aa68cf0227c6987d8779a315fd4f0f03b79a699fccb7b49",
+      "functionName": "authorize",
+      "bothRpcStatus": "success",
+      "blockHash": "0x9f60d992e557caa42c5a3c58d513539b88820820d2f0e4c378c333adb3a684d3",
+      "transferCount": 1
+    },
+    {
+      "hash": "0x3223f61304d059b755532d02a9638c043b7b4a86fc1850334dbb8d9ada2db9c0",
+      "functionName": "capture",
+      "bothRpcStatus": "success",
+      "blockHash": "0x5c48330336bdb61577b12d9f007267a775add67775f309371174d95a2dfe15ec",
+      "transferCount": 2
+    },
+    {
+      "hash": "0x4f7cf67fc7ef18a99e88694a8502cec0ad33ac3cbca056b11068e5ed4a7988b1",
+      "functionName": "void",
+      "bothRpcStatus": "success",
+      "blockHash": "0xd3c3d8fdc1ae132e5cf34bee029affc9eedf02db6eb034c4f75bbc30a6faa269",
+      "transferCount": 1
+    },
+    {
+      "hash": "0x8e1b1fff0a325e7699b43dcfc0a622bd4ca70295827bc8a5c31c997ba14da99a",
+      "functionName": "refund",
+      "bothRpcStatus": "success",
+      "blockHash": "0x6c751673276bd98279be59118bff342be0559f299f032f00c87cb615e3ca226a",
+      "transferCount": 2
+    },
+    {
+      "hash": "0x5ec8c04239e1e48af11ed225d548236a8d2ecc397891a98b8975228d91e22138",
+      "functionName": "refund",
+      "bothRpcStatus": "success",
+      "blockHash": "0xd1c1d868c9134b447d399f11dec1abd9627daa6c31be0f9bb8e4b463b7fb9f1d",
+      "transferCount": 2
+    },
+    {
+      "hash": "0x3912fcacd6dfc033b74ec98f8535acf49c5c1ea3f8eed14191497ff913cdfe10",
+      "functionName": "charge",
+      "bothRpcStatus": "success",
+      "blockHash": "0xf63dd1bab12744dd91dd2ecd454e0bb67815d4ad51c1e0dfb25e9d4f157a52e1",
+      "transferCount": 3
+    },
+    {
+      "hash": "0x6ef2c522cbccd83e8cd1d53e6b57c59e8782f3b8e47ba237c4e92bebda6d8b28",
+      "functionName": "refund",
+      "bothRpcStatus": "success",
+      "blockHash": "0x46791c3a0daa63eb7becaac34bb1207b071e5655c76ee09218d579c999bb74b2",
+      "transferCount": 2
+    },
+    {
+      "hash": "0x7927ffa56fb750ef954185c0e25be87e14dc6f1626173185d54586359042be36",
+      "functionName": "authorize",
+      "bothRpcStatus": "success",
+      "blockHash": "0x488c0d4eb612822a1fc9233d5fbdbee85df9a40c654f1aad382a420ab0884b31",
+      "transferCount": 2
+    },
+    {
+      "hash": "0xc273f2528025f7fa184d45350ba0d34396f3b8cf7c934a317532f25191e99b1c",
+      "functionName": "capture",
+      "bothRpcStatus": "success",
+      "blockHash": "0xce8f43e80dfc87e478be302797736723fc1c24bd50306be4a515599f8ebc9431",
+      "transferCount": 2
+    },
+    {
+      "hash": "0xd03eb7626f357352d07468424dcf2c2767b099d26d602e92829473821221dd30",
+      "functionName": "void",
+      "bothRpcStatus": "success",
+      "blockHash": "0x655a3378c60f4d9194ea65cf868e0c27c64e59a47e268d8a2006bd0d285bd340",
+      "transferCount": 1
+    },
+    {
+      "hash": "0x58eab556af86cf365a12fc28d18afce3c4a09b942908c9ee57abc55bf228ca81",
+      "functionName": "refund",
+      "bothRpcStatus": "success",
+      "blockHash": "0x900ca557582b452c17e952e39a3605925726d2a7d11127c7f4f7691ea251980f",
+      "transferCount": 2
+    },
+    {
+      "hash": "0xa08df1be8892d5360ae3e8e61a982a43cc2bab0973da97117dd7f0864cc40fae",
+      "functionName": "authorize",
+      "bothRpcStatus": "success",
+      "blockHash": "0xc11bb55731e45d2bee84c549211abb20c7dcad37c66cfa9da51e8df928930df3",
+      "transferCount": 2
+    },
+    {
+      "hash": "0x27bbe66bbe52a9ea809aeaa0cca8b1b3dae233087aa0d9a72c64548c8b8d5834",
+      "functionName": "reclaim",
+      "bothRpcStatus": "success",
+      "blockHash": "0x5f0a9927f1dd175ce5c72ac5bdfe93ec016e8a94238c406094e24d61830ad042",
+      "transferCount": 1
+    }
+  ],
+  "setupReceipts": [
+    {
+      "hash": "0xc426475035395726943f024b0a5852e580bbaed832497efe4892fccc5c9c246c",
+      "label": "fund operator 0.0001 test ETH",
+      "bothRpcStatus": "success",
+      "blockHash": "0xee83b25929a984054858aa5c29ae18ca6d12a81329acb2f39550878f87ad2d6d"
+    },
+    {
+      "hash": "0xdbd337bf56c407cc56cd2a86ad66a3c2ef2b84dc13759fa640a3ecd0b55cff1d",
+      "label": "fund operator 0.05 test USDC for refunds",
+      "bothRpcStatus": "success",
+      "blockHash": "0x4da0e5a3ce5118f114cd2bda2f7ce46a82bddd85a27ceb7d21e3818d3735077b"
+    },
+    {
+      "hash": "0x5b0278ea912b4c08c0f8df3430707fe5537d8f111c3230b6fd42d25b9f6369d0",
+      "label": "approve refund collector 0.05 USDC",
+      "bothRpcStatus": "success",
+      "blockHash": "0x0ef8ef63cdf48611bb5ca12371dd081a5c2d8069828455d34985fe2203755268"
+    },
+    {
+      "hash": "0x7f255bf663f1a621ff33fc52d2e2b8485fe9daa34fc32433a3326dcb4f344f21",
+      "label": "approve Permit2 0.02 USDC",
+      "bothRpcStatus": "success",
+      "blockHash": "0x56d4531d5a000df2323f8329a6b785f1a1c1c987dbd345b8c933b31ebe877e7e"
+    },
+    {
+      "hash": "0x0b8fb71d7f3d3823445e60330364c7aa64b4f8d0a52e084042bdfb3595459c1f",
+      "label": "revoke Permit2 allowance",
+      "bothRpcStatus": "success",
+      "blockHash": "0x865822932bbb07436f1df49a263505d942ab38bb172c8160f2911736a8a9bd67"
+    },
+    {
+      "hash": "0x89064b52584ad398e6552c16520de6a52a6cc84de6d878ec99613b6f723b6421",
+      "label": "revoke refund allowance",
+      "bothRpcStatus": "success",
+      "blockHash": "0xf40ca8deb67abb44341f1bddd95a24bf9453dbd67d743612fee04048f368645b"
+    }
+  ],
+  "payments": [
+    {
+      "path": "/erc3009/deferred",
+      "paymentInfoHash": "0xc30c0234c3efc6fd01f7c67cac00ef0ea341f6b4fb2a2e32782124a9b83bc38a",
+      "finalState": [
+        true,
+        "0",
+        "0"
+      ]
+    },
+    {
+      "path": "/erc3009/charge",
+      "paymentInfoHash": "0xbf764a56d0d04fbe2526875ade58b902e6acb8b10b043154ba4cd51555f8c58c",
+      "finalState": [
+        true,
+        "0",
+        "0"
+      ]
+    },
+    {
+      "path": "/permit2/deferred",
+      "paymentInfoHash": "0x9729df01e084cfdb3bd461b70c111f81eddafb748a2ef4c6a6d27494ac87b22a",
+      "finalState": [
+        true,
+        "0",
+        "0"
+      ]
+    },
+    {
+      "path": "/permit2/charge",
+      "paymentInfoHash": "0x600de36db42ca2e2a41acb1e1f3282f2768c02ba7c2d00248d86b3773af38bf3",
+      "finalState": [
+        true,
+        "0",
+        "0"
+      ]
+    },
+    {
+      "path": "/erc3009/sync",
+      "paymentInfoHash": "0xebf6248dfe2b9e29821874fdbb7de7a96261b09844524f3f51edb9f0f12ec08d",
+      "finalState": [
+        true,
+        "0",
+        "0"
+      ]
+    },
+    {
+      "path": "/erc3009/reclaim",
+      "paymentInfoHash": "0x2346804eb1aa69fb910349e6307becad6cf9393fe800e2d94a9618f1f20ad55f",
+      "finalState": [
+        true,
+        "0",
+        "0"
+      ]
+    }
+  ],
+  "balanceDeltasFromTransferLogs": {
+    "payer": "0",
+    "operator": "-30000",
+    "merchant": "29700",
+    "fee": "300",
+    "tokenStore": "0",
+    "erc3009": "0",
+    "permit2Collector": "0"
+  },
+  "success": true,
+  "allowancesRevoked": true,
+  "escrowAndCollectorBalancesZero": true,
+  "knownSdkIssues": [
+    "sync-storage-after-settle"
+  ]
+}

@@ -381,6 +381,8 @@ TokenStore 先检查 msg.sender==authCaptureEscrow，再调用 SafeERC20.safeTra
 
 更换工具链也做了对照：Foundry v1.8.5 下 111 项通过、1 项失败。失败项是 Permit2PaymentCollectorTest.test_collectTokens_succeeds_withERC6492Signature，trace 显示钱包 CREATE2 出现 CreateCollision，准备调用返回失败，Permit2 随后报 InvalidSignatureLength。Solidity 0.8.37 自动选择和显式 0.8.28 均复现；同一源码在官方 CI 工具链通过。这里只记录兼容性差异，没有修改上游合约。[对照记录](../demos/auth-capture/results/toolchain-comparison.json)
 
+公开 Base Sepolia 又完成了 20 笔生命周期交易，涵盖两种付款 Collector 和六个核心函数。SDK 的 472 项单测通过；HTTP 实测另发现 sync 后的本地账本更新遗漏，该笔退款由 operator 直接调用完成。
+
 本地 fork 还跑了 9 笔生命周期交易和 15 项拒绝 / 回滚检查，包含商家转账失败后手续费与记账一并回滚。[实测流程](auth-capture-contract-analysis.md#9-实际验证和演示) · [复现命令](auth-capture-official-code-walkthrough.md#12-运行验证与演示)
 
 [SDK 与接口](auth-capture-official-code-walkthrough.md) · [TRON 适配范围](auth-capture-official-code-walkthrough.md#11-tron-适配) · [返回分享主稿](auth-capture-contract-analysis.md)
