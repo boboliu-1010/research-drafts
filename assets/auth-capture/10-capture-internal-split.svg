@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1330" viewBox="0 0 1440 1330" role="img" aria-labelledby="title desc">
+<title id="title">capture 内部分账：一笔交易、两次代币转账</title>
+<desc id="desc">已托管 10 USDC，operator 调用 capture 总额 6、费用 0.06。Escrow 检查订单并先更新账本，再依次指令 TokenStore 调 USDC transfer，先向费用方转 0.06，再向商家转 5.94。全部发生在同一笔交易中；任何转账失败，全部资金移动、账本及事件回滚，失败交易仍消耗 gas。成功后本订单托管余额为 4，可退额度为 6，剩余款不自动退回。</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#657992" stroke-width="1.8"/></marker></defs>
+<style>text{font-family:'PingFang SC','Microsoft YaHei',Arial,sans-serif} .title{font-size:27px;font-weight:600;fill:#14283f} .body{font-size:23px;fill:#33465e} .small{font-size:20px;fill:#5d7087}</style>
+<rect width="1440" height="1330" fill="#f5f7fb"/>
+<rect width="1440" height="140" fill="#14283f"/>
+<text x="60" y="62" font-size="36" font-weight="650" fill="white">capture 内部分账：一笔交易，两次转账</text>
+<text x="60" y="110" font-size="23" fill="#c4d3e5">已托管 10 USDC，本次结算 6；约定手续费 1% → 费用方 0.06 + 商家 5.94</text>
+
+<rect x="60" y="174" width="380" height="128" rx="16" fill="#eaf0fd" stroke="#d4dff1"/>
+<text x="84" y="215" class="title" style="fill:#315fcd">Operator 发起交易</text>
+<text x="84" y="254" class="body">默认由 facilitator 执行</text>
+<text x="84" y="284" class="small">gas 由发送账户或代付方承担</text>
+<path d="M451 237 H500" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<rect x="520" y="174" width="860" height="128" rx="16" fill="white" stroke="#d4dff1"/>
+<text x="544" y="215" class="title">调用 AuthCaptureEscrow.capture(...)</text>
+<text x="544" y="254" class="body">amount = 6,000,000  |  feeAmount = 60,000</text>
+<text x="544" y="284" class="small">USDC 为 6 位小数；amount 是包含手续费的总额</text>
+<rect x="60" y="332" width="1320" height="568" rx="16" fill="#edf3fb" stroke="#b9cbe3"/>
+<text x="84" y="374" class="title" style="fill:#315fcd">以下全部在同一笔 capture 交易内执行</text>
+<rect x="84" y="394" width="1272" height="87" rx="16" fill="white" stroke="#d4dff1"/>
+<text x="105" y="429" class="body">先校验 operator、费率范围、期限和本订单余额，再更新订单账本。</text>
+<text x="105" y="463" class="small">capturableAmount：10 → 4  |  refundableAmount：0 → 6（可退额度，不是另存的资金）</text>
+<text x="84" y="516" class="title" style="fill:#6c51ac">① 先转手续费</text>
+<rect x="84" y="535" width="270" height="112" rx="16" fill="white" stroke="#dfd9f0"/>
+<text x="101" y="569" class="body" style="fill:#6c51ac">Escrow</text>
+<text x="101" y="604" class="small">_sendTokens(...)</text>
+<text x="101" y="633" class="small">选择 operator 的资金容器</text>
+<rect x="404" y="535" width="270" height="112" rx="16" fill="white" stroke="#dfd9f0"/>
+<text x="421" y="569" class="body" style="fill:#6c51ac">TokenStore</text>
+<text x="421" y="604" class="small">sendTokens(...)</text>
+<text x="421" y="633" class="small">仅接受指定 Escrow 调用</text>
+<rect x="724" y="535" width="330" height="112" rx="16" fill="white" stroke="#dfd9f0"/>
+<text x="741" y="569" class="body" style="fill:#6c51ac">USDC 合约</text>
+<text x="741" y="604" class="small">transfer(收款方, 0.06)</text>
+<text x="741" y="633" class="small">从 TokenStore 地址扣款</text>
+<rect x="1104" y="535" width="252" height="112" rx="16" fill="#efedf9" stroke="#dfd9f0"/>
+<text x="1121" y="569" class="body" style="fill:#6c51ac">费用方 feeReceiver</text>
+<text x="1121" y="604" class="small">收到 0.06 USDC</text>
+<text x="1121" y="633" class="small">余额在此步骤增加</text>
+<path d="M359 592 H390" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<path d="M679 592 H710" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<path d="M1059 592 H1090" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<text x="84" y="688" class="title" style="fill:#167563">② 再转商家货款</text>
+<rect x="84" y="707" width="270" height="112" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="101" y="741" class="body" style="fill:#167563">Escrow</text>
+<text x="101" y="776" class="small">_sendTokens(...)</text>
+<text x="101" y="805" class="small">选择 operator 的资金容器</text>
+<rect x="404" y="707" width="270" height="112" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="421" y="741" class="body" style="fill:#167563">TokenStore</text>
+<text x="421" y="776" class="small">sendTokens(...)</text>
+<text x="421" y="805" class="small">仅接受指定 Escrow 调用</text>
+<rect x="724" y="707" width="330" height="112" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="741" y="741" class="body" style="fill:#167563">USDC 合约</text>
+<text x="741" y="776" class="small">transfer(收款方, 5.94)</text>
+<text x="741" y="805" class="small">从 TokenStore 地址扣款</text>
+<rect x="1104" y="707" width="252" height="112" rx="16" fill="#eaf5f1" stroke="#d2e8df"/>
+<text x="1121" y="741" class="body" style="fill:#167563">商家 receiver</text>
+<text x="1121" y="776" class="small">收到 5.94 USDC</text>
+<text x="1121" y="805" class="small">余额在此步骤增加</text>
+<path d="M359 764 H390" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<path d="M679 764 H710" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<path d="M1059 764 H1090" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<text x="84" y="863" class="small">调用箭头表示执行顺序；真实余额由 USDC 合约更新，TokenStore 累计支出 6。</text>
+<rect x="60" y="926" width="640" height="211" rx="16" fill="#eaf5f1" stroke="#d2e8df"/>
+<text x="84" y="970" class="title" style="fill:#167563">全部成功后</text>
+<text x="84" y="1010" class="body">本订单仍托管 4 USDC；可退额度为 6。</text>
+<text x="84" y="1047" class="body">费用方 +0.06；商家 +5.94。</text>
+<text x="84" y="1084" class="small">剩余 4 要另行 void 或到期 reclaim。</text>
+<text x="84" y="1117" class="small">TokenStore 还可能持有其他订单的资金。</text>
+<rect x="730" y="926" width="650" height="211" rx="16" fill="#fff0ee" stroke="#edd4d0"/>
+<text x="754" y="970" class="title" style="fill:#aa4f43">任意一次转账失败 → 整笔回滚</text>
+<text x="754" y="1010" class="body">即使手续费先执行，也不会最终收走。</text>
+<text x="754" y="1047" class="body">本订单恢复：可扣 10，可退 0。</text>
+<text x="754" y="1084" class="small">本次转账、账本修改及事件全部撤销。</text>
+<text x="754" y="1117" class="small">已上链的失败交易仍消耗 gas。</text>
+<rect x="60" y="1165" width="1320" height="116" rx="16" fill="white" stroke="#dce4ee"/>
+<text x="84" y="1205" class="title">浏览器通常看到：一个交易哈希 + 两条 USDC Transfer 记录</text>
+<text x="84" y="1245" class="small">不是两笔独立交易；0.06 是业务费用，gas 另算。零费用时只转商家一笔。</text>
+<text x="60" y="1312" class="small">Commerce Payments v1.1 · charge 收款后复用同一分账函数 · 未经评审研究草稿</text>
+</svg>

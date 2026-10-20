@@ -148,6 +148,12 @@ paymentState[paymentInfoHash] = state;
 
 然后从 TokenStore 将 feeAmount 发给费用方，将 amount-feeAmount 发给 receiver。amount 包含手续费，不是在 amount 之外额外扣一次。扣款 6 USDC、费用 0.06 时，商户收到 5.94。
 
+![capture 内部分账的调用与资金变化](../assets/auth-capture/10-capture-internal-split.png)
+
+一次外部 capture 调用内，_distributeTokens 依次两次调用 _sendTokens：先 feeReceiver，后 receiver；_sendTokens 找到当前 operator 对应的 TokenStore，调用 sendTokens(token, recipient, amount)。TokenStore 验证调用者为其固定 Escrow，再通过 SafeERC20 调 token.transfer，所以 token 合约看到的付款地址是 TokenStore，而不是 operator。无需从用户钱包再次 transferFrom，也不需要用户为 capture 新增 allowance。
+
+两次转账有顺序，但没有跨交易的中间结算状态。第二次失败时，异常向上冒泡，前一次转账、paymentState 修改、PaymentCaptured 和 Transfer 日志全部回滚；失败交易的 gas 不会因此退回全部。成功时通常有一条 PaymentCaptured 和两条 token Transfer 日志；费用为零时跳过第一条转账。这些调用与事件仍属于同一交易哈希，不应把浏览器中的 token 转账记录数当作独立交易数。
+
 v1.1 的 feeAmount 为代币最小单位，且须处于 floor(amount×minFeeBps/10000) 与 floor(amount×maxFeeBps/10000) 之间。条款 feeReceiver 非零则不能更换；费用非零时执行费用地址不得为零。逐笔整数向下取整意味着多次小额 capture 的费用与一次 capture 可能不同。
 
 capture 可多次执行，但累计不能越过托管额；到达 authorizationExpiry 的那一刻即不能再扣。refund 不会重新增加可扣余额。

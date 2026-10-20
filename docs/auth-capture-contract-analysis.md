@@ -112,15 +112,37 @@ escrow 的 captureMode="sync" 默认在请求结束阶段扣款，"deferred" 由
 
 同一个 /settle 也处理 payload.type 为 capture、void、refund 的操作，没有另外规定 /refund 接口。**settle 成功的含义要看实际操作：authorize 成功只表示托管，capture 或 charge 成功才表示向商家付款。**
 
-## 手续费怎么付
+## 内部分账：一笔交易怎样付给两方
 
-![一笔 capture 中的货款与手续费](../assets/auth-capture/04-fee-split.png)
+![capture 的调用链、两次 USDC 转账及回滚边界](../assets/auth-capture/10-capture-internal-split.png)
 
-托管 10 USDC，本次扣 6、手续费 1%：商家收到 5.94，费用方收到 0.06，剩余 4 继续托管。买方不用另转一笔手续费。
+假设已 authorize 托管 10 USDC，本次消费 6，约定手续费 1%。**operator 只发一笔 capture 交易，TokenStore 支出总共 6：费用方收到 0.06，商家收到 5.94。** 用户钱包此时不会再被扣款，手续费包含在 6 里。
 
-货款和费用是**一笔 capture 里的两次内部转账**，一起成功或回滚。合约支持零费率，也没有额外写死的协议费。gas 另由发交易的账户或代付方承担。
+v1.1 的参数为 capture(paymentInfo, 6000000, 60000, feeReceiver)，USDC 使用 6 位小数。amount 是含费用的结算总额，feeAmount 是其中的绝对费用；1% 不是合约写死的费率。原条款 minFeeBps=maxFeeBps=100 时，合约要求费用等于 6×1%=0.06；有费率范围时按范围校验，整数除法向下取整。feeReceiver 在原条款中非零，就不能改成其他地址。
+
+调用按以下顺序执行：
+
+1. **Escrow 检查和记账。** 校验 operator、费用、扣款期限和本订单余额，将 capturableAmount 从 10 改为 4，refundableAmount 从 0 改为 6。
+2. **先付手续费。** Escrow 的 _sendTokens 调 TokenStore.sendTokens；TokenStore 再调用 USDC.transfer，把 0.06 从自身地址转给费用方。
+3. **再付商家。** 重复这条调用链，将 amount−feeAmount，也就是 5.94，转给原条款中的 receiver。
+
+TokenStore 只接受指定 Escrow 的支出指令，operator 不能绕过订单检查直接调用它转钱。这里使用 transfer，capture 不需要买方再次签名，也不需要对 TokenStore 的支出另做 approve。首次支出时若 TokenStore 尚未部署，Escrow 会在同一交易里创建实例再转账。
+
+“内部转账”指同一交易中的合约调用产生了两次 ERC-20 转账，不是两笔独立交易，也不是两次转 gas 币。实际由 USDC 合约更新地址余额：TokenStore 减 6，费用方加 0.06，商家加 5.94。区块浏览器通常显示一个交易哈希和两条 USDC Transfer 记录；两次分账共享这笔交易的 gas，gas 另由发交易的账户或代付方承担。
+
+**任何一条转账失败，前面的转账、订单记账和本次事件一起回滚。** 即使先执行了手续费转账，后面的商家转账失败，费用方也不会最终收到钱；原订单仍有 10 可扣、0 可退。已上链的失败交易仍会消耗 gas。
+
+| 本次 capture 的结果 | 成功 | 转账失败并回滚 |
+| --- | --- | --- |
+| 本订单可扣托管余额 | 4 | 10 |
+| 本订单可退额度 | 6（额度，不是准备金） | 0 |
+| 费用方 / 商家本次到账 | 0.06 / 5.94 | 0 / 0 |
+
+这里的 4 是本订单余额；TokenStore 共用时，还可能存有其他订单的钱。零费率时不会执行费用转账，商家收到全部 6。charge 收款后也调用同一个 _distributeTokens 分账函数。
 
 capture 后再 void 剩余款，才是两笔独立交易。官方 SDK 对后续 void 尽力执行，capture 成功不能当成剩余款已退回的证明。
+
+源码：[capture](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L267)、[_distributeTokens](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L464)、[TokenStore.sendTokens](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/TokenStore.sol#L33)。[原简图](../assets/auth-capture/04-fee-split.png)保留供快速演示。
 
 ## refund：退的是已付款，资金需要重新准备
 
