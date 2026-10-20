@@ -1,6 +1,6 @@
 # auth-capture 配图目录
 
-> 未经评审的研究草稿配图。源码版本和验证范围见[基础概念](../../docs/auth-capture-foundations.md#6-源码版本与验证范围)。
+> 未经评审的研究草稿配图。源码版本和验证范围见[分享主稿](../../docs/auth-capture-contract-analysis.md#9-源码版本与验证范围)。
 
 配图统一使用“上限 10 USDC、实际消费 6、费用 1%”这个例子。概念图用于解释设计，不表示已经部署或测试通过。[返回分享主稿](../../docs/auth-capture-contract-analysis.md)
 

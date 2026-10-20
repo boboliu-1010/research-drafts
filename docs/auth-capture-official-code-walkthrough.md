@@ -1,10 +1,10 @@
-# x402 auth-capture SDK 与接口走读
+# x402 auth-capture SDK、接口与 TRON 接入
 
 > 未经评审的研究草稿。TypeScript 静态源码分析，未运行 SDK 测试或链上交易。
 
-更新：2026 年 10 月 20 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [基础概念](auth-capture-foundations.md) · [合约源码](auth-capture-solidity-walkthrough.md) · [TRON 适配](auth-capture-tron-port.md)
+更新：2026 年 10 月 20 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [合约源码](auth-capture-solidity-walkthrough.md) · [TRON 适配](#11-tron-适配)
 
-本文顺着一笔支付往下读：服务端给出付款条件，客户端签名，facilitator 调用合约，再保存状态、处理重试。合约内部实现见 Solidity 走读；固定提交和验证范围见[来源说明](auth-capture-foundations.md#6-源码版本与验证范围)。
+本文顺着一笔支付往下读：服务端给出付款条件，客户端签名，facilitator 调用合约，再保存状态、处理重试。合约内部实现见 Solidity 走读；固定提交和验证范围见[来源说明](auth-capture-contract-analysis.md#9-源码版本与验证范围)。
 
 ## 1 代码入口与职责
 
@@ -19,6 +19,12 @@
 | nonce.ts、lifecyclePayload.ts | 支付身份、nonce 及商家操作授权数据 |
 
 client、server、facilitator 都有名为 AuthCaptureEvmScheme 的类，但各自实现不同接口，导入时要选对入口。它们最终接入同一套已有的 Commerce Payments 合约，并不是三套链上 Escrow。
+
+核对 [#3203](https://github.com/x402-foundation/x402/pull/3203) 的提交 [28376d6](https://github.com/x402-foundation/x402/commit/28376d643a6d9492e4a6cbfa5199376b90eb89dc)后可见，164 个变更文件中没有生产 Solidity 合约变更。这次主要新增或完善了 client / server / facilitator 的授权、结算和生命周期管理。abi.ts 描述的是已有合约的接口，不是新的合约实现。
+
+新增的 Solidity 只有三个集成测试 operator：ForwardingOperator 转发 authorize / charge；NoopOperator 调用不 revert 却不收款，用于识别假成功；GasWastingOperator 消耗过多 gas，用于检查调用限制。
+
+官方[测试说明](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/contracts/auth-capture/README.md)限定它们用于集成测试，不能当作生产 operator 模板。
 
 ## 2 HTTP 接口与操作分派
 
@@ -194,6 +200,61 @@ AuthorizedPaymentStorage.update 要求原子条件修改。默认内存实现的
 | [settlementHooks.test.ts](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/unit/auth-capture/settlementHooks.test.ts) | 委托签名 enrichment、deferred 跳过、失败不保存记录 |
 | [lifecycleFacilitator.test.ts](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/unit/auth-capture/lifecycleFacilitator.test.ts) | 拒绝 PaymentInfo 不匹配、salt 绑定错误、错误费用字段 |
 
-合约检查金额、费用、期限和操作人；SDK 处理签名、身份绑定、模拟和重试。业务系统还要负责判断交付、审批退款、准备资金和对账。接入 TRON 时，执行及签名适配也需要替换，见[TRON 适配](auth-capture-tron-port.md)。
+合约检查金额、费用、期限和操作人；SDK 处理签名、身份绑定、模拟和重试。业务系统还要负责判断交付、审批退款、准备资金和对账。TRON 的适配范围见下一节。
 
-[返回分享主稿](auth-capture-contract-analysis.md) · [查看合约实现](auth-capture-solidity-walkthrough.md) · [来源与验证范围](auth-capture-foundations.md#6-源码版本与验证范围)
+## 11 TRON 适配
+
+以下是待执行的移植范围，尚未完成编译、合约测试或链上部署验证。建议首版限定为 **USDT + Permit2 + 单一 delegated operator**。TVM 兼容 Solidity 有助于复用代码，但不能据此认为现有 EVM 部署可直接使用，或只复制 Escrow 就能接入。
+
+![TRON 合约与 SDK 适配范围](../assets/auth-capture/07-tron-port.png)
+
+### 11.1 要移植什么
+
+| 组件 | 首版处理 | 不能省略的依赖 |
+| --- | --- | --- |
+| AuthCaptureEscrow | 移植并部署六种操作及账本 | 重入锁、Collector 类型、入金核对 |
+| TokenStore | 部署模板、按 operator 创建实例 | CREATE2 / clone 的预测与实际地址一致 |
+| Permit2PaymentCollector | 从 payer 收款进入 TokenStore | 目标 Permit2 接口、签名域和 token allowance |
+| OperatorRefundCollector | 从 operator 收取退款资金 | TRC-20 transferFrom、余额和给 Collector 的 allowance |
+| TokenCollector 等基类 | 随具体合约编译适配 | 不额外部署一个抽象基类中转地址 |
+| SDK / facilitator | 形成付款条件、签名、交易提交与状态恢复 | 原始 PaymentInfo、部署配置、持久化状态 |
+
+### 11.2 USDT 为什么走 Permit2
+
+现有 TRON SDK 的[资产配置说明](https://github.com/BofAI/x402/blob/main/typescript/packages/mechanisms/tron/src/shared/defaultAssets.ts)为 USDT 选择 Permit2，因为它不支持所需的 3009 风格签名转账。Collector 只能使用代币已有的能力；写一个名为 TRC3009PaymentCollector 的合约，不会改变现有 USDT 的接口。
+
+等目标代币确实支持相应签名收款，再增加 3009 路径。还要核对官方 ERC3009 Collector 的 receiveWithAuthorization，与现有 TRON exact 的 transferWithAuthorization 在接口、签名类型和调用约束上有哪些差别。
+
+USDT 的预期流程是：
+
+```text
+首次准备：用户 approve USDT 给 Permit2
+每笔支付：用户签名 → Escrow → PaymentCollector → Permit2
+资金移动：payer → TokenStore
+后续付款：Escrow → TokenStore → USDT.transfer → 商家 / 费用方
+```
+
+首次 allowance 和每笔付款签名是两个条件。还需与客户端一起验证钱包能否完成相应的结构化签名，以及失败或到期后怎样重试。
+
+现有 SDK 的 [constants.ts](https://github.com/BofAI/x402/blob/main/typescript/packages/mechanisms/tron/src/constants.ts)登记了 Permit2 和 exact / upto Proxy 地址，但这些地址的链上字节码与接口尚未核实。需要确认目标 Permit2 的 permitTransferFrom、签名域、nonce 和地址处理；exact / upto Proxy 使用 witness，不能直接当作 auth-capture Collector。token 工具、注册表和交易执行适配也要核对 TRC-20 ABI、decimals、地址、allowance、模拟、回执及 pending 支持。
+
+### 11.3 三处重点
+
+**TokenStore 地址预测。** 资金可以先进入预测地址，首次支出时才部署实例。TRON CREATE2 使用 0x41 推导前缀，EVM 使用 0xff；需要逐项核对 LibClone 创建代码、salt、部署地址和 TVM 规则，不能只改 SDK 地址格式，否则资金可能无法按预期转出。依据见 [TRON TVM 与 EVM 差异](https://developers.tron.network/docs/tvm-vs-evm)。
+
+**签名与哈希。** 区分链上 20 字节地址与外部 Base58 / 41 前缀地址。合约与 SDK 的 chainId、Escrow、字段顺序和哈希规则必须一致：账本使用真实 payer，付款 nonce 使用 payer 置零后的条款哈希，不能用 exact witness 替换。Token、Permit2 和商家操作签名各自使用正确的域、类型和表示；后续 capture / refund 保留原条款和 saltNonce，重试不能另造期限或 salt。形成过程见[第 4 节](#4-客户端签什么nonce-如何绑定条款)。
+
+**执行与恢复。** 原合约使用 Solidity ^0.8.28、Solady clone 和 transient storage 重入锁，要按目标网络实际升级配置核对编译产物和 opcode，不能笼统认为 TVM 完全兼容或不支持 transient storage。ERC-6492 / Multicall3 也要核对；限定钱包范围时，SDK 应明确准入并拒绝未支持路径。facilitator 还要处理 Energy / 费用估计、广播、回执、事件与余额对账，以及 pending 恢复。结果不明时先查原交易；refund 仍需资金协议、operator 余额和 allowance。
+
+### 11.4 验证顺序
+
+1. 核对目标 Permit2 与 USDT 的实际接口、签名和 allowance。
+2. 在目标 TVM 环境验证编译、CREATE2 预测、clone 和先入金后部署。
+3. 跑通 authorize → capture → void / reclaim，核对六种操作的权限、期限与账本。
+4. 跑通 charge 与部分退款，核对分账原子性、失败回滚和退款资金来源。
+5. 接入 SDK 的支付条件、用户签名和商家授权，验证原始条款持久化。
+6. 验证超时、重复请求、进程重启、回执不明、余额或 allowance 不足的恢复行为。
+
+以上工作尚待执行，不代表测试已经通过。
+
+[返回分享主稿](auth-capture-contract-analysis.md) · [查看合约实现](auth-capture-solidity-walkthrough.md) · [来源与验证范围](auth-capture-contract-analysis.md#9-源码版本与验证范围)

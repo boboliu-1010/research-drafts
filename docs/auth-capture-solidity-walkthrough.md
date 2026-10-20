@@ -2,13 +2,13 @@
 
 > 未经评审的研究草稿。静态阅读官方合约与测试源码，未执行 Foundry 测试或链上交易。
 
-更新：2026 年 10 月 20 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [基础概念](auth-capture-foundations.md) · [SDK 与接口](auth-capture-official-code-walkthrough.md) · [TRON 适配](auth-capture-tron-port.md)
+更新：2026 年 10 月 20 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [SDK 与 TRON 接入](auth-capture-official-code-walkthrough.md)
 
-本文按固定的 Commerce Payments v1.1 源码，解释检查条件、合约调用和账本变化。全文使用同一笔订单：上限 10 USDC、实际消费 6、费用 1%，传入真实参数时需乘 10⁶。代码摘录省略了部分声明和检查，流程块用于辅助阅读；源码版本和验证范围见[来源说明](auth-capture-foundations.md#6-源码版本与验证范围)。
+本文按固定的 Commerce Payments v1.1 源码，解释检查条件、合约调用和账本变化。全文使用同一笔订单：上限 10 USDC、实际消费 6、费用 1%，传入真实参数时需乘 10⁶。代码摘录省略了部分声明和检查，流程块用于辅助阅读；源码版本和验证范围见[来源说明](auth-capture-contract-analysis.md#9-源码版本与验证范围)。
 
 ## 1 合约分工与源码阅读顺序
 
-Escrow 管订单账和权限，Collector 负责接入不同收款方式，TokenStore 持币并按 Escrow 指令转出。TokenCollector 是抽象基类，没有单独的收款中转地址。这些配套合约由 x402 复用；项目关系及“本次新增”的两种含义见[基础概念](auth-capture-foundations.md#4-支付配套合约与通用依赖)。
+Escrow 管订单账和权限，Collector 负责接入不同收款方式，TokenStore 持币并按 Escrow 指令转出。TokenCollector 是抽象基类，没有单独的收款中转地址。这些配套合约来自 Commerce Payments，由 x402 复用。
 
 | 阅读顺序 | 官方源码 | 要回答的问题 |
 | --- | --- | --- |
@@ -21,6 +21,22 @@ Escrow 管订单账和权限，Collector 负责接入不同收款方式，TokenS
 | 7 | [ERC6492SignatureHandler.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/ERC6492SignatureHandler.sol) | 未部署钱包的准备调用怎样处理 |
 
 ERC6492SignatureHandler 是两个付款 Collector 共用的签名准备辅助类，后文单独说明。
+
+### 1.1 支付合约与通用依赖
+
+这些支付合约不是 EVM 自带的，也不是本次 x402 SDK 更新才新增的。项目背景见[分享主稿](auth-capture-contract-analysis.md#1-先分清-commerce-payments-和-x402)。
+
+| 分类 | 内容 | 与本次接入的关系 |
+| --- | --- | --- |
+| 支付业务合约，5 类 | AuthCaptureEscrow、TokenStore、ERC3009PaymentCollector、Permit2PaymentCollector、OperatorRefundCollector | 为这套支付系统实现，由 x402 复用 Commerce Payments 的实现 |
+| 支付辅助基类 | TokenCollector、ERC6492SignatureHandler | 随具体合约编译继承，不额外计为两类业务合约 |
+| 通用应用合约 | token（如 USDC）、Permit2、Multicall3 | 部署在链上的通用依赖，不是 EVM 原生功能 |
+| 通用库 / 基类 | SafeERC20、LibClone、ReentrancyGuardTransient | 安全转账、clone、重入锁 |
+| EVM 底层能力 | CALL、存储、哈希、CREATE2 等 | 提供合约运行能力，本身不理解支付订单 |
+
+Commerce Payments 还有 PreApprovalPaymentCollector、SpendPermissionPaymentCollector 等收款方式，未计入当前 x402 ERC-3009 / Permit2 标准路径。
+
+本次 x402 更新的代码和三个测试 operator，见[SDK 入口](auth-capture-official-code-walkthrough.md#1-代码入口与职责)。Commerce Payments 自身 v1.0→v1.1 的 feeBps→feeAmount 属于另一条版本升级。
 
 ## 2 PaymentInfo：用户同意的固定条款
 
@@ -365,4 +381,4 @@ TokenStore 的入口只做少量工作：检查 msg.sender==authCaptureEscrow，
 
 本文阅读了实现和相关测试源码，没有运行上述测试。TokenStore 负责转账，Collector 验签收款，SDK 按代办规则发起操作，共同完成支付。基础 Escrow 不判断交付，不保证 facilitator 持续在线，也不预存退款准备金。
 
-[继续阅读 SDK 与接口](auth-capture-official-code-walkthrough.md) · [TRON 适配范围](auth-capture-tron-port.md) · [返回分享主稿](auth-capture-contract-analysis.md)
+[继续阅读 SDK 与接口](auth-capture-official-code-walkthrough.md) · [TRON 适配范围](auth-capture-official-code-walkthrough.md#11-tron-适配) · [返回分享主稿](auth-capture-contract-analysis.md)
