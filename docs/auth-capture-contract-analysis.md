@@ -4,13 +4,32 @@
 
 更新：2026 年 10 月 20 日。
 
-auth-capture 用来处理“先准备好钱，稍后再结算”的支付。比如 Agent 做一个预算 10 USDC 的任务：先托管 10，完成后实际扣 6，再退回剩余 4。
+auth-capture 让用户先签一笔支付上限，再按实际金额结算。它提供两条路：**开工前先锁钱，完成后 capture；或者只拿签名，完成后 charge，一次收款并分账。**
 
 ![exact 与 authorize capture 及 charge 的流程对比](../assets/auth-capture/08-auth-capture-overview.png)
 
 图中三种方式最终都付 6 USDC：exact 签固定金额并直付；authorize → capture 先托管 10 再扣 6；charge 签上限 10，最终净收 6。exact 以 ERC-3009 默认直付为例，后两条采用 delegated 模式、费用设为 1%，并保留合约退款额度。
 
 它适合异步任务、按用量计费和一次会话内分次扣款。**每笔支付有额度和期限，不能反复充值，也不是长期自动续费。**
+
+## 为什么要设计两条路
+
+用户签名只是允许以后收款，钱仍在钱包。调用 authorize 才会把钱转进托管。两条路的区别是：商家开工前，要不要先把付款资金锁住。
+
+| 对比 | exact | authorize → capture | charge |
+| --- | --- | --- | --- |
+| 用户签什么 | 固定支付 6 | 支付上限 10 | 支付上限 10 |
+| 开工前的资金保障 | 签名本身不锁钱 | authorize(10)，先锁住 10 | 签名本身不锁钱 |
+| 最终支付 6 怎么做 | 按签名支付 6 | capture(6)，剩余 4 另行释放 | charge(6)，当场收款并分账 |
+| TokenStore | ERC-3009 直付例子不经过它 | 钱先留下，稍后付给商家 | 收进来，同一笔交易就分出去 |
+| 剩余款处理 | 没有本方案托管余额 | void 或到期 reclaim | 没有剩余托管款，无需 void |
+| 费用分账、退款额度 | 方案本身无统一机制 | 合约内置 | 合约内置 |
+
+高成本、长耗时的任务，可以先 authorize，避免做完才发现收不到钱。短请求若能接受最后扣款失败的风险，可以用 charge，省掉单独的锁款交易。charge 覆盖一部分 exact 场景，但需要客户端和 facilitator 支持 auth-capture，并引入 operator 权限；要开放退款还需安排退款资金，不能直接当作 exact 的升级替代。
+
+**两条 auth-capture 路径的钱都会进 TokenStore，区别是会不会留下来等后续结算。** capture 用已有托管款，不会再扣用户钱包；charge 则当场收钱。charge 成功后要退已付款，用 refund；失败则整笔回滚，不需要 void。
+
+签上限 10、charge 实收 6 时，Collector 的细节不同：Permit2 直接收 6；ERC-3009 先收 10 到 Collector、同一交易退回 4，再将 6 转进 TokenStore。因此 ERC-3009 路径执行时仍需有 10 的余额。这里的“净收 6”不能理解为所有收款方式都只发生一笔 6 的转账。
 
 ## 谁来操作
 
@@ -66,17 +85,6 @@ PaymentState 只存三个字段：
 | reclaim | payer | 扣款到期后，取回全部剩余托管款 |
 | refund | operator | 重新提供退款资金，退给买方 |
 
-### capture 和 charge 有什么区别
-
-两者都按实际金额向商家付款、分手续费，并增加可退款额度。区别是：**capture 扣已经托管的钱，charge 当场从买方收钱再分账。**
-
-例如预算上限 10 USDC，实际费用 6：
-
-- authorize → capture：先托管 10，再扣 6；剩余 4 另行 void 或到期 reclaim。可以在余额和期限内分次 capture。
-- charge：一次净收 6 并分账，没有剩余托管款；同一支付不能再次 charge。
-
-需要开工前保证资金到位，就先 authorize 再 capture。charge 没有提前锁钱，即使预验证通过，收款时仍可能因余额不足或授权过期失败。exact 通常用于确定金额的直接支付，方案本身没有这里的费用分账和退款账本。
-
 authorize 或 charge 对同一支付只能成功一次。capture 不能超过剩余托管款；refund 不能超过已扣且未退的金额，也不会恢复可扣余额。void 不能取消尚未收款的 token 签名。
 
 合约收钱后会核对 TokenStore 的实际入金。各操作有重入保护，转账失败时，账本修改和转账一起回滚。
@@ -93,11 +101,16 @@ authorize 或 charge 对同一支付只能成功一次。capture 不能超过剩
 
 具体请求与交易顺序见[两次 settle 时序图](../assets/auth-capture/03-settle-sequence.png)。
 
-默认 escrow 路径通常分两次 settle：第一次调用 authorize，确认托管；业务完成后，第二次调用 capture，实际付给商家。captureMode=sync 在请求结束阶段扣款，deferred 由应用稍后发起。
+**路径由商家服务端在业务接口的付款条件里配置**，客户端读取 402 返回的条件后签名：
 
-同一个 /settle 也处理 payload.type 为 capture、void、refund 的操作；paymentFlow=authorization 则执行 charge，一次收款并分账。**settle 成功的含义要看它执行了什么，authorize 成功还不代表商家已收到钱。**
+| 服务端 extra 配置 | 官方 SDK 的处理顺序 |
+| --- | --- |
+| paymentFlow: "escrow"（默认） | settle → authorize → 执行业务 → settle → capture |
+| paymentFlow: "authorization" | verify → 执行业务 → settle → charge |
 
-官方 SDK 的 authorization 路径在业务处理后的结算阶段执行 charge，由服务端补齐金额、费用和操作授权。
+escrow 的 captureMode="sync" 默认在请求结束阶段扣款，"deferred" 由应用稍后发起；charge 路径不设置 captureMode。/escrow、/charge 只是示例业务路由名，真实接口可以都叫 /generate-report，采用哪条路径取决于配置。
+
+同一个 /settle 也处理 payload.type 为 capture、void、refund 的操作，没有另外规定 /refund 接口。**settle 成功的含义要看实际操作：authorize 成功只表示托管，capture 或 charge 成功才表示向商家付款。**
 
 ## 手续费怎么付
 
@@ -109,7 +122,28 @@ authorize 或 charge 对同一支付只能成功一次。capture 不能超过剩
 
 capture 后再 void 剩余款，才是两笔独立交易。官方 SDK 对后续 void 尽力执行，capture 成功不能当成剩余款已退回的证明。
 
-已经付给商家的钱，要通过 refund 退。标准路径由 operator 重新出资，不会自动从商家或费用方追回。
+## refund：退的是已付款，资金需要重新准备
+
+![官方 delegated 退款的请求与资金路径](../assets/auth-capture/09-refund-funding.png)
+
+void / reclaim 释放尚未花掉的托管款；refund 退已经 capture 或 charge 的款。**refundableAmount 是允许退款的额度，不是留在 TokenStore 的退款准备金。**
+
+默认 delegated 模式下，商家批准退款，通过 SDK 发起；facilitator 验证授权、期限、额度和资金条件，再以原 operator 身份调用合约。标准 OperatorRefundCollector 从 operator 钱包收款，经过 TokenStore 退给原 payer，需要余额和 allowance。它不会自动向商家或手续费方追款。
+
+例如已结算 6 USDC，商家收到 5.94、手续费方收到 0.06。全退时 operator 要新提供 6；这两方之前收到的钱不变，如何返还手续费、如何与商家对账，要另外约定。也可以先退 2、再退 4，累计不超过 6；必须在 refundExpiry 前执行。退款失败时，转账和额度更新一起回滚。
+
+官方做到哪一步，要分开看：
+
+| 层面 | 已核实的情况 |
+| --- | --- |
+| 合约与 SDK | 已实现 refund，存在成功、权限、期限和超额退款测试源码；本次未运行测试 |
+| 官方 facilitator 示例 | 明确配置 refundFunding: false，默认拒绝 delegated 退款；不代表所有线上部署都关闭 |
+| 接入方要补的部分 | 与商家的资金协议、退款余额及 allowance、审批和对账；设为 true 不会自动准备资金 |
+| 实际使用情况 | 本次未核实生产退款案例或链上用量，无法判断采用规模 |
+
+自定义 operator 的退款通过它自己的接口和规则执行，官方 facilitator 不代办。用户不能凭退款额度强制调用基础合约 refund；到期 reclaim 也只能取回尚未结算的余额。
+
+源码：[退款函数](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L351)、[官方示例开关](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/examples/typescript/facilitator/auth-capture/index.ts#L133-L135)、[退款资金要求](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/specs/schemes/auth-capture/scheme_auth_capture_evm.md#refund-funding)。
 
 ## Facilitator 挂了怎么办
 

@@ -4,9 +4,9 @@
 
 ## auth-capture
 
-- [支付机制与合约分享](docs/auth-capture-contract-analysis.md)：精简分享稿，讲清合约、结算、费用、故障处理和 TRON 移植；正文配 4 张图。
+- [支付机制与合约分享](docs/auth-capture-contract-analysis.md)：对比 exact、先托管后 capture、直接 charge，讲清合约、退款资金、故障处理和 TRON 移植；正文配 5 张图。
 - [官方代码走读](docs/auth-capture-official-code-walkthrough.md)：固定官方源码提交，包含函数、行号、资金与权限边界。
-- [配图与可编辑 Mermaid 图源](assets/auth-capture/)。
+- [配图与可编辑图源](assets/auth-capture/)：Mermaid 和 SVG。
 
 ## 文档状态
 

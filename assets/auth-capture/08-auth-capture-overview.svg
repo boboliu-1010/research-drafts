@@ -89,7 +89,7 @@
 <text x="1003" y="708" class="step">charge 净收 6</text>
 <text x="1003" y="739" class="small" style="fill:#6c51ac">Operator</text>
 <text x="1003" y="770" class="small">从买方钱包收款</text>
-<text x="1003" y="797" class="small">同一交易内收款并分账</text>
+<text x="1003" y="797" class="small">收进 TokenStore，随即分账</text>
 <rect x="984" y="870" width="372" height="154" rx="16" fill="white" stroke="#dfd9f0"/>
 <text x="1003" y="905" class="step">资金结果</text>
 <text x="1003" y="945" class="small">商家收到 5.94 USDC</text>

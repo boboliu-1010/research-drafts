@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="930" viewBox="0 0 1440 930" role="img" aria-labelledby="title desc">
+<title id="title">refund 的操作与资金来源</title>
+<desc id="desc">默认 delegated 模式：商家批准退款后，SDK 通过 settle 请求 facilitator，校验后由原 operator 调用退款。标准 Collector 从 operator 钱包收取新资金，经 TokenStore 退给原 payer。示例已收 6，退款 2 后可退额度为 4；商家与手续费方此前所得不自动追回。官方示例 refundFunding 默认 false，开启需资金协议、余额和 allowance。生产使用情况未核实。</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#657992" stroke-width="1.8"/></marker></defs>
+<style>text{font-family:'PingFang SC','Microsoft YaHei',Arial,sans-serif} .title{font-size:27px;font-weight:600;fill:#14283f} .body{font-size:23px;fill:#33465e} .small{font-size:21px;fill:#5d7087}</style>
+<rect width="1440" height="930" fill="#f5f7fb"/><rect width="1440" height="140" fill="#14283f"/>
+<text x="60" y="62" font-size="36" font-weight="650" fill="white">refund：退已付款，资金重新准备</text>
+<text x="60" y="110" font-size="23" fill="#c4d3e5">以 delegated 为例：已结算 6 USDC，本次退 2；剩余托管款的释放另走 void / reclaim</text>
+
+<rect x="60" y="170" width="1320" height="140" rx="16" fill="#eaf0fd" stroke="#d4dff1"/>
+<text x="84" y="208" class="title" style="fill:#315fcd">请求路径</text>
+<text x="84" y="252" class="body">商家批准退款</text>
+<text x="84" y="285" class="small">服务端 SDK 生成请求</text>
+<text x="427" y="252" class="body">POST /settle</text>
+<text x="427" y="285" class="small">发送 type = refund</text>
+<text x="768" y="252" class="body">Facilitator 校验</text>
+<text x="768" y="285" class="small">授权、期限、额度、模拟</text>
+<text x="1115" y="252" class="body">原 operator 调用</text>
+<text x="1115" y="285" class="small">Escrow.refund()</text>
+<path d="M337 245 H396" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<path d="M682 245 H741" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<path d="M1038 245 H1090" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<text x="60" y="361" class="title" style="fill:#167563">资金路径：使用 operator 新提供的资金</text>
+<rect x="60" y="390" width="280" height="148" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="80" y="431" class="title" style="fill:#167563">Operator 钱包</text>
+<text x="80" y="476" class="body">准备 2 USDC</text>
+<text x="80" y="513" class="small">需有余额和 allowance</text>
+<rect x="390" y="390" width="280" height="148" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="410" y="431" class="title" style="fill:#167563">Refund Collector</text>
+<text x="410" y="476" class="body">transferFrom 收款</text>
+<text x="410" y="513" class="small">从 operator 地址扣 2</text>
+<rect x="720" y="390" width="280" height="148" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="740" y="431" class="title" style="fill:#167563">TokenStore</text>
+<text x="740" y="476" class="body">收到 2 USDC</text>
+<text x="740" y="513" class="small">同一交易立即转出</text>
+<rect x="1050" y="390" width="330" height="148" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="1070" y="431" class="title" style="fill:#167563">原付款人 payer</text>
+<text x="1070" y="476" class="body">收到退款 2 USDC</text>
+<text x="1070" y="513" class="small">无需重新签付款授权</text>
+<path d="M345 467 H376" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<path d="M675 467 H706" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<path d="M1005 467 H1036" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<rect x="60" y="570" width="640" height="148" rx="16" fill="#eaf5f1" stroke="#d2e8df"/>
+<text x="84" y="612" class="title" style="fill:#167563">退款额度：6 → 4</text>
+<text x="84" y="653" class="body">refundableAmount 是额度，不是准备金。</text>
+<text x="84" y="689" class="small">入金或转账失败，交易及额度更新一起回滚。</text>
+<rect x="730" y="570" width="650" height="148" rx="16" fill="#efedf9" stroke="#dfd9f0"/>
+<text x="754" y="612" class="title" style="fill:#6c51ac">之前的分账不会自动追回</text>
+<text x="754" y="653" class="body">商家此前收到 5.94，费用方收到 0.06。</text>
+<text x="754" y="689" class="small">退款的资金承担、手续费返还和对账另行约定。</text>
+<rect x="60" y="748" width="1320" height="132" rx="16" fill="#fff3e6" stroke="#efdcc4"/>
+<text x="84" y="790" class="title" style="fill:#96601f">官方示例默认 refundFunding: false</text>
+<text x="84" y="831" class="small">开启前需与商家约定退款资金，并准备余额和 allowance；true 只开放处理，不会自动筹资。</text>
+<text x="84" y="863" class="small">合约与 SDK 已有实现；默认关闭的是示例代办配置，生产退款用量本次未核实。</text>
+<text x="60" y="914" class="small">Commerce Payments v1.1 / x402 固定源码快照 · 未经评审研究草稿</text>
+</svg>

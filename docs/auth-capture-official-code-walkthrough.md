@@ -6,6 +6,8 @@
 
 阅读目标是能回答：签名承诺了什么、谁可以推动支付、钱在哪里、每个函数改变什么，以及失败时哪些事情不会发生。本文是静态源码走读，检查了相关测试源码，未执行 SDK 测试、Foundry 测试或链上交易。
 
+2026 年 10 月 20 日补充：两条收款路径的选择、charge 的 TokenStore 路径，以及官方退款开关和资金来源。分享用的[精简图文稿](auth-capture-contract-analysis.md)按业务问题组织，本文保留源码顺序。
+
 ## 1 官方实现分为两层
 
 x402 SDK 负责付款条件、签名、商户操作授权、验证、交易提交和本地记录；Commerce Payments 负责链上账本及代币移动。商户交付状态不在基础 Escrow 的判断范围内。
@@ -156,7 +158,11 @@ capture 可多次执行，但累计不能越过托管额；到达 authorizationE
 
 charge 执行收款检查和费用检查，直接设 capturable=0、refundable=amount，随后收款并分账。任一 token 操作失败，整笔交易回滚。
 
-它与 authorize 后再 capture 的经济效果类似，但没有持续的托管阶段，也没有可供 reclaim 的余额。其原子性不覆盖外部 HTTP 服务交付，更不覆盖以后的一笔 refund。
+charge 并不绕过 TokenStore：_collectTokens 将实际 amount 收入 TokenStore，_distributeTokens 随即从中向商家和费用方付款。authorize 则在收款后结束交易，等之后的 capture 才分账。两条路的区别是是否留下待结算的托管余额。
+
+上限 10、charge 金额 6 时，最终净扣 6、refundable=6；ERC-3009 Collector 会先收上限 10、同交易退 4，再将 6 存入 TokenStore，Permit2 Collector 直接请求 6。不要把 charge 简写成所有收款方式都只从钱包转出 6。
+
+charge 成功后没有剩余余额供 void / reclaim；失败整笔回滚，也无需 void。成功后退已付款走 refund。同一支付不能重复 charge，退款也不会重置 hasCollectedPayment。其原子性不覆盖外部 HTTP 服务交付，更不覆盖以后的一笔 refund。
 
 ## 9 void reclaim refund 必须分别理解
 
@@ -174,6 +180,18 @@ reclaim 的唯一调用者是 payer，到期不会自动触发。智能账户必
 
 refund 先扣减退款额度，再通过 Refund Collector 入金并向买方转账；收款失败则全量回滚。标准 OperatorRefundCollector 从 operator transferFrom，需要余额和 allowance。它不向商户或费用方追回此前收到的资金。
 
+### 官方 SDK 默认如何处理 refund
+
+源码：[refundFunding 配置](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/types.ts#L202-L212)；[未开启时拒绝](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/lifecycle.ts#L142-L148)；[官方示例默认关闭](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/examples/typescript/facilitator/auth-capture/index.ts#L133-L135)；[LifecycleManager.refund](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/server/lifecycleManager.ts#L115-L139)。
+
+官方示例的 refundFunding=false；SDK 在 delegated 退款未开启时返回 invalid_auth_capture_evm_refund_funding_unavailable。原因是退款会花 operator 自己的钱，商户操作签名不能代替商户与 facilitator 的资金协议。设为 true 只开放处理分支，不会自动筹资、approve 或建立商户备付金账本；多提交地址轮转时，每个旧订单对应的 operator 都需要资金和 allowance。
+
+有持久化订单记录后，服务端可以调用 lifecycleManager.refund(paymentInfoHash, {amount: "2000000"}) 退 2 USDC（6 位小数）。SDK 构建 type="refund" 的 payload，经同一个 /settle 提交；商户自签模式提供操作签名，委托签名模式按已认证调用者与支付绑定由 facilitator 签。随后检查 refundExpiry、链上两项预期余额、退款额度并模拟，最终以原 operator 调用 Escrow。成功后服务端更新本地可退额度；余额预期的校验在 facilitator，基础 Escrow 没有原子比较这两项预期余额的参数。
+
+已收 6、费用 0.06 的订单全退时，operator 新提供 6；refund 不拆手续费，也不会自动追回商户的 5.94 或费用方的 0.06。部分退款可分多次，累计不超过已收未退金额，且不恢复 capturableAmount。用户不能直接要求基础 Escrow 强制退款；custom operator 的退款也不走官方 facilitator relay。
+
+合约、SDK、测试源码存在，不能当作生产使用证据；示例默认关闭，也不能推出全部部署未开启或无人使用。本次没有核实生产退款交易及用量。
+
 ## 10 TokenStore 为何是每个 operator 一个
 
 源码：[function sendTokens(](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/TokenStore.sol#L33)；[function _sendTokens(](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L433)。
@@ -189,6 +207,8 @@ nonReentrant、外部调用前更新账本、转账失败回滚共同约束重�
 源码：[async enhancePaymentRequirements(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/server/scheme.ts#L228)；[async enrichSettlementPayload(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/server/settlementHooks.ts#L80)；[private async persistCollect(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/server/settlementHooks.ts#L255)。
 
 server.enhancePaymentRequirements 合并 facilitator 与商户配置，并解析部署、期限和支付路径；它明确拒绝旧 autoCapture 字段。相对期限会转换为绝对期限，不能在后续扣款时改用新期限重建订单。
+
+paymentFlow 由服务端业务路由的 extra 设置：escrow（默认）将初次 collect 解释为 authorize；authorization 将其解释为 charge。captureMode 的 sync / deferred 仅适用于 escrow，authorization 不得设置。客户端根据选中的付款条件生成签名，不另传一个 type="charge" 来自主改变路径；/escrow 与 /charge 只是示例路由名，并非协议接口。
 
 settlementHooks 的 before-handler 不追加商户扣款签名；authorize 成功后的 handleAfterSettle 保存完整 PaymentInfo、saltNonce、支付 key、收款交易和余额。after-handler 为 sync escrow 构造 capture，为 authorization 路径补齐 charge；deferred escrow 跳过请求结束时扣款，保留已托管结果。cancel 对可代办生命周期的 escrow 路径构造 void。
 
