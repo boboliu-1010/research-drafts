@@ -6,7 +6,7 @@
 
 阅读目标是能回答：签名承诺了什么、谁可以推动支付、钱在哪里、每个函数改变什么，以及失败时哪些事情不会发生。本文是静态源码走读，检查了相关测试源码，未执行 SDK 测试、Foundry 测试或链上交易。
 
-2026 年 10 月 20 日补充：两条收款路径的选择、charge 的 TokenStore 路径，以及官方退款开关和资金来源。分享用的[精简图文稿](auth-capture-contract-analysis.md)按业务问题组织，本文保留源码顺序。
+只想先读合约，可以从[Solidity 合约源码走读](auth-capture-solidity-walkthrough.md)开始，按函数看检查、调用和状态变化。本文继续解释签名与 x402 SDK 如何接到这些合约；分享用的[精简图文稿](auth-capture-contract-analysis.md)按业务问题组织。
 
 ## 1 官方实现分为两层
 

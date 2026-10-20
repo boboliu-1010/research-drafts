@@ -202,6 +202,6 @@ void / reclaim 释放尚未花掉的托管款；refund 退已经 capture 或 cha
 
 ## 源码
 
-逐函数解释、参数细节和测试入口见[官方代码走读](auth-capture-official-code-walkthrough.md)。[全部配图及可编辑图源](../assets/auth-capture/)可单独使用。
+逐函数解释见[Solidity 合约源码走读](auth-capture-solidity-walkthrough.md)，签名与 SDK 接入细节见[官方代码走读](auth-capture-official-code-walkthrough.md)。[全部配图及可编辑图源](../assets/auth-capture/)可单独使用。
 
 本文依据 x402 提交 faa1c694c66a3732aaabbce93bdae140e521a67d 和 Commerce Payments 提交 b748fdd7a830a655a19a530edcf2a94b9dc7d25f，以 v1.1 为主。v1.0 扣款参数是 feeBps，v1.1 是 feeAmount，升级时必须配套核对部署、Collector、ABI 和签名配置。
