@@ -8,11 +8,11 @@
 
 ## 1 先区分这次新增与原有合约
 
-这里的“这次”指 x402 auth-capture SDK v1.1 接入改动 [#3203](https://github.com/x402-foundation/x402/pull/3203)（提交 [28376d6](https://github.com/x402-foundation/x402/commit/28376d643a6d9492e4a6cbfa5199376b90eb89dc)），不是 Commerce Payments 自身的版本升级。核对该提交的 164 个变更文件，没有生产 Solidity 合约变更；新增 .sol 为下列三个测试 operator。
+**本文中的 Escrow、TokenStore 和具体 Collector，都是为 Commerce Payments 这套 auth-capture 支付系统实现的配套合约，不是 EVM 内置合约。** “已有”指它们在 Commerce Payments 中已经存在，x402 接入时复用；对原先只做 exact 直付的应用而言，它们仍是新接入的支付依赖。
 
-**这次新做的是 x402 的接入层；下面重点走读的生产支付合约，都是复用已有实现。** 对原先只用 exact 直付的应用而言，它们是新接入的合约依赖，但不代表合约源码这次才出现。
+区分三个层次：EVM 提供 CALL、存储、CREATE2 等底层能力；USDC、Permit2、Multicall3 是部署在链上的通用应用合约；Escrow、TokenStore、这些 Collector 是支付系统的配套实现。EVM 兼容不代表目标链已经部署后两层合约。
 
-### 1.1 原有支付合约：本次复用
+### 1.1 按用途分：支付专用合约与通用依赖
 
 | 类别 | 合约 | 本次接入的作用 |
 | --- | --- | --- |
@@ -28,6 +28,8 @@
 因此，本路径直接使用 **5 类业务合约**。Commerce Payments 还有 PreApprovalPaymentCollector、SpendPermissionPaymentCollector 等已有收款方式，未列入当前 x402 ERC-3009 / Permit2 标准路径。
 
 ### 1.2 这次新增的 Solidity：仅用于测试
+
+这里的“这次”限定为 x402 auth-capture SDK v1.1 接入改动 [#3203](https://github.com/x402-foundation/x402/pull/3203)（提交 [28376d6](https://github.com/x402-foundation/x402/commit/28376d643a6d9492e4a6cbfa5199376b90eb89dc)），不是 Commerce Payments 自身的版本升级。核对该提交的 164 个变更文件，没有生产 Solidity 合约变更；新增 .sol 为以下三个测试 operator。
 
 | 新增文件 | 测什么 | 是否生产支付合约 |
 | --- | --- | --- |
@@ -139,7 +141,7 @@ return keccak256(abi.encode(block.chainid, address(this), paymentInfoHash));
 
 合约允许 authorize 金额小于上限；本次阅读的 x402 authorize 路径选择收完整上限。无论收多少，这个支付身份都不能再用来补款。
 
-## 7 _collectTokens：Collector 说收到了还不够
+## 7 Escrow._collectTokens：安排收款并核对入金
 
 位置：[_collectTokens](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L408)。
 
@@ -156,9 +158,61 @@ return keccak256(abi.encode(block.chainid, address(this), paymentInfoHash));
 
 这里校验的是类型和实收入金，不是硬编码 canonical Collector 地址白名单。x402 SDK 还会按部署配置选择、验证相应 Collector。
 
-## 8 两种 Payment Collector 的调用链
+## 8 TokenCollector 与具体 Collector：先看继承，再看收款
 
-### ERC-3009：签名金额固定为上限
+**TokenCollector 是抽象基类，提供共同入口和规则；具体 Collector 继承它，实现不同的收款方式。** 它不是一个接收资金后再转发给其他 Collector 的路由合约，也不单独部署成一层中间收款地址。
+
+![TokenCollector 的继承关系和具体 Collector 内部的运行时调用](../assets/auth-capture/11-collector-inheritance-call.png)
+
+### 8.1 TokenCollector 负责共同规则
+
+位置：[TokenCollector.collectTokens](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/TokenCollector.sol#L39)、[_getHashPayerAgnostic](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/TokenCollector.sol#L70)。
+
+| 基类提供的内容 | 作用 |
+| --- | --- |
+| authCaptureEscrow | 构造时固定允许调用自己的 Escrow |
+| collectTokens(...) | 对外统一入口，检查调用者是指定 Escrow，再调用内部实现 |
+| CollectorType | 声明 Payment / Refund 两种收款类别；具体合约返回相应类别 |
+| _getHashPayerAgnostic(...) | 为付款授权计算绑定订单条款的 nonce，退款路径无需使用它 |
+| _collectTokens(...) | internal virtual 抽象函数，留给具体 Collector 实现 |
+
+共同入口的源码是：
+
+```solidity
+function collectTokens(
+    AuthCaptureEscrow.PaymentInfo calldata paymentInfo,
+    address tokenStore,
+    uint256 amount,
+    bytes calldata collectorData
+) external {
+    if (msg.sender != address(authCaptureEscrow)) revert OnlyAuthCaptureEscrow();
+    _collectTokens(paymentInfo, tokenStore, amount, collectorData);
+}
+```
+
+具体 Collector 部署后，继承的入口和子类实现都在这个实例里执行。最后一行会进入子类覆盖的内部函数，不会再发起一次到独立 TokenCollector 地址的外部调用。
+
+同名函数要分清：
+
+| 函数所在位置 | 做什么 |
+| --- | --- |
+| Escrow._collectTokens | 选定收款目标、检查 Collector 类型、核对 TokenStore 实收入金 |
+| 具体 Collector 继承的 collectTokens | 检查必须由指定 Escrow 调用，进入自己的内部收款实现 |
+| 具体 Collector 实现的 _collectTokens | 执行 ERC-3009、Permit2 或退款 transferFrom |
+
+### 8.2 具体 Collector 决定从谁那里、用什么方式收款
+
+| 合约 | 资金提供方 | 实际收款方式 | collectorType |
+| --- | --- | --- | --- |
+| ERC3009PaymentCollector | payer | token.receiveWithAuthorization，退差额后转入 TokenStore | Payment |
+| Permit2PaymentCollector | payer | Permit2.permitTransferFrom，直接转入 TokenStore | Payment |
+| OperatorRefundCollector | operator | token.transferFrom，依赖 operator 给退款 Collector 的 allowance | Refund |
+
+Collector 可以理解为“把外部资金收进 TokenStore 的适配器”，但钱不一定先经过 Collector 自己的地址。ERC-3009 会经过，Permit2 和标准退款则直接转入 TokenStore。
+
+出款不需要这层适配：capture / void / reclaim 走 Escrow → TokenStore → token.transfer。refund 因为要新收退款资金，会先经过退款 Collector；charge 因为当场收款，会先经过付款 Collector。
+
+### 8.3 ERC-3009：签名金额固定为上限
 
 位置：[ERC3009PaymentCollector._collectTokens](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/ERC3009PaymentCollector.sol#L31)。
 
@@ -174,7 +228,7 @@ Operator → Escrow.authorize / charge
 
 authorize 10 时，Collector 收 10、存 10；charge 6 时，Collector 收 10、退 4、存 6，全部在同一交易。因此后者虽然净付 6，执行时钱包仍需有 10。
 
-### Permit2：签上限，只请求本次金额
+### 8.4 Permit2：签上限，只请求本次金额
 
 位置：[Permit2PaymentCollector._collectTokens](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/Permit2PaymentCollector.sol#L37)。
 
@@ -187,7 +241,7 @@ Operator → Escrow.authorize / charge
 
 permitted.amount 为 maxAmount，requestedAmount 为实际 amount，nonce 和 deadline 同样绑定订单。spender 是付款 Collector；token 的底层 allowance 则需要给 Permit2。签名授权和 ERC-20 allowance 是两个条件，不能只准备签名。
 
-TokenCollector 的公共入口只接受它构造时指定的 Escrow。两个付款 Collector 都继承这个入口，再分别实现自己的内部 _collectTokens。
+这两条路径使用同一套 TokenCollector 入口规则，不同点在各自的内部 _collectTokens。OperatorRefundCollector 的收款实现见第 13 节。
 
 ## 9 capture：把可扣余额转换为可退额度
 
@@ -333,3 +387,19 @@ TokenStore 的业务入口很小：先确认 msg.sender==authCaptureEscrow，再
 | [refund.t.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/test/src/PaymentEscrow/refund.t.sol) | 退款出资、额度与期限 |
 
 本文检查实现及相关测试源码，没有运行上述测试。TokenStore 转账、Collector 验签收款和 SDK 代办规则共同构成完整路径；基础 Escrow 不判断交付，不保证 facilitator 持续在线，也不预存退款准备金。
+
+## 18 TRON 接入时需要补哪些合约
+
+按现有 TRON SDK 的[资产配置说明](https://github.com/BofAI/x402/blob/main/typescript/packages/mechanisms/tron/src/shared/defaultAssets.ts)，USDT 不实现该 SDK 所需的 3009 风格签名转账，采用 Permit2 路径。首版若以 USDT 为主，移植重点是：
+
+| 组件 | 首版处理 |
+| --- | --- |
+| AuthCaptureEscrow、TokenStore | 移植并部署，核对 TVM 兼容性和 CREATE2 地址预测 |
+| Permit2PaymentCollector | 适配收款；验证目标 Permit2 的 permitTransferFrom 接口和签名域 |
+| OperatorRefundCollector | 适配 TRC-20 退款入金，准备 operator 的余额和 allowance |
+| TokenCollector 等基类 | 随具体合约一同编译适配，不独立部署一个基类实例 |
+| 3009PaymentCollector | 目标代币确实支持所需签名收款接口时，再加入 |
+
+写一个名为 TRC3009PaymentCollector 的合约，不会让现有 USDT 获得签名收款能力。3009 和 Permit2 是通用授权机制，Collector 才是把它们接到 auth-capture 订单与 TokenStore 的适配层。
+
+还要分清接口：官方 ERC3009 Collector 调 receiveWithAuthorization，现有 TRON exact 代码使用 transferWithAuthorization；现有 exact 的 Permit2 Proxy 使用 witness 直付路径，也不能直接当作 auth-capture Collector。需要重新核对订单绑定、资金去向和签名构造。部署兼容性尚未做链上验证，其他移植事项见[分享稿](auth-capture-contract-analysis.md#tron-上要改什么)。

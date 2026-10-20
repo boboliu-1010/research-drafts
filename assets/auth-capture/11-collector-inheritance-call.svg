@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1160" viewBox="0 0 1440 1160" role="img" aria-labelledby="title desc">
+<title id="title">TokenCollector 的继承与运行时调用</title>
+<desc id="desc">TokenCollector 是抽象基类，提供入口权限、类型声明、nonce 工具和抽象收款函数。ERC3009PaymentCollector、Permit2PaymentCollector、OperatorRefundCollector 继承后分别实现不同收款方式。运行时 Escrow 直接调用具体 Permit2PaymentCollector 实例，先执行继承的 collectTokens，再在同一实例内部执行子类 _collectTokens，之后外部调用 Permit2。不存在单独部署的 TokenCollector 中转地址。</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#657992" stroke-width="1.8"/></marker></defs>
+<style>text{font-family:'PingFang SC','Microsoft YaHei',Arial,sans-serif} .title{font-size:27px;font-weight:600;fill:#14283f} .body{font-size:23px;fill:#33465e} .small{font-size:20px;fill:#5d7087}</style>
+<rect width="1440" height="1160" fill="#f5f7fb"/><rect width="1440" height="140" fill="#14283f"/>
+<text x="60" y="62" font-size="36" font-weight="650" fill="white">TokenCollector 是基类，具体 Collector 执行收款</text>
+<text x="60" y="110" font-size="23" fill="#c4d3e5">上半图看代码继承，下半图看真实调用；继承不会增加一个链上中转地址</text>
+
+<rect x="310" y="170" width="820" height="135" rx="16" fill="#eaf0fd" stroke="#d4dff1"/>
+<text x="334" y="213" class="title" style="fill:#315fcd">TokenCollector（abstract 抽象基类）</text>
+<text x="334" y="253" class="body">统一 collectTokens 入口、Escrow 调用权限、类别与 nonce 工具</text>
+<text x="334" y="286" class="small">_collectTokens 是抽象函数；基类本身不实现具体收款方式。</text>
+<path d="M720 309 V330 H270 V356" stroke="#93a6c1" stroke-width="2.2" stroke-dasharray="7 5" marker-end="url(#arrow)" fill="none"/>
+<path d="M720 309 V330 H720 V356" stroke="#93a6c1" stroke-width="2.2" stroke-dasharray="7 5" marker-end="url(#arrow)" fill="none"/>
+<path d="M720 309 V330 H1170 V356" stroke="#93a6c1" stroke-width="2.2" stroke-dasharray="7 5" marker-end="url(#arrow)" fill="none"/>
+<rect x="60" y="366" width="420" height="142" rx="16" fill="#eaf0fd" stroke="#d4dff1"/>
+<text x="80" y="409" class="body" style="fill:#315fcd">ERC3009PaymentCollector</text>
+<text x="80" y="451" class="body">Payment · 用户签名收款</text>
+<text x="80" y="486" class="small">payer → Collector → TokenStore</text>
+<rect x="510" y="366" width="420" height="142" rx="16" fill="#eaf5f1" stroke="#d2e8df"/>
+<text x="530" y="409" class="body" style="fill:#167563">Permit2PaymentCollector</text>
+<text x="530" y="451" class="body">Payment · 用户签名收款</text>
+<text x="530" y="486" class="small">Permit2 将 payer 的钱转进 TokenStore</text>
+<rect x="960" y="366" width="420" height="142" rx="16" fill="#efedf9" stroke="#dfd9f0"/>
+<text x="980" y="409" class="body" style="fill:#6c51ac">OperatorRefundCollector</text>
+<text x="980" y="451" class="body">Refund · 收取新退款资金</text>
+<text x="980" y="486" class="small">operator → TokenStore</text>
+<rect x="60" y="535" width="1320" height="76" rx="16" fill="white" stroke="#dce4ee"/>
+<text x="84" y="568" class="body">虚线表示继承：三个具体合约各自包含共同入口，并实现自己的内部收款函数。</text>
+<text x="84" y="598" class="small">它们是 auth-capture 支付配套实现；不是 EVM 内置合约。</text>
+<rect x="60" y="640" width="1320" height="410" rx="16" fill="#edf3fb" stroke="#b9cbe3"/>
+<text x="84" y="682" class="title" style="fill:#315fcd">运行时调用：以 Permit2PaymentCollector 为例</text>
+<rect x="84" y="766" width="270" height="102" rx="16" fill="white" stroke="#d4dff1"/>
+<text x="104" y="806" class="body" style="fill:#315fcd">AuthCaptureEscrow</text>
+<text x="104" y="844" class="small">直接调用具体合约地址</text>
+<path d="M361 807 H397" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<rect x="405" y="711" width="650" height="271" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="425" y="747" class="title" style="fill:#167563">一个 Permit2PaymentCollector 实例</text>
+<rect x="425" y="766" width="610" height="73" rx="16" fill="#eaf0fd" stroke="#d4dff1"/>
+<text x="445" y="798" class="body" style="fill:#315fcd">collectTokens(...)（继承入口）</text>
+<text x="445" y="826" class="small">检查 msg.sender 必须是指定 Escrow</text>
+<path d="M715 844 V864" stroke="#657992" stroke-width="2.2" marker-end="url(#arrow)" fill="none"/>
+<text x="744" y="860" class="small">内部调用</text>
+<rect x="425" y="874" width="610" height="73" rx="16" fill="#eaf5f1" stroke="#d2e8df"/>
+<text x="445" y="906" class="body" style="fill:#167563">_collectTokens(...)（子类实现）</text>
+<text x="445" y="934" class="small">设置 owner、上限、实际金额、nonce 和收款地址</text>
+<path d="M1062 911 H1082" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<rect x="1090" y="874" width="265" height="73" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="1110" y="906" class="body" style="fill:#167563">Permit2 合约</text>
+<text x="1110" y="934" class="small">permitTransferFrom</text>
+<text x="84" y="1022" class="small">资金路径：Permit2 执行代币转账，payer → TokenStore；基类没有独立的收款地址。</text>
+<text x="60" y="1100" class="small">Escrow 检查 Collector 类别与 TokenStore 实收余额；继承入口检查调用者；具体实现负责收款。</text>
+<text x="60" y="1138" class="small">Commerce Payments v1.1 · 继承关系与合约调用分开看 · 未经评审研究草稿</text>
+</svg>

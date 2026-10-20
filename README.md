@@ -5,7 +5,7 @@
 ## auth-capture
 
 - [支付机制与合约分享](docs/auth-capture-contract-analysis.md)：对比 exact、先托管后 capture、直接 charge，讲清合约、退款资金、故障处理和 TRON 移植；正文配 5 张图。
-- [Solidity 合约源码走读](docs/auth-capture-solidity-walkthrough.md)：先区分本次新增代码与已有合约，再按函数阅读 Escrow、TokenStore 和 Collector 的权限、调用及状态变化。
+- [Solidity 合约源码走读](docs/auth-capture-solidity-walkthrough.md)：区分支付配套合约与通用依赖，配图解释 Collector 继承与调用，再按函数阅读权限、资金和状态变化；附 TRON 适配范围。
 - [官方代码走读](docs/auth-capture-official-code-walkthrough.md)：固定官方源码提交，包含函数、行号、资金与权限边界。
 - [配图与可编辑图源](assets/auth-capture/)：Mermaid 和 SVG。
 

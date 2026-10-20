@@ -128,6 +128,8 @@ _validatePayment 检查 now < preApprovalExpiry，且 preApprovalExpiry ≤ auth
 
 ## 6 Collector 才是 token 签名的执行入口
 
+TokenCollector 是抽象基类，统一入口权限、类别声明和 nonce 工具；三个具体 Collector 继承它，分别实现用户 ERC-3009 收款、用户 Permit2 收款和 operator 退款入金。继承的 collectTokens 与子类 _collectTokens 在同一个具体合约实例内执行，不存在额外的基类中转地址。继承图和逐层调用见[合约走读第 8 节](auth-capture-solidity-walkthrough.md#8-tokencollector-与具体-collector先看继承再看收款)。
+
 源码：[function _collectTokens(](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/ERC3009PaymentCollector.sol#L31)；[function _collectTokens(](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/Permit2PaymentCollector.sol#L37)；[function _getHashPayerAgnostic(](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/TokenCollector.sol#L70)。
 
 ERC3009PaymentCollector 调 token.receiveWithAuthorization，value 使用 PaymentInfo.maxAmount，nonce 使用 payer-agnostic hash。若实际 amount 较小，先退 maxAmount-amount 给 payer，再把 amount 转入 TokenStore。因此小额 charge 也可能需要钱包暂时具备完整上限的余额。

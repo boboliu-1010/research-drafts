@@ -51,6 +51,8 @@ auth-capture 让用户先签一笔支付上限，再按实际金额结算。它�
 
 上面 5 类业务合约都来自 Base 已有的 Commerce Payments。**本次 x402 SDK 接入没有新写一套生产支付合约，主要在 client / server / facilitator 中新增或完善接入与生命周期管理代码。** 对 exact 直付应用而言，这是新接入的依赖，不是新发明的合约。
 
+这里的“已有”不指 EVM 内置：这 5 类是为 auth-capture 支付模型实现的配套合约。TokenCollector 是它们中三个具体 Collector 的抽象基类，统一收款入口和权限；具体 Collector 才决定用什么方式把钱收进 TokenStore，继承代码在同一个实例中运行。[继承与调用图](auth-capture-solidity-walkthrough.md#8-tokencollector-与具体-collector先看继承再看收款)见走读。
+
 这次新增的 Solidity 是 ForwardingOperator、NoopOperator、GasWastingOperator 三个集成测试合约，不属于生产支付合约。TokenCollector、ERC6492SignatureHandler 是已有辅助基类；USDC 等 token、Permit2、Multicall3 是原有外部依赖。来源与本次变更核对见[新增与复用清单](auth-capture-solidity-walkthrough.md#1-先区分这次新增与原有合约)。
 
 **TokenStore 按 operator 地址区分，不是每笔订单一个。** 同一条链、同一 Escrow 下，多笔支付共用资金容器，Escrow 按支付编号分别记账。Escrow 部署时创建模板；实例地址可提前计算，首次需要转出资金时再自动部署。一个 facilitator 使用多个执行地址，就会对应多个 TokenStore。
