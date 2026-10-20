@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1120" viewBox="0 0 1440 1120" role="img" aria-labelledby="title desc">
+<title id="title">auth-capture 支付流程与资金去向</title>
+<desc id="desc">买方签名后，由 operator 托管 10 USDC，商家执行业务，再由 operator 扣款 6。商家收到 5.94，费用方收到 0.06。剩余 4 需另行 void 或到期 reclaim，已扣款的 refund 则需要新的资金。</desc>
+<defs>
+ <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#57718e" stroke-width="1.8"/></marker>
+ <marker id="blueArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#2165db" stroke-width="1.8"/></marker>
+ <filter id="shadow" x="-10%" y="-15%" width="120%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="#19324d" flood-opacity="0.05"/></filter>
+</defs>
+<style>text {font-family:'PingFang SC','Microsoft YaHei',Arial,sans-serif} .label{font-size:22px;fill:#50627a} .small{font-size:20px;fill:#64748b} .body{font-size:24px;fill:#33465e} .title{font-size:28px;font-weight:600;fill:#14283f} .num{font-size:40px;font-weight:650;fill:#14283f}</style>
+<rect width="1440" height="1120" fill="#f5f7fb"/>
+<rect x="0" y="0" width="1440" height="142" fill="#14283f"/>
+<text x="60" y="61" font-size="36" font-weight="650" fill="white">auth-capture 支付流程</text>
+<text x="60" y="108" font-size="23" fill="#c4d3e5">先锁定资金，再按实际费用结算</text>
+<rect x="1070" y="42" width="310" height="48" rx="24" fill="#29425e"/>
+<text x="1225" y="73" text-anchor="middle" font-size="20" fill="#e1eaf5">delegated · escrow 路径</text>
+
+<rect x="60" y="178" width="306" height="244" rx="18" fill="white" stroke="#dce4ee" filter="url(#shadow)"/>
+<rect x="82" y="200" width="44" height="36" rx="10" fill="#e9efff"/>
+<text x="90" y="225" class="body" style="fill:#315fcd">01</text>
+<text x="82" y="280" class="title">付款签名</text>
+<text x="82" y="319" class="small" style="fill:#315fcd">买方</text>
+<text x="82" y="366" class="small">同意最多支付 10 USDC</text>
+<text x="82" y="398" class="small">此时钱仍在买方钱包</text>
+<path d="M370 280 H392" stroke="#57718e" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="398" y="178" width="306" height="244" rx="18" fill="white" stroke="#dce4ee" filter="url(#shadow)"/>
+<rect x="420" y="200" width="44" height="36" rx="10" fill="#e6f4f0"/>
+<text x="428" y="225" class="body" style="fill:#168270">02</text>
+<text x="420" y="280" class="title">托管 10</text>
+<text x="420" y="319" class="small" style="fill:#168270">Operator · authorize</text>
+<text x="420" y="366" class="small">从买方收取 10 USDC</text>
+<text x="420" y="398" class="small">进入 TokenStore</text>
+<path d="M708 280 H730" stroke="#57718e" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="736" y="178" width="306" height="244" rx="18" fill="white" stroke="#dce4ee" filter="url(#shadow)"/>
+<rect x="758" y="200" width="44" height="36" rx="10" fill="#edf0f5"/>
+<text x="766" y="225" class="body" style="fill:#60738c">03</text>
+<text x="758" y="280" class="title">执行任务</text>
+<text x="758" y="319" class="small" style="fill:#60738c">商家服务端</text>
+<text x="758" y="366" class="small">完成业务，确定费用</text>
+<text x="758" y="398" class="small">本例实际使用 6 USDC</text>
+<path d="M1046 280 H1068" stroke="#57718e" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1074" y="178" width="306" height="244" rx="18" fill="white" stroke="#dce4ee" filter="url(#shadow)"/>
+<rect x="1096" y="200" width="44" height="36" rx="10" fill="#e6f4f0"/>
+<text x="1104" y="225" class="body" style="fill:#168270">04</text>
+<text x="1096" y="280" class="title">扣款 6</text>
+<text x="1096" y="319" class="small" style="fill:#168270">Operator · capture</text>
+<text x="1096" y="366" class="small">托管款付给商家和费用方</text>
+<text x="1096" y="398" class="small">买方无需再次签付款授权</text>
+<text x="60" y="481" class="title">资金怎么走</text>
+<text x="280" y="479" class="label">示例：预算 10 USDC · 实际扣款 6 USDC · 手续费 1%</text>
+<rect x="60" y="526" width="280" height="194" rx="18" fill="white" stroke="#dce4ee"/>
+<rect x="565" y="526" width="300" height="194" rx="18" fill="white" stroke="#dce4ee"/>
+<rect x="1080" y="526" width="300" height="194" rx="18" fill="white" stroke="#dce4ee"/>
+<text x="86" y="568" class="title">买方钱包</text>
+<text x="86" y="620" class="num">10 USDC</text>
+<text x="86" y="669" class="small">authorize 后转入托管</text>
+<text x="590" y="568" class="title">TokenStore</text>
+<text x="590" y="620" class="num">10 → 4</text>
+<text x="590" y="669" class="small">入金 10，扣款后剩余 4</text>
+<text x="1104" y="568" class="title">本次分账</text>
+<text x="1104" y="612" class="body">商家   5.94 USDC</text>
+<text x="1104" y="651" class="body">费用   0.06 USDC</text>
+<text x="1104" y="693" class="small">同一交易内的两次转账</text>
+<path d="M350 613 H553" stroke="#57718e" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="376" y="592" class="label">authorize 10</text>
+<path d="M875 613 H1068" stroke="#57718e" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="896" y="592" class="label">capture 6</text>
+<path d="M715 720 V790 Q715 810 695 810 H220 Q200 810 200 790 V729" fill="none" stroke="#2165db" stroke-width="2.5" marker-end="url(#blueArrow)"/>
+<rect x="291" y="788" width="334" height="42" rx="21" fill="#e8effe"/>
+<text x="315" y="816" class="label" style="fill:#2165db">剩余 4 USDC 返回买方</text>
+<rect x="60" y="870" width="805" height="142" rx="16" fill="#eaf0fd"/>
+<text x="85" y="911" class="title">未扣款：void 或 reclaim</text>
+<text x="85" y="951" class="small">operator 另发 void；或扣款到期后，买方主动 reclaim。</text>
+<text x="85" y="986" class="small">不自动退款，capture 成功也不代表 void 已成功。</text>
+<rect x="900" y="770" width="480" height="242" rx="16" fill="#fff3e6" stroke="#f1ddc6"/>
+<text x="925" y="818" class="title">已扣款：refund</text>
+<text x="925" y="863" class="small">退已付给商家的钱，需要重新出资。</text>
+<text x="925" y="901" class="small">标准路径从 operator 钱包收款，</text>
+<text x="925" y="938" class="small">不会自动向商家追回。</text>
+<text x="925" y="984" class="small">仍受退款期限与可退款额度限制。</text>
+<line x1="60" y1="1043" x2="1380" y2="1043" stroke="#d7e0ec"/>
+<text x="60" y="1083" class="small">默认 operator 为 facilitator 执行地址；合约按条款转账，不判断任务是否完成。</text>
+</svg>

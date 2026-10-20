@@ -6,6 +6,10 @@
 
 auth-capture 用来处理“先准备好钱，稍后再结算”的支付。比如 Agent 做一个预算 10 USDC 的任务：先托管 10，完成后实际扣 6，再退回剩余 4。
 
+![auth-capture 支付流程与资金去向](../assets/auth-capture/08-auth-capture-overview.png)
+
+上图展示 delegated escrow 路径：签名时钱还没转出，authorize 才锁定资金；capture 付给商家，剩余款另行处理。费用按 1% 举例。
+
 它适合异步任务、按用量计费和一次会话内分次扣款。**每笔支付有额度和期限，不能反复充值，也不是长期自动续费。**
 
 ## 谁来操作
@@ -87,7 +91,7 @@ authorize 或 charge 对同一支付只能成功一次。capture 不能超过剩
 | POST /verify | 检查、验签和模拟，不收钱 |
 | POST /settle | 提交链上操作并处理交易结果 |
 
-![托管和扣款的两次 settle](../assets/auth-capture/03-settle-sequence.png)
+具体请求与交易顺序见[两次 settle 时序图](../assets/auth-capture/03-settle-sequence.png)。
 
 默认 escrow 路径通常分两次 settle：第一次调用 authorize，确认托管；业务完成后，第二次调用 capture，实际付给商家。captureMode=sync 在请求结束阶段扣款，deferred 由应用稍后发起。
 
@@ -142,6 +146,6 @@ capture 后再 void 剩余款，才是两笔独立交易。官方 SDK 对后续 
 
 ## 源码
 
-逐函数解释、参数细节和测试入口见[官方代码走读](auth-capture-official-code-walkthrough.md)。[全部配图及 Mermaid 图源](../assets/auth-capture/)可单独使用。
+逐函数解释、参数细节和测试入口见[官方代码走读](auth-capture-official-code-walkthrough.md)。[全部配图及可编辑图源](../assets/auth-capture/)可单独使用。
 
 本文依据 x402 提交 faa1c694c66a3732aaabbce93bdae140e521a67d 和 Commerce Payments 提交 b748fdd7a830a655a19a530edcf2a94b9dc7d25f，以 v1.1 为主。v1.0 扣款参数是 feeBps，v1.1 是 feeAmount，升级时必须配套核对部署、Collector、ABI 和签名配置。
