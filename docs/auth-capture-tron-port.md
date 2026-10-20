@@ -6,9 +6,9 @@
 
 ## 1 首版范围
 
-建议先限定为 **USDT + Permit2 + 单一 delegated operator**。复用 Commerce Payments 的账本模型，移植必要收付合约，并在 TRON SDK / facilitator 中实现对应签名、模拟、广播和对账。
+建议首版先做 **USDT + Permit2 + 单一 delegated operator**。沿用 Commerce Payments 的账本模型，移植必要的收付合约，再为 TRON SDK / facilitator 实现对应的签名、模拟、广播和对账。
 
-TVM 兼容 Solidity 有助于复用代码，不代表现有 EVM 部署在 TRON 上可直接调用，也不代表只复制 AuthCaptureEscrow 就完成接入。模型与角色先见[基础概念](auth-capture-foundations.md)。
+TVM 兼容 Solidity，有助于复用代码，但不能据此认为现有 EVM 部署可供 TRON 直接调用，或只复制 AuthCaptureEscrow 就能完成接入。模型和角色见[基础概念](auth-capture-foundations.md)。
 
 ![TRON 合约与 SDK 适配范围](../assets/auth-capture/07-tron-port.png)
 
@@ -23,9 +23,9 @@ TVM 兼容 Solidity 有助于复用代码，不代表现有 EVM 部署在 TRON �
 
 ## 2 为什么 USDT 首版不先做 3009 Collector
 
-现有 TRON SDK 的[资产配置说明](https://github.com/BofAI/x402/blob/main/typescript/packages/mechanisms/tron/src/shared/defaultAssets.ts)将不支持所需 3009 风格签名转账的 USDT 引导到 Permit2。Collector 只能适配代币已有的能力，写一个名为 TRC3009PaymentCollector 的合约，不会改变现有 USDT 的接口。
+现有 TRON SDK 的[资产配置说明](https://github.com/BofAI/x402/blob/main/typescript/packages/mechanisms/tron/src/shared/defaultAssets.ts)为 USDT 选择 Permit2，因为它不支持所需的 3009 风格签名转账。Collector 只能使用代币已有的能力；写一个名为 TRC3009PaymentCollector 的合约，不会改变现有 USDT 的接口。
 
-目标代币确实支持相应签名收款时，再增加 3009 路径。还要核对官方 ERC3009 Collector 使用的 receiveWithAuthorization，与现有 TRON exact 的 transferWithAuthorization 在接口、签名类型和调用约束上的差别。
+等目标代币确实支持相应签名收款，再增加 3009 路径。还要核对官方 ERC3009 Collector 的 receiveWithAuthorization，与现有 TRON exact 的 transferWithAuthorization 在接口、签名类型和调用约束上有哪些差别。
 
 USDT 的预期流程是：
 
@@ -36,11 +36,11 @@ USDT 的预期流程是：
 后续付款：Escrow → TokenStore → USDT.transfer → 商家 / 费用方
 ```
 
-首次 allowance 与每笔签名是两个条件。钱包是否支持对应结构化签名、失败或到期如何重试，也需与客户端一起验证。
+首次 allowance 和每笔付款签名是两个条件。还需与客户端一起验证钱包能否完成相应的结构化签名，以及失败或到期后怎样重试。
 
 ## 3 哪些现有组件可能复用
 
-现有 SDK 的 [constants.ts](https://github.com/BofAI/x402/blob/main/typescript/packages/mechanisms/tron/src/constants.ts)登记了 TRON Permit2 和 exact / upto Proxy 地址。它们提供接入线索，本次没有据此确认目标链上字节码及接口兼容性。
+现有 SDK 的 [constants.ts](https://github.com/BofAI/x402/blob/main/typescript/packages/mechanisms/tron/src/constants.ts)登记了 TRON Permit2 和 exact / upto Proxy 地址，可作为接入线索。本文尚未核实这些地址的链上字节码和接口兼容性。
 
 | 组件 | 复用前要确认什么 |
 | --- | --- |
@@ -49,13 +49,13 @@ USDT 的预期流程是：
 | token 工具和注册表 | TRC-20 ABI、decimals、地址表示和 allowance 查询是否适用 |
 | 交易执行适配 | 模拟、Energy 估计、回执事件和 pending 处理是否覆盖生命周期 |
 
-Permit2 / USDT 是通用依赖；PaymentCollector 是把它们接入 auth-capture 订单与 TokenStore 的支付适配层。
+Permit2 / USDT 是通用依赖；PaymentCollector 负责把它们接到 auth-capture 订单和 TokenStore。
 
 ## 4 重点一：TokenStore 地址预测
 
-TokenStore 可以先向预测地址入金，再在首次支出时部署。如果预测和实际部署地址不同，后续资金支出就无法按预期执行。
+资金可以先进入 TokenStore 的预测地址，实例等到首次支出时再部署。如果预测地址与实际部署地址不一致，后续就无法按预期转出资金。
 
-TRON CREATE2 地址推导使用 0x41 前缀，EVM 使用 0xff。需要逐项核对 LibClone 的创建代码、salt、部署地址和 TVM 推导规则；不能只改 SDK 中的地址格式。依据见 [TRON TVM 与 EVM 差异](https://developers.tron.network/docs/tvm-vs-evm)。
+TRON CREATE2 使用 0x41 推导前缀，EVM 使用 0xff。因此要逐项核对 LibClone 的创建代码、salt、部署地址和 TVM 推导规则，不能只修改 SDK 的地址格式。依据见 [TRON TVM 与 EVM 差异](https://developers.tron.network/docs/tvm-vs-evm)。
 
 ## 5 重点二：签名和 PaymentInfo 哈希
 
@@ -69,11 +69,11 @@ TRON CREATE2 地址推导使用 0x41 前缀，EVM 使用 0xff。需要逐项核�
 
 ## 6 重点三：执行环境与恢复
 
-原合约使用 Solidity ^0.8.28、Solady clone 与 transient storage 重入锁。要按目标 TRON 网络实际升级配置核对编译产物和 opcode；不能笼统判断 TVM 完全兼容或不支持 transient storage。参见[官方差异说明](https://developers.tron.network/docs/tvm-vs-evm)。
+原合约使用 Solidity ^0.8.28、Solady clone 和 transient storage 重入锁。需要根据目标 TRON 网络的实际升级配置，核对编译产物和 opcode，不能笼统认为 TVM 完全兼容或不支持 transient storage。参见[官方差异说明](https://developers.tron.network/docs/tvm-vs-evm)。
 
-ERC-6492 / Multicall3 需要一并核对。若首版限定钱包支持范围，SDK 必须明确准入并拒绝尚未支持的签名路径，不能声称已兼容所有钱包。
+ERC-6492 / Multicall3 也要一起核对。首版如果限定钱包范围，SDK 就要明确支持哪些钱包，并拒绝尚未支持的签名路径，不能声称已兼容所有钱包。
 
-facilitator 需处理 Energy / 费用估计、构造和广播交易、等待回执、检查事件与余额、恢复 pending；结果不明时先对账原交易。refund 还要求资金协议、operator 余额和 allowance，不能通过开启配置自动解决。
+facilitator 需要估计 Energy / 费用、构造并广播交易、等待回执、检查事件和余额，以及恢复 pending 交易。结果不明时，先核对原交易。refund 还需要资金协议、operator 余额和 allowance，开启配置不会自动解决这些问题。
 
 ## 7 建议验证顺序
 
@@ -84,4 +84,4 @@ facilitator 需处理 Energy / 费用估计、构造和广播交易、等待回�
 5. 接入 SDK 的支付条件、用户签名和商家授权，验证原始条款持久化。
 6. 验证超时、重复请求、进程重启、回执不明、余额或 allowance 不足的恢复行为。
 
-以上为待执行工作，不是已通过的测试结果。合约函数内部见[Solidity 走读](auth-capture-solidity-walkthrough.md)，请求组织与重试见[SDK 走读](auth-capture-official-code-walkthrough.md)。
+以上工作尚待执行，不代表测试已经通过。合约函数内部见[Solidity 走读](auth-capture-solidity-walkthrough.md)，请求组织与重试见[SDK 走读](auth-capture-official-code-walkthrough.md)。

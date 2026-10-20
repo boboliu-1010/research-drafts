@@ -2,7 +2,7 @@
 
 > 未经评审的研究草稿配图。源码版本和验证范围见[基础概念](../../docs/auth-capture-foundations.md#6-源码版本与验证范围)。
 
-配图统一使用“上限 10 USDC、实际消费 6、费用 1%”的示例；纯概念图不表示已部署或测试通过。[返回分享主稿](../../docs/auth-capture-contract-analysis.md)
+配图统一使用“上限 10 USDC、实际消费 6、费用 1%”这个例子。概念图用于解释设计，不表示已经部署或测试通过。[返回分享主稿](../../docs/auth-capture-contract-analysis.md)
 
 ## 正文使用的图
 
@@ -26,4 +26,4 @@
 | [04 分账简图](04-fee-split.png) | 只看 6=5.94+0.06；完整调用说明以图 10 为准 | [Mermaid](04-fee-split.mmd) |
 | [06 故障恢复](06-failure-recovery.png) | 区分仅签名、已广播不明、已托管和已扣款 | [Mermaid](06-failure-recovery.mmd) |
 
-SVG 和 Mermaid 为可编辑源文件，PNG 用于 GitHub 正文展示。Mermaid 图使用同目录的 mermaid-config.json；修改图源后需重新渲染 PNG，并检查文字、金额、箭头和适用模式。
+SVG 和 Mermaid 是可编辑的图源，正文用 PNG 在 GitHub 展示。Mermaid 图使用同目录的 mermaid-config.json；修改图源后，需要重新渲染 PNG，并检查文字、金额、箭头和适用模式。

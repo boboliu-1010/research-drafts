@@ -16,13 +16,13 @@ Commerce Payments Protocol 是 Coinbase 与 Shopify 推出的开源链上商业�
 
 ![Commerce Payments、Coinbase Payments 与 x402 的关系](../assets/auth-capture/12-project-layers.png)
 
-Coinbase 的[产品介绍](https://www.coinbase.com/en-gb/blog/powering-the-future-of-ecommerce-introducing-coinbase-payments)将 Commerce Payments Protocol 列为链上执行层，并说明 Shopify 的 USDC 支付使用它。x402 的[官方 EVM 规范](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/specs/schemes/auth-capture/scheme_auth_capture_evm.md)则明确复用 Commerce Payments。不能把 Shopify 的协议使用情况直接说成使用了 x402 HTTP 接口。
+Coinbase 的[产品介绍](https://www.coinbase.com/en-gb/blog/powering-the-future-of-ecommerce-introducing-coinbase-payments)把 Commerce Payments Protocol 列为链上执行层，并说明 Shopify 的 USDC 支付使用了它。x402 的[官方 EVM 规范](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/specs/schemes/auth-capture/scheme_auth_capture_evm.md)也明确复用 Commerce Payments。但 Shopify 使用这套合约，并不代表它使用了 x402 HTTP 接口。
 
 ## 2 auth-capture 解决什么问题
 
 签名表示允许以后收款，钱仍在用户钱包；authorize 才真正把钱转进托管。商家可以先锁钱，执行任务后按实际金额 capture；也可以只拿签名，在业务完成后用 charge 一次收款并分账。
 
-这适合异步任务、按用量计费，以及一笔授权内分次付款。每笔支付有上限与期限，只能首次收款一次，不支持反复充值，不等于长期自动续费。具体金额和资金路径对比见[分享稿第 2 节](auth-capture-contract-analysis.md#2-为什么有-authorize--capture-和-charge-两条路)。
+它适合异步任务、按用量计费，以及在一笔授权内分次付款。每笔支付都有上限和期限，只能首次收款一次，不能反复充值，也不等于长期自动续费。金额和资金路径对比见[分享稿第 2 节](auth-capture-contract-analysis.md#2-为什么有-authorize--capture-和-charge-两条路)。
 
 | 操作 | 调用者 | 处理哪笔钱 |
 | --- | --- | --- |
@@ -44,13 +44,13 @@ Coinbase 的[产品介绍](https://www.coinbase.com/en-gb/blog/powering-the-futu
 | receiverAuthorizer | 商家操作授权的签名地址，可由商家自管，也可经认证委托给 facilitator |
 | feeReceiver | 费用接收地址，不必与商家或 operator 相同 |
 
-operator 是地址角色，facilitator 是服务角色，两者不能在所有模式下画等号。delegated 的 operator 可以是 EOA 或由 facilitator 控制的智能账户；custom 的 operator 是应用自定义合约。
+operator 是一个地址角色，facilitator 是提供支付服务的程序，二者并不总是一回事。delegated 的 operator 可以是 EOA，也可以是 facilitator 控制的智能账户；custom 的 operator 则是应用自定义合约。
 
-默认 delegated 模式中，基础 Escrow 只认 operator 和用户固定条款，不验证商家操作签名，也不判断交付。facilitator 校验商家意图；custom 可以在自身合约中增加规则，后续生命周期由其接口在官方 relay 之外处理。policy 在本次固定 SDK 快照中仍为保留类型。
+默认 delegated 模式下，基础 Escrow 只检查 operator 和用户固定条款，不验证商家操作签名，也不判断业务是否交付。这些商家意图由 facilitator 校验。custom 可以在自己的合约中增加规则，后续操作通过其接口处理，不由官方 relay 代办。policy 在本文使用的 SDK 快照中仍是保留类型。
 
 ## 4 支付配套合约与通用依赖
 
-“为了 auth-capture 实现的配套合约”和“本次 x402 SDK 新写的代码”是两个口径。
+按用途看，这些是为 auth-capture 实现的配套合约；按代码来源看，它们未必是本次 x402 SDK 更新才写出来的。
 
 | 分类 | 内容 | 与本次接入的关系 |
 | --- | --- | --- |
@@ -66,7 +66,7 @@ Commerce Payments 还有 PreApprovalPaymentCollector、SpendPermissionPaymentCol
 
 ### 本次 x402 SDK 更新实际新增了什么
 
-核对 [#3203](https://github.com/x402-foundation/x402/pull/3203) 的提交 [28376d6](https://github.com/x402-foundation/x402/commit/28376d643a6d9492e4a6cbfa5199376b90eb89dc)，164 个变更文件中没有生产 Solidity 合约变更。主要新增或完善的是 client / server / facilitator 的授权、结算和生命周期管理；abi.ts 描述已有合约接口，不是新的合约实现。
+核对 [#3203](https://github.com/x402-foundation/x402/pull/3203) 的提交 [28376d6](https://github.com/x402-foundation/x402/commit/28376d643a6d9492e4a6cbfa5199376b90eb89dc)后可见，164 个变更文件中没有生产 Solidity 合约变更。这次主要新增或完善了 client / server / facilitator 的授权、结算和生命周期管理。abi.ts 描述的是已有合约的接口，不是新的合约实现。
 
 新增的 Solidity 仅有三个集成测试 operator：
 
@@ -87,7 +87,7 @@ Commerce Payments 还有 PreApprovalPaymentCollector、SpendPermissionPaymentCol
 | [x402r](https://www.x402r.org/) | 提供 operator 和仲裁扩展，资料核对时官网标注 beta | 与上游默认 delegated 模式完全一致 |
 | [Circle Arc 电商 demo](https://github.com/circlefin/arc-ecommerce-payments/blob/master/README.md) | 测试网展示六种操作，可参考实现 | 已商业化或有相应交易规模 |
 
-案例资料核对于 2026 年 10 月 19 日。[Shopify USDC 产品说明](https://help.shopify.com/en/manual/payments/shopify-payments/local-payment-methods/usdc-payments)当时不支持部分扣款或订阅商品；产品开放范围和合约底层能力要分开看。生产退款案例及用量本次未核实，不能断言“没人用”或“功能未生效”。
+案例资料核对于 2026 年 10 月 19 日。[Shopify USDC 产品说明](https://help.shopify.com/en/manual/payments/shopify-payments/local-payment-methods/usdc-payments)当时不支持部分扣款或订阅商品，因此产品开放范围不能等同于合约的全部能力。本文没有核实生产退款案例和用量，不能据此判断“没人用”或“功能未生效”。
 
 ## 6 源码版本与验证范围
 
@@ -96,8 +96,8 @@ Commerce Payments 还有 PreApprovalPaymentCollector、SpendPermissionPaymentCol
 | [x402-foundation/x402](https://github.com/x402-foundation/x402/tree/faa1c694c66a3732aaabbce93bdae140e521a67d) | faa1c694c66a3732aaabbce93bdae140e521a67d，2026-10-15 UTC | TypeScript SDK、规范、示例与测试源码 |
 | [base/commerce-payments](https://github.com/base/commerce-payments/tree/b748fdd7a830a655a19a530edcf2a94b9dc7d25f) | b748fdd7a830a655a19a530edcf2a94b9dc7d25f，2026-09-03 UTC | Commerce Payments v1.1 合约与测试源码 |
 
-合约已按固定提交核对，文档提供函数行号及测试入口；没有运行 SDK / Foundry 测试、故障注入或生产链上交易，也没有验证 TRON 部署。仓库 main 的实现能力不等于 npm 已发布版本能力。
+合约已按文中固定的提交核对，文档列出了函数行号和测试入口。尚未运行 SDK / Foundry 测试、故障注入或生产链上交易，也未验证 TRON 部署。仓库 main 中的实现不一定已经发布到 npm。
 
-EVM 部分以 v1.1 的 feeAmount 为准，v1.0 使用 feeBps。部署地址、Collector、ABI 和操作签名必须配套，不能只改一个参数名称。
+EVM 部分以 v1.1 的 feeAmount 为准，v1.0 使用 feeBps。切换版本时，部署地址、Collector、ABI 和操作签名都要配套，不能只改参数名称。
 
 继续阅读：[合约源码](auth-capture-solidity-walkthrough.md) → [SDK 与接口](auth-capture-official-code-walkthrough.md) → [TRON 适配](auth-capture-tron-port.md)。
