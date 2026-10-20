@@ -8,6 +8,7 @@
 
 | 图 | 内容 | 图源 |
 | --- | --- | --- |
+| [15 完整支付流程](15-payment-lifecycle-overview.png) | 从 402、钱包签名到两条收款路径、TokenStore 分账和退款；对应主稿第 3～6 节 | [SVG](15-payment-lifecycle-overview.svg) |
 | [14 公开链支付验证](14-public-validation.svg) | 两种 Collector、授权扣款与 charge、真实分账与 SDK 问题 | [SVG](14-public-validation.svg) |
 | [13 实测余额变化](13-validation-results.svg) | 从本地 fork 的真实执行记录生成；含分账、释放和退款后的余额 | [SVG](13-validation-results.svg) |
 | [12 项目关系](12-project-layers.png) | Coinbase Payments 与 x402 auth-capture 分别使用 Commerce Payments；不表示 Shopify 使用 x402 | [SVG](12-project-layers.svg) |

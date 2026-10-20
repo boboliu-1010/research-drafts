@@ -4,6 +4,14 @@
 
 **auth-capture 让用户先同意一笔支付上限，再按实际金额结算。** 商家可以先锁住资金再开工，也可以先拿到签名，等业务完成后一次收款并分账。下面都用“上限 10 USDC、实际消费 6、费用 1%”这个例子。
 
+## 先看完整流程
+
+先看一笔支付怎样从请求走到收款。商家服务端决定何时收款，钱包签支付上限，facilitator 提交交易，合约负责托管、分账和退钱。
+
+![auth-capture 完整流程：HTTP 请求、两条收款路径、分账与退款](../assets/auth-capture/15-payment-lifecycle-overview.png)
+
+图中 Escrow 即 AuthCaptureEscrow。后面[第 3 节](#3-合约和参与方)说清谁负责，[第 4 节](#4-capture-怎么分账)看钱怎么分，[第 5 节](#5-voidreclaim-与-refund)看钱怎么退，[第 6 节](#6-x402-如何驱动合约)再看 SDK 如何把这些调用串起来。
+
 ## 1 Commerce Payments 与 x402
 
 Commerce Payments 是 Coinbase 与 Shopify 推出的开源商业支付协议，提供托管、扣款、取消和退款合约。实现位于 [base/commerce-payments](https://github.com/base/commerce-payments)。x402 是 API 等资源的支付协议；它的 auth-capture 方案接入这套合约。Coinbase Payments 则是包含结账和商家 API 的商业产品。[官方产品介绍](https://www.coinbase.com/en-gb/blog/powering-the-future-of-ecommerce-introducing-coinbase-payments)

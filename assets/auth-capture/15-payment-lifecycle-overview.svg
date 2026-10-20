@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1630" viewBox="0 0 1440 1630" role="img" aria-labelledby="title desc">
+<title id="title">一笔 auth-capture 支付，从请求到退款</title>
+<desc id="desc">客户端请求 API，收到商家返回的 402 条件，钱包签署 10 USDC 上限并重试。服务端的 paymentFlow 决定两条路径：escrow 先由 operator 调用 Escrow.authorize，Collector 把 10 收入 TokenStore，再执行业务并 capture 6；authorization 先 verify 和执行业务，再通过 charge 收入 6 并在同一交易分账。两条路径均由 TokenStore 支出手续费 0.06、商家货款 5.94。先托管路径剩余的 4 可由 operator void，或到期后由 payer reclaim；已付的 6 若需 refund，要从 operator 另收退款资金，经 Refund Collector 和 TokenStore 退给 payer。到期不自动转账。默认 delegated 模式下，facilitator 控制 operator 提交地址。</desc>
+<defs><marker id="arrow" viewBox="0 0 9 9" markerWidth="8" markerHeight="8" refX="8" refY="4.5" orient="auto-start-reverse"><path d="M1 1 L8 4.5 L1 8" fill="none" stroke="context-stroke" stroke-width="1.7"/></marker></defs>
+<style>text{font-family:'PingFang SC','Microsoft YaHei',Arial,sans-serif}.heading{font-size:36px;font-weight:650}.section{font-size:25px;font-weight:650;fill:#183b4c}.title{font-size:29px;font-weight:650;fill:#173749}.body{font-size:23px;fill:#264959}.small{font-size:21px;fill:#537282}.step{font-size:25px;font-weight:600;fill:#183b4c}.meta{font-size:23px;fill:#c1d7e4}</style>
+<rect width="1440" height="1630" fill="#f1f6f8"/><rect width="1440" height="138" fill="#132f40"/>
+
+<text x="48" y="58" class="heading" fill="white">一笔 auth-capture 支付，从请求到退款</text>
+<text x="48" y="103" class="meta">上限 10 USDC · 实际消费 6 · 费用 1% · 默认 delegated：facilitator 控制 operator 提交地址</text>
+<text x="48" y="176" class="section">① 先拿到付款授权</text>
+<text x="1392" y="176" class="small" text-anchor="end">HTTP 与 SDK · 第 6 节</text>
+<rect x="48" y="198" width="312" height="96" rx="16" fill="white" stroke="#d8e3ea"/>
+<text x="66" y="235" class="step">客户端请求服务</text>
+<text x="66" y="270" class="small">访问商家的业务 API</text>
+<rect x="392" y="198" width="312" height="96" rx="16" fill="white" stroke="#d8e3ea"/>
+<text x="410" y="235" class="step">商家返回 402</text>
+<text x="410" y="270" class="small">给出上限、期限、费用与路径</text>
+<rect x="736" y="198" width="312" height="96" rx="16" fill="white" stroke="#d8e3ea"/>
+<text x="754" y="235" class="step">钱包签上限 10</text>
+<text x="754" y="270" class="small">携付款签名重试原请求</text>
+<rect x="1080" y="198" width="312" height="96" rx="16" fill="white" stroke="#d8e3ea"/>
+<text x="1098" y="235" class="step">facilitator 接收支付</text>
+<text x="1098" y="270" class="small">商家服务端调用其支付接口</text>
+<path d="M365 246 H387" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M709 246 H731" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M1053 246 H1075" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M1236 294 V313 H720 V326" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="460" y="326" width="520" height="44" rx="22" fill="#e7eff5" stroke="#d3e0ea"/>
+<text x="720" y="356" class="body" text-anchor="middle">由服务端设置的 paymentFlow 选择路径</text>
+<path d="M720 370 V388 H372 V408" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M720 370 V388 H1068 V408" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="48" y="408" width="648" height="570" rx="20" fill="#e8f3ee" stroke="#cddfd5"/>
+<text x="72" y="453" class="title">先托管，再扣款</text>
+<text x="72" y="487" class="small">paymentFlow = escrow</text>
+<rect x="72" y="512" width="600" height="144" rx="14" fill="white" stroke="#cddfd5"/>
+<rect x="72" y="688" width="600" height="90" rx="14" fill="white" stroke="#cddfd5"/>
+<rect x="72" y="810" width="600" height="130" rx="14" fill="white" stroke="#cddfd5"/>
+<path d="M372 657 V682" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M372 779 V804" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="744" y="408" width="648" height="570" rx="20" fill="#eeedf8" stroke="#dcd8ec"/>
+<text x="768" y="453" class="title">业务结束时收款</text>
+<text x="768" y="487" class="small">paymentFlow = authorization</text>
+<rect x="768" y="512" width="600" height="144" rx="14" fill="white" stroke="#dcd8ec"/>
+<rect x="768" y="688" width="600" height="90" rx="14" fill="white" stroke="#dcd8ec"/>
+<rect x="768" y="810" width="600" height="130" rx="14" fill="white" stroke="#dcd8ec"/>
+<path d="M1068 657 V682" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M1068 779 V804" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="92" y="548" class="step">/settle → authorize(10)</text>
+<text x="92" y="584" class="body">operator 调用 Escrow，建立托管</text>
+<text x="92" y="619" class="small">Collector 从 payer 收 10，存入 TokenStore</text>
+<text x="92" y="720" class="step">商家执行业务</text>
+<text x="92" y="753" class="small">资金已托管，再开工；实际消费为 6</text>
+<text x="92" y="848" class="step">/settle → capture(6)</text>
+<text x="92" y="884" class="small">operator 调用 Escrow，结算托管款中的 6</text>
+<text x="92" y="918" class="small">剩余 4 继续托管，需另行释放</text>
+<text x="72" y="964" class="small">sync 在请求结束扣款；deferred 稍后扣款</text>
+<text x="788" y="548" class="step">/verify 验证付款授权</text>
+<text x="788" y="584" class="body">检查签名和条款，此时不锁钱</text>
+<text x="788" y="619" class="small">资金仍在 payer 钱包，最后收款仍可能失败</text>
+<text x="788" y="720" class="step">商家执行业务</text>
+<text x="788" y="753" class="small">先完成业务，确定实际消费为 6</text>
+<text x="788" y="848" class="step">/settle → charge(6)</text>
+<text x="788" y="884" class="small">operator 调用 Escrow，经 Collector 收款</text>
+<text x="788" y="918" class="small">6 进入 TokenStore，同一笔交易里分账</text>
+<text x="768" y="964" class="small">ERC-3009 收 10 退 4；Permit2 直接收 6</text>
+<path d="M48 910 H24 V1289 H372 V1306" fill="none" stroke="#4a8b70" stroke-width="2.8" stroke-linejoin="round" stroke-dasharray="7 6" marker-end="url(#arrow)"/>
+<path d="M372 978 V1005 H720 V1044" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M1068 978 V1005 H720 V1044" fill="none" stroke="#78909d" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="48" y="1044" width="1344" height="190" rx="20" fill="white" stroke="#d8e3ea"/>
+<text x="72" y="1084" class="section">② capture / charge 的共同结果：结算总额 6</text>
+<text x="1368" y="1084" class="small" text-anchor="end">分账 · 第 4 节</text>
+<rect x="88" y="1112" width="472" height="88" rx="14" fill="#e6f2ef" stroke="#cfdfd9"/>
+<text x="112" y="1148" class="step">TokenStore 支出 6 USDC</text>
+<text x="112" y="1181" class="small">Escrow 下指令；同一交易内分成两笔转账</text>
+<rect x="752" y="1106" width="576" height="44" rx="12" fill="#edf5fb" stroke="#d8e4ed"/>
+<text x="776" y="1137" class="body">费用方 feeReceiver：0.06 USDC</text>
+<rect x="752" y="1166" width="576" height="44" rx="12" fill="#edf5fb" stroke="#d8e4ed"/>
+<text x="776" y="1197" class="body">商家 receiver：5.94 USDC</text>
+<path d="M560 1156 H646 V1128 H748" fill="none" stroke="#4a8b70" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M646 1156 V1188 H748" fill="none" stroke="#4a8b70" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="48" y="1279" class="section">③ 需要退钱时，分清“未扣的余额”和“已付的钱”</text>
+<path d="M1068 1234 V1302" fill="none" stroke="#ae8054" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="48" y="1306" width="648" height="200" rx="20" fill="#e8f3ee" stroke="#cddfd5"/>
+<text x="72" y="1345" class="step">未扣的 4 · 仅先托管路径</text>
+<text x="72" y="1382" class="body">TokenStore → payer</text>
+<text x="72" y="1419" class="small">operator 调 void；或到期后 payer 调 reclaim</text>
+<text x="72" y="1457" class="small">释放的是仍留在托管里的钱。</text>
+<rect x="744" y="1306" width="648" height="200" rx="20" fill="#fff4e5" stroke="#ecddc6"/>
+<text x="768" y="1345" class="step">已付的 6 · 两条路径都可 refund</text>
+<text x="768" y="1382" class="body">operator → OperatorRefundCollector</text>
+<text x="768" y="1417" class="body">→ TokenStore → payer</text>
+<text x="768" y="1457" class="small">退款期内另收备付金；不会追回商家、费用方余额。</text>
+<text x="1392" y="1540" class="small" text-anchor="end">参与方与合约 · 第 3 节　　释放和退款 · 第 5 节</text>
+<text x="48" y="1581" class="body">签名只表达授权；authorize 才托管，capture / charge 才付款。</text>
+<text x="48" y="1614" class="small">void / refund 由 operator 发起；到期 reclaim 由 payer 发起。到期不会自动转账。</text>
+</svg>

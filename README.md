@@ -12,6 +12,6 @@ boboliu-1010 的研究与分享草稿，尚未经评审。每份调研都附运�
 | **[Solidity 合约源码走读](docs/auth-capture-solidity-walkthrough.md)** | 合约来源、PaymentInfo、账本、六种操作、Collector、TokenStore 与逐层调用 |
 | **[SDK、接口与 TRON 接入](docs/auth-capture-official-code-walkthrough.md)** | 服务端配置、钱包签名、facilitator、重试和 TRON 移植 |
 
-先读主稿，需要细节再看合约或 SDK。配图和可编辑图源在 [assets/auth-capture](assets/auth-capture/README.md)。
+先看[主稿开头的完整流程图](docs/auth-capture-contract-analysis.md#先看完整流程)，把请求、收款、分账和退款串起来；需要细节再看合约或 SDK。配图和可编辑图源在 [assets/auth-capture](assets/auth-capture/README.md)。
 
 已核验 Base Sepolia 部署，完成 20 笔公开链交易、112 项合约测试和 472 项 SDK 单测。HTTP 实测发现 sync 后的 SDK 账本更新问题，退款已直接调用合约验证。结果、配图和命令见[验证与演示](docs/auth-capture-contract-analysis.md#9-实际验证和演示)。源码版本和其余测试状态见[主稿末尾](docs/auth-capture-contract-analysis.md#10-源码版本)。
