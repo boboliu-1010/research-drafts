@@ -62,6 +62,17 @@ PaymentState 只存三个字段：
 | reclaim | payer | 扣款到期后，取回全部剩余托管款 |
 | refund | operator | 重新提供退款资金，退给买方 |
 
+### capture 和 charge 有什么区别
+
+两者都按实际金额向商家付款、分手续费，并增加可退款额度。区别是：**capture 扣已经托管的钱，charge 当场从买方收钱再分账。**
+
+例如预算上限 10 USDC，实际费用 6：
+
+- authorize → capture：先托管 10，再扣 6；剩余 4 另行 void 或到期 reclaim。可以在余额和期限内分次 capture。
+- charge：一次净收 6 并分账，没有剩余托管款；同一支付不能再次 charge。
+
+需要开工前保证资金到位，就先 authorize 再 capture。charge 没有提前锁钱，即使预验证通过，收款时仍可能因余额不足或授权过期失败。exact 通常用于确定金额的直接支付，方案本身没有这里的费用分账和退款账本。
+
 authorize 或 charge 对同一支付只能成功一次。capture 不能超过剩余托管款；refund 不能超过已扣且未退的金额，也不会恢复可扣余额。void 不能取消尚未收款的 token 签名。
 
 合约收钱后会核对 TokenStore 的实际入金。各操作有重入保护，转账失败时，账本修改和转账一起回滚。
@@ -81,6 +92,8 @@ authorize 或 charge 对同一支付只能成功一次。capture 不能超过剩
 默认 escrow 路径通常分两次 settle：第一次调用 authorize，确认托管；业务完成后，第二次调用 capture，实际付给商家。captureMode=sync 在请求结束阶段扣款，deferred 由应用稍后发起。
 
 同一个 /settle 也处理 payload.type 为 capture、void、refund 的操作；paymentFlow=authorization 则执行 charge，一次收款并分账。**settle 成功的含义要看它执行了什么，authorize 成功还不代表商家已收到钱。**
+
+官方 SDK 的 authorization 路径在业务处理后的结算阶段执行 charge，由服务端补齐金额、费用和操作授权。
 
 ## 手续费怎么付
 
