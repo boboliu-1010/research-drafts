@@ -261,4 +261,3 @@ AuthorizedPaymentStorage.update 要求原子条件修改；默认内存实现的
 合约层控制金额、费用、时间、操作人、账本变化和真实代币收付；SDK 层组织商户签名、身份绑定、custom 模拟和 pending 重试。资源是否交付、退款是否批准、退款由谁出资属于业务与 operator 规则。
 
 最容易误读的四点是：authorize 已经收钱；refundable 是额度而非储备金；商户签名未由基础 Escrow 检查；capture 加 void 不是一笔原子交易。沿上面的固定代码链接可以分别找到这些结论的实现位置。
-
