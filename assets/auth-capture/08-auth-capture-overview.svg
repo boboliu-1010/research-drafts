@@ -1,78 +1,112 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1390" viewBox="0 0 1440 1390" role="img" aria-labelledby="title desc">
-<title id="title">auth-capture 两种支付路径</title>
-<desc id="desc">买方签署最多 10 USDC 的付款授权。escrow 路径先 authorize 托管 10，再执行业务并 capture 6，剩余 4 另行 void 或到期 reclaim。authorization 路径执行业务后 charge，一笔交易净收 6 并分账，不留下可 void 或 reclaim 的余额。两条路径均可在退款期限内由 operator 另行出资 refund。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1470" viewBox="0 0 1440 1470" role="img" aria-labelledby="title desc">
+<title id="title">exact 与 auth-capture 两条路径对比</title>
+<desc id="desc">exact 签固定 6 USDC，结算直接付给商家。auth-capture escrow 签上限 10，authorize 托管 10，业务后 capture 6，剩余 4 另行 void 或到期 reclaim。auth-capture authorization 签上限 10，业务后 charge 一次净收 6 并分账，无剩余托管。exact 本身没有费用分账和退款账本，auth-capture 可在条件内由 operator 另行出资 refund。</desc>
 <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#64748b" stroke-width="1.8"/></marker></defs>
-<style>text{font-family:'PingFang SC','Microsoft YaHei',Arial,sans-serif} .title{font-size:28px;font-weight:600;fill:#14283f} .body{font-size:23px;fill:#33465e} .small{font-size:20px;fill:#5d7087} .step{font-size:26px;font-weight:600;fill:#14283f}</style>
-<rect width="1440" height="1390" fill="#f5f7fb"/>
-<rect width="1440" height="144" fill="#14283f"/>
-<text x="60" y="62" font-size="36" font-weight="650" fill="white">auth-capture 的两种支付方式</text>
-<text x="60" y="110" font-size="23" fill="#c4d3e5">capture 扣托管款；charge 当场收款并分账</text>
-<rect x="1110" y="43" width="270" height="46" rx="23" fill="#29425e"/>
-<text x="1245" y="73" text-anchor="middle" font-size="20" fill="#e1eaf5">delegated 模式示例</text>
+<style>text{font-family:'PingFang SC','Microsoft YaHei',Arial,sans-serif} .title{font-size:28px;font-weight:600;fill:#14283f} .body{font-size:23px;fill:#33465e} .small{font-size:20px;fill:#5d7087} .step{font-size:25px;font-weight:600;fill:#14283f}</style>
+<rect width="1440" height="1470" fill="#f5f7fb"/>
+<rect width="1440" height="138" fill="#14283f"/>
+<text x="60" y="61" font-size="36" font-weight="650" fill="white">x402 三种收付方式对比</text>
+<text x="60" y="109" font-size="23" fill="#c4d3e5">exact 是支付方案；authorize → capture 与 charge 是 auth-capture 的两条路径</text>
 
-<rect x="60" y="176" width="1320" height="98" rx="16" fill="white" stroke="#dce4ee"/>
-<text x="84" y="214" class="title">共同起点：买方签名，同意最多支付 10 USDC</text>
-<text x="84" y="249" class="small">仅签名不转账。实际采用哪条路径，由付款条件中的 paymentFlow 决定。</text>
-<rect x="60" y="308" width="1320" height="405" rx="16" fill="#eaf5f1" stroke="#d2e8df"/>
-<text x="84" y="350" class="title">A  先托管，再扣款</text>
-<text x="84" y="385" class="body" style="fill:#167563">paymentFlow = escrow · 两次结算调用：authorize → capture</text>
-<rect x="84" y="414" width="280" height="168" rx="16" fill="white" stroke="#cee1d9"/>
-<text x="103" y="451" class="step">托管 10</text>
-<text x="103" y="486" class="small" style="fill:#167563">Operator · authorize</text>
-<text x="103" y="531" class="small">买方转出 10 USDC</text>
-<text x="103" y="561" class="small">钱进入 TokenStore</text>
-<path d="M372 493 L398 493" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
-<rect x="406" y="414" width="280" height="168" rx="16" fill="white" stroke="#cee1d9"/>
-<text x="425" y="451" class="step">执行任务</text>
-<text x="425" y="486" class="small" style="fill:#167563">商家服务端</text>
-<text x="425" y="531" class="small">托管成功后开始业务</text>
-<text x="425" y="561" class="small">本例实际费用 6 USDC</text>
-<path d="M694 493 L720 493" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
-<rect x="728" y="414" width="280" height="168" rx="16" fill="white" stroke="#cee1d9"/>
-<text x="747" y="451" class="step">扣款 6</text>
-<text x="747" y="486" class="small" style="fill:#167563">Operator · capture</text>
-<text x="747" y="531" class="small">从托管余额中付款</text>
-<text x="747" y="561" class="small">可按余额与期限分次扣</text>
-<path d="M1016 493 L1042 493" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
-<rect x="1050" y="414" width="280" height="168" rx="16" fill="white" stroke="#cee1d9"/>
-<text x="1069" y="451" class="step">剩余 4</text>
-<text x="1069" y="486" class="small" style="fill:#167563">void / reclaim</text>
-<text x="1069" y="531" class="small">operator 另发 void</text>
-<text x="1069" y="561" class="small">或到期后买方取回</text>
-<rect x="84" y="603" width="1246" height="77" rx="16" fill="#dceee7" stroke="none"/>
-<text x="104" y="634" class="body">资金结果：商家 5.94 USDC  +  费用方 0.06 USDC  +  剩余托管 4 USDC</text>
-<text x="104" y="665" class="small">capture 内部分账原子执行；后续 void 是另一笔交易，剩余款不会自动退回。</text>
-<rect x="60" y="746" width="1320" height="358" rx="16" fill="#efedf9" stroke="#dfd9f0"/>
-<text x="84" y="788" class="title">B  当场收款并分账</text>
-<text x="84" y="823" class="body" style="fill:#6c51ac">paymentFlow = authorization · 一次结算调用：charge</text>
-<rect x="84" y="850" width="280" height="168" rx="16" fill="white" stroke="#dfd9ee"/>
-<text x="103" y="887" class="step">执行任务</text>
-<text x="103" y="922" class="small" style="fill:#6c51ac">商家服务端</text>
-<text x="103" y="967" class="small">验证付款授权后执行业务</text>
-<text x="103" y="997" class="small">此时尚未锁定买方资金</text>
-<path d="M372 929 L398 929" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
-<rect x="406" y="850" width="280" height="168" rx="16" fill="white" stroke="#dfd9ee"/>
-<text x="425" y="887" class="step">charge 收 6</text>
-<text x="425" y="922" class="small" style="fill:#6c51ac">Operator · charge</text>
-<text x="425" y="967" class="small">确定费用后净收 6 USDC</text>
-<text x="425" y="997" class="small">收款失败则本交易回滚</text>
-<path d="M694 929 L720 929" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
-<rect x="728" y="850" width="280" height="168" rx="16" fill="white" stroke="#dfd9ee"/>
-<text x="747" y="887" class="step">立即分账</text>
-<text x="747" y="922" class="small" style="fill:#6c51ac">charge 的同一笔交易</text>
-<text x="747" y="967" class="small">商家收到 5.94 USDC</text>
-<text x="747" y="997" class="small">费用方收到 0.06 USDC</text>
-<path d="M1016 929 L1042 929" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
-<rect x="1050" y="850" width="280" height="168" rx="16" fill="white" stroke="#dfd9ee"/>
-<text x="1069" y="887" class="step">无剩余托管</text>
-<text x="1069" y="922" class="small" style="fill:#6c51ac">不能 void / reclaim</text>
-<text x="1069" y="967" class="small">没有为后续扣款保留资金</text>
-<text x="1069" y="997" class="small">同一支付不能再次 charge</text>
-<text x="84" y="1064" class="small">最终净收 6；未使用的 4 不会被持续锁定。charge 前仍有余额不足或授权到期的风险。</text>
-<rect x="60" y="1138" width="1320" height="142" rx="16" fill="#fff3e6" stroke="#efdcc4"/>
-<text x="84" y="1181" class="title">两条路径都能 refund，但退款需要重新出资</text>
-<text x="84" y="1222" class="small">标准路径：operator 钱包 → Refund Collector → TokenStore → 买方。不会自动向商家追回。</text>
-<text x="84" y="1257" class="small">仍需 operator 调用、退款资金和 allowance，并满足退款期限与可退款额度。</text>
-<line x1="60" y1="1310" x2="1380" y2="1310" stroke="#d7e0ec"/>
-<text x="60" y="1351" class="small">示例：预算 10 USDC、实际收款 6、费率 1%。Operator 默认是 facilitator 执行地址。</text>
+<rect x="60" y="172" width="420" height="1010" rx="16" fill="#eaf0fd" stroke="#d4dff1"/>
+<text x="84" y="219" class="title">exact</text>
+<text x="84" y="261" class="body" style="fill:#315fcd">固定金额，直接支付</text>
+<text x="84" y="299" class="small" style="fill:#315fcd">scheme = exact</text>
+<rect x="84" y="326" width="372" height="134" rx="16" fill="white" stroke="#d4dff1"/>
+<text x="103" y="360" class="step">签固定金额</text>
+<text x="103" y="391" class="small" style="fill:#315fcd">买方</text>
+<text x="103" y="422" class="small">本次价格 6 USDC</text>
+<text x="103" y="449" class="small">签署 6 USDC 付款授权</text>
+<path d="M112 467 V492" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
+<rect x="84" y="500" width="372" height="134" rx="16" fill="white" stroke="#d4dff1"/>
+<text x="103" y="534" class="step">验证付款授权</text>
+<text x="103" y="565" class="small" style="fill:#315fcd">服务端 / Facilitator</text>
+<text x="103" y="596" class="small">检查签名和支付条件</text>
+<text x="103" y="623" class="small">验证本身不锁定资金</text>
+<path d="M112 641 V666" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
+<text x="137" y="660" class="small">提交结算</text>
+<rect x="84" y="674" width="372" height="134" rx="16" fill="white" stroke="#d4dff1"/>
+<text x="103" y="708" class="step">settle 直付 6</text>
+<text x="103" y="739" class="small" style="fill:#315fcd">Facilitator 提交交易</text>
+<text x="103" y="770" class="small">从买方钱包收款</text>
+<text x="103" y="797" class="small">直接支付给商家</text>
+<rect x="84" y="870" width="372" height="154" rx="16" fill="white" stroke="#d4dff1"/>
+<text x="103" y="905" class="step">资金结果</text>
+<text x="103" y="945" class="small">买方净支出 6 USDC</text>
+<text x="103" y="976" class="small">商家收到 6 USDC</text>
+<text x="103" y="1007" class="small">默认直付，不设置额外业务费</text>
+<text x="84" y="1070" class="small">没有托管余额</text>
+<text x="84" y="1105" class="small">方案本身无费用分账、退款账本</text>
+<text x="84" y="1140" class="small">退款可由商家另行转账安排</text>
+<rect x="510" y="172" width="420" height="1010" rx="16" fill="#eaf5f1" stroke="#d2e8df"/>
+<text x="534" y="219" class="title">authorize → capture</text>
+<text x="534" y="261" class="body" style="fill:#167563">先锁定资金，再按实际扣款</text>
+<text x="534" y="299" class="small" style="fill:#167563">auth-capture · escrow</text>
+<rect x="534" y="326" width="372" height="134" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="553" y="360" class="step">签支付上限</text>
+<text x="553" y="391" class="small" style="fill:#167563">买方</text>
+<text x="553" y="422" class="small">最多同意支付 10 USDC</text>
+<text x="553" y="449" class="small">签名时钱仍在买方钱包</text>
+<path d="M562 467 V492" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
+<rect x="534" y="500" width="372" height="134" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="553" y="534" class="step">authorize 托管 10</text>
+<text x="553" y="565" class="small" style="fill:#167563">Operator</text>
+<text x="553" y="596" class="small">买方转出 10 USDC</text>
+<text x="553" y="623" class="small">资金进入 TokenStore</text>
+<path d="M562 641 V666" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
+<text x="587" y="660" class="small">托管后执行业务</text>
+<rect x="534" y="674" width="372" height="134" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="553" y="708" class="step">capture 扣款 6</text>
+<text x="553" y="739" class="small" style="fill:#167563">Operator</text>
+<text x="553" y="770" class="small">业务完成，实际费用为 6</text>
+<text x="553" y="797" class="small">从已有托管余额中付款</text>
+<rect x="534" y="870" width="372" height="154" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="553" y="905" class="step">资金结果</text>
+<text x="553" y="945" class="small">商家收到 5.94 USDC</text>
+<text x="553" y="976" class="small">费用方收到 0.06 USDC</text>
+<text x="553" y="1007" class="small">剩余托管 4 USDC</text>
+<text x="534" y="1070" class="small">可在余额和期限内分次 capture</text>
+<text x="534" y="1105" class="small">剩余 4：另行 void 或到期 reclaim</text>
+<text x="534" y="1140" class="small">到期不会自动退款</text>
+<rect x="960" y="172" width="420" height="1010" rx="16" fill="#efedf9" stroke="#dfd9f0"/>
+<text x="984" y="219" class="title">charge</text>
+<text x="984" y="261" class="body" style="fill:#6c51ac">当场收款并分账</text>
+<text x="984" y="299" class="small" style="fill:#6c51ac">auth-capture · authorization</text>
+<rect x="984" y="326" width="372" height="134" rx="16" fill="white" stroke="#dfd9f0"/>
+<text x="1003" y="360" class="step">签支付上限</text>
+<text x="1003" y="391" class="small" style="fill:#6c51ac">买方</text>
+<text x="1003" y="422" class="small">最多同意支付 10 USDC</text>
+<text x="1003" y="449" class="small">签名时钱仍在买方钱包</text>
+<path d="M1012 467 V492" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
+<rect x="984" y="500" width="372" height="134" rx="16" fill="white" stroke="#dfd9f0"/>
+<text x="1003" y="534" class="step">执行业务</text>
+<text x="1003" y="565" class="small" style="fill:#6c51ac">商家服务端</text>
+<text x="1003" y="596" class="small">验证授权后确定实际费用</text>
+<text x="1003" y="623" class="small">未提前锁定资金</text>
+<path d="M1012 641 V666" stroke="#64748b" stroke-width="2.4" marker-end="url(#arrow)" fill="none"/>
+<text x="1037" y="660" class="small">业务后提交结算</text>
+<rect x="984" y="674" width="372" height="134" rx="16" fill="white" stroke="#dfd9f0"/>
+<text x="1003" y="708" class="step">charge 净收 6</text>
+<text x="1003" y="739" class="small" style="fill:#6c51ac">Operator</text>
+<text x="1003" y="770" class="small">从买方钱包收款</text>
+<text x="1003" y="797" class="small">同一交易内收款并分账</text>
+<rect x="984" y="870" width="372" height="154" rx="16" fill="white" stroke="#dfd9f0"/>
+<text x="1003" y="905" class="step">资金结果</text>
+<text x="1003" y="945" class="small">商家收到 5.94 USDC</text>
+<text x="1003" y="976" class="small">费用方收到 0.06 USDC</text>
+<text x="1003" y="1007" class="small">未使用的 4 不被持续锁定</text>
+<text x="984" y="1070" class="small">没有剩余托管款可 void / reclaim</text>
+<text x="984" y="1105" class="small">同一支付不能再次 charge</text>
+<text x="984" y="1140" class="small">收款时仍可能余额不足或过期</text>
+<rect x="60" y="1206" width="420" height="132" rx="16" fill="white" stroke="#dce4ee"/>
+<text x="84" y="1245" class="step">一次直接支付结算</text>
+<text x="84" y="1285" class="small">无需部署本方案的 Escrow / TokenStore</text>
+<text x="84" y="1318" class="small">这里以 ERC-3009 直付为例</text>
+<rect x="510" y="1206" width="870" height="132" rx="16" fill="#fff3e6" stroke="#efdcc4"/>
+<text x="534" y="1245" class="step">这两条路径都记录可退款额度，可调用 refund</text>
+<text x="534" y="1285" class="small">标准路径由 operator 重新提供退款资金；不能自动向商家追回。</text>
+<text x="534" y="1318" class="small">须满足退款期限、额度、余额与 allowance；不是买方单方面强制退款。</text>
+<line x1="60" y1="1370" x2="1380" y2="1370" stroke="#d7e0ec"/>
+<text x="60" y="1407" class="small">示例：最终支付总额均为 6 USDC；auth-capture 两条路径设置 1% 手续费，operator 为 facilitator 执行地址。</text>
+<text x="60" y="1441" class="small">capture / charge 的货款与费用在一笔交易内分账；capture 后的 void 是另一笔交易，不能保证自动完成。</text>
 </svg>
