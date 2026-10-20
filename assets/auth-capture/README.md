@@ -1,12 +1,12 @@
 # auth-capture 配图目录
 
-> 未经评审的研究草稿配图。源码版本和验证范围见[分享主稿](../../docs/auth-capture-contract-analysis.md#9-源码版本与验证范围)。
+源码版本和测试状态见[分享主稿](../../docs/auth-capture-contract-analysis.md#9-源码版本)。
 
-配图统一使用“上限 10 USDC、实际消费 6、费用 1%”这个例子。概念图用于解释设计，不表示已经部署或测试通过。[返回分享主稿](../../docs/auth-capture-contract-analysis.md)
+配图使用“上限 10 USDC、实际消费 6、费用 1%”这个例子，说明合约设计和调用过程。[返回分享主稿](../../docs/auth-capture-contract-analysis.md)
 
 ## 正文使用的图
 
-| 图 | 说明与适用范围 | 图源 |
+| 图 | 内容 | 图源 |
 | --- | --- | --- |
 | [12 项目关系](12-project-layers.png) | Coinbase Payments 与 x402 auth-capture 分别使用 Commerce Payments；不表示 Shopify 使用 x402 | [SVG](12-project-layers.svg) |
 | [08 三种支付方式](08-auth-capture-overview.png) | exact 以 ERC-3009 默认直付为例；另两列为 delegated 的 escrow / authorization 路径 | [SVG](08-auth-capture-overview.svg) |
@@ -17,7 +17,7 @@
 | [02 TokenStore 部署](02-tokenstore-deployment.png) | 地址可预测，先入金、首次支出时才部署实例 | [Mermaid](02-tokenstore-deployment.mmd) |
 | [05 三个期限](05-deadlines.png) | 首次收款、capture、refund 的截止与主动 reclaim | [Mermaid](05-deadlines.mmd) |
 | [03 两次 settle](03-settle-sequence.png) | 限定 delegated、有 receiverAuthorizer、sync escrow；不在业务前额外调用 /verify | [Mermaid](03-settle-sequence.mmd) |
-| [07 TRON 适配](07-tron-port.png) | USDT + Permit2 首版的待移植范围，不代表已验证兼容 | [Mermaid](07-tron-port.mmd) |
+| [07 TRON 适配](07-tron-port.png) | USDT + Permit2 首版移植方案，兼容性待验证 | [Mermaid](07-tron-port.mmd) |
 
 ## 补充图
 

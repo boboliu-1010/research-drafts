@@ -1,10 +1,8 @@
 # x402 auth-capture SDK、接口与 TRON 接入
 
-> 未经评审的研究草稿。TypeScript 静态源码分析，未运行 SDK 测试或链上交易。
-
 更新：2026 年 10 月 20 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [合约源码](auth-capture-solidity-walkthrough.md) · [TRON 适配](#11-tron-适配)
 
-本文顺着一笔支付往下读：服务端给出付款条件，客户端签名，facilitator 调用合约，再保存状态、处理重试。合约内部实现见 Solidity 走读；固定提交和验证范围见[来源说明](auth-capture-contract-analysis.md#9-源码版本与验证范围)。
+服务端设置付款条件，客户端签名，facilitator 验证并提交交易，业务系统负责交付判断、退款审批、备付金和商户对账。合约内部实现见[合约走读](auth-capture-solidity-walkthrough.md)，[源码版本](auth-capture-contract-analysis.md#9-源码版本)统一列在主稿末尾。
 
 ## 1 代码入口与职责
 
@@ -20,13 +18,13 @@
 
 client、server、facilitator 都有名为 AuthCaptureEvmScheme 的类，但各自实现不同接口，导入时要选对入口。它们最终接入同一套已有的 Commerce Payments 合约，并不是三套链上 Escrow。
 
-核对 [#3203](https://github.com/x402-foundation/x402/pull/3203) 的提交 [28376d6](https://github.com/x402-foundation/x402/commit/28376d643a6d9492e4a6cbfa5199376b90eb89dc)后可见，164 个变更文件中没有生产 Solidity 合约变更。这次主要新增或完善了 client / server / facilitator 的授权、结算和生命周期管理。abi.ts 描述的是已有合约的接口，不是新的合约实现。
+[#3203](https://github.com/x402-foundation/x402/pull/3203) 的提交 [28376d6](https://github.com/x402-foundation/x402/commit/28376d643a6d9492e4a6cbfa5199376b90eb89dc)修改了 164 个文件，没有生产 Solidity 合约变更。主要新增或完善 client / server / facilitator 的授权、结算和生命周期管理。abi.ts 是已有合约的接口定义。
 
 新增的 Solidity 只有三个集成测试 operator：ForwardingOperator 转发 authorize / charge；NoopOperator 调用不 revert 却不收款，用于识别假成功；GasWastingOperator 消耗过多 gas，用于检查调用限制。
 
 官方[测试说明](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/contracts/auth-capture/README.md)限定它们用于集成测试，不能当作生产 operator 模板。
 
-## 2 HTTP 接口与操作分派
+## 2 HTTP 接口
 
 客户端首次请求业务 API，服务端返回 402 和 PAYMENT-REQUIRED；客户端签名后携 PAYMENT-SIGNATURE 重试。服务端与 facilitator 使用以下接口：
 
@@ -44,7 +42,7 @@ client、server、facilitator 都有名为 AuthCaptureEvmScheme 的类，但各�
 
 没有单独规定 /capture、/void、/refund HTTP 接口。/settle 成功也不一定表示商家已收钱：authorize 只是建立托管。/verify 不保证以后一定能收款，settle 会重新验证并模拟。
 
-下图限定为 delegated、可代办生命周期的 sync escrow 路径；charge 和 custom 的分支见下文。
+图中是 delegated 模式、有非零 receiverAuthorizer 的 sync escrow 调用过程。charge 和 custom 的处理方式在后面分别说明。
 
 ![sync escrow 的两次 settle](../assets/auth-capture/03-settle-sequence.png)
 
@@ -62,7 +60,7 @@ settlementHooks 的 before-handler 不追加商户扣款签名。authorize 成�
 
 after-handler 为 sync escrow 构造 capture，为 authorization 路径补齐 charge。deferred escrow 则保留已托管结果，不在请求结束时扣款。cancel 会为可代办生命周期的 escrow 路径构造 void。
 
-上述阶段依据 scheme hooks 及其测试说明，本文未展开全部 core HTTP middleware 的调度源码。操作由 SDK 发起，不能理解成合约到时会自动执行。
+这些操作由 SDK 发起，合约不会到时自动执行。业务前后的顺序按 scheme hooks 及其测试说明，未逐行展开全部 core HTTP middleware。
 
 | extra 主要参数 | 对应意义 |
 | --- | --- |
@@ -73,7 +71,7 @@ after-handler 为 sync escrow 构造 capture，为 authorization 路径补齐 ch
 | feeRecipient / minFeeBps / maxFeeBps | 费用地址和范围 |
 | assetTransferMethod | eip3009（默认）或 permit2，决定配套 Collector |
 
-SDK 支持相对期限不代表后续操作可以延期。订单形成后必须保留原始 PaymentInfo；charge 属于首次收款，仍受用户签名中的 preApprovalExpiry 限制。
+相对期限只在创建订单时换算。之后必须保留原始 PaymentInfo，不能借此延期；charge 是首次收款，仍受用户签名中的 preApprovalExpiry 限制。
 
 ## 4 客户端签什么，nonce 如何绑定条款
 
@@ -111,7 +109,7 @@ token nonce 中的 payer 虽然置零，实际付款人仍由 ERC-3009 的 from 
 
 receiver、operator、金额上限、期限和费用都绑定在 nonce 中。即使拿到了 token 签名，修改这些字段后也无法通过 canonical Collector 的授权验证。
 
-## 5 Facilitator 验证与合约目标选择
+## 5 Facilitator 验证什么
 
 分派：[async verify(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/scheme.ts#L169)；collect 验证：[export async function verifyCollect(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/collect.ts#L177)；目标选择：[export function resolveSettleTarget](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/extra.ts#L329)；operator 准入：[export function validateOperator](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/extra.ts#L261)。
 
@@ -126,7 +124,7 @@ verify/settle 按 payload.type 区分 collect 与 capture/void/refund。verifyCo
 
 智能钱包的签名不能只靠 recoverAddress 验证。ERC-1271 验证失败后，不能自动回退为 ECDSA 成功。未部署的 ERC-6492 钱包需要允许的准备目标，并通过 collect 模拟完成验证。预验证时可以取出内层签名；提交时仍要保留 ERC-6492 wrapper，让链上调用完成部署准备。
 
-delegated 模式要求 operator 是 facilitator 控制的提交地址，调用目标为 Escrow。custom 模式调用 operator 合约，后续生命周期不由此 SDK relay。本文使用的实现仍不接受 policy 类型的 operator。
+delegated 模式要求 operator 是 facilitator 控制的提交地址，调用目标为 Escrow。custom 模式调用 operator 合约，后续生命周期不由此 SDK relay。当前 SDK 不接受 policy 类型的 operator。
 
 | operator 配置 | 官方 relay 范围 | escrow 路由的 captureMode |
 | --- | --- | --- |
@@ -134,9 +132,9 @@ delegated 模式要求 operator 是 facilitator 控制的提交地址，调用�
 | delegated，无 receiverAuthorizer 或为零 | 只代办 authorize，后续由 operator 自行处理 | 必须 deferred |
 | custom | 只代办 collect（authorize / charge），生命周期走自定义 operator 接口 | 必须 deferred |
 
-charge 在两种 operator 模式下都需要非零 receiverAuthorizer。服务端自管签名地址时，要配置匹配的 receiverAuthorizerSigner；若委托 facilitator 签名，还需下文的调用者认证与订单绑定。
+charge 在两种 operator 模式下都需要非零 receiverAuthorizer。服务端自管签名地址时，要配置匹配的 receiverAuthorizerSigner；委托 facilitator 签名时，则要认证调用者并绑定订单，见第 7 节。
 
-## 6 Custom operator 的模拟与结果核对
+## 6 Custom operator 怎么确认收款成功
 
 源码：[async function simulateCollect(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/collect.ts#L1093)；[export async function settleCollect(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/collect.ts#L765)。
 
@@ -144,15 +142,15 @@ custom operator 收到调用后，可能什么都没做。因此 simulateCollect
 
 广播后，awaitCollectSettlement 还会核对所需事件和状态；custom 路径会额外核对余额。交易 receipt 为 success 只能说明交易执行成功，还需要确认约定的收款确实完成。
 
-这些检查用于验证外围合约的收款行为，不能证明任意自定义仲裁逻辑都已由基础 Escrow 验证正确。
+SDK 这里只检查外围合约的收款行为，自定义仲裁逻辑仍要另行验证。
 
-## 7 商家操作签名与委托身份
+## 7 商家操作签名与调用者认证
 
 源码：[export async function buildCaptureFields](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/lifecyclePayload.ts#L100)；[async function verifyCapturePayload(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/lifecycle.ts#L864)；[async function signDelegatedLifecycle(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/lifecycle.ts#L258)；[export async function bindThenBroadcast](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/delegatedAuth.ts#L198)。
 
 buildCaptureFields 将支付 key、金额、费用、预期 capturable/refundable 余额纳入商户操作签名。verifyCapturePayload 验证签名、读取链上余额并与预期值比对，再模拟 capture。余额变化后，旧操作通常无法再次通过同一预期状态检查。
 
-基础 Escrow.capture 的参数没有 authorizerSignature，也没有 expectedBalances，只检查 operator、金额、费用和期限。因此，商户是否同意以及操作是否符合预期余额，主要由 facilitator 校验。读链与写链之间仍有并发时间窗口，不能把它理解成链上的原子比较交换。
+基础 Escrow.capture 不接收 authorizerSignature 或 expectedBalances，只检查 operator、金额、费用和期限。商户是否同意、余额是否符合预期，由 facilitator 校验。检查后到交易上链前，余额仍可能变化，这不是合约里的原子比较交换。
 
 源码也支持由 facilitator 代任 receiver authorizer。这个分支仍要认证调用者：先 resolveCallerIdentity，再在收款时 bind 调用者与支付身份。后续生命周期只有匹配同一绑定身份，facilitator 才能生成操作签名。
 
@@ -160,7 +158,7 @@ bindThenBroadcast 在广播前建立绑定，之后是否撤销，要看广播�
 
 ## 8 退款如何接入
 
-### 官方 SDK 默认如何处理 refund
+### 退款开关与资金
 
 源码：[refundFunding 配置](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/types.ts#L202-L212)；[未开启时拒绝](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/lifecycle.ts#L142-L148)；[官方示例默认关闭](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/examples/typescript/facilitator/auth-capture/index.ts#L133-L135)；[LifecycleManager.refund](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/server/lifecycleManager.ts#L115-L139)。
 
@@ -176,9 +174,7 @@ bindThenBroadcast 在广播前建立绑定，之后是否撤销，要看广播�
 
 退款的额度、资金流和费用处理见[合约 refund](auth-capture-solidity-walkthrough.md#13-refund额度减少新资金再进来)。custom operator 的退款不由官方 facilitator relay。
 
-合约、SDK、测试源码存在，不能当作生产使用证据；示例默认关闭，也不能推出全部部署未开启或无人使用。本次没有核实生产退款交易及用量。
-
-## 9 Pending 重试、剩余款释放与存储
+## 9 Pending、void 失败与本地余额
 
 源码：[export async function settleCollect(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/collect.ts#L765)；[async function settleVerifiedLifecycle(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/facilitator/lifecycle.ts#L582)；[async capture(](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/server/lifecycleManager.ts#L43)；[export interface AuthorizedPaymentStorage](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/src/auth-capture/server/storage.ts#L64)。
 
@@ -186,31 +182,27 @@ settleCollect 先查 pending 交易。缓存命中后，会继续等待原交易
 
 capture 带有释放剩余款的意图时，settleVerifiedLifecycle 会先等 capture 成功，再单独 submit void。第二笔操作按 best effort 处理：即使 void 失败，仍返回 capture 成功，剩余款需要后续 void 或到期 reclaim。
 
-本地记录也可能与链上结果不同。LifecycleManager.capture 成功后按 opts.voidRemainder 更新本地余额；sync hooks 则按是否存在 void 签名判断清零意图。因此，本地 capturable=0 不能证明第二笔 void 已确认，还要核对两笔交易和真实链上 paymentState。这是从源码看到的记录与执行差异，本文没有运行故障注入测试。
+LifecycleManager.capture 成功后按 opts.voidRemainder 更新本地余额；sync hooks 则按是否存在 void 签名判断是否清零。因此，本地 capturable=0 不一定表示第二笔 void 已确认，还要查两笔交易和链上 paymentState。
 
 AuthorizedPaymentStorage.update 要求原子条件修改。默认内存实现的锁只在一个 JS runtime 内生效，无法协调多个实例；存储更新是原子的，也不代表整个“读记录—发链上交易—更新记录”过程都被锁住。
 
-## 10 SDK 测试入口与阅读边界
+## 10 SDK 测试
 
-以下为本次检查的测试源码入口，没有执行测试。合约测试集中见[Solidity 走读](auth-capture-solidity-walkthrough.md#17-读完后去看哪些测试)。
-
-| 官方测试源码 | 可核对的断言 |
+| 测试文件 | 覆盖内容 |
 | --- | --- |
-| [pendingSettlement.test.ts](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/unit/auth-capture/pendingSettlement.test.ts) | receipt 超时返回 pending，缓存命中不重广播 |
-| [settlementHooks.test.ts](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/unit/auth-capture/settlementHooks.test.ts) | 委托签名 enrichment、deferred 跳过、失败不保存记录 |
+| [pendingSettlement.test.ts](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/unit/auth-capture/pendingSettlement.test.ts) | 交易回执超时返回 pending，命中缓存后不重复广播 |
+| [settlementHooks.test.ts](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/unit/auth-capture/settlementHooks.test.ts) | 补齐委托签名、deferred 模式跳过请求结束时扣款、失败不保存记录 |
 | [lifecycleFacilitator.test.ts](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/unit/auth-capture/lifecycleFacilitator.test.ts) | 拒绝 PaymentInfo 不匹配、salt 绑定错误、错误费用字段 |
-
-合约检查金额、费用、期限和操作人；SDK 处理签名、身份绑定、模拟和重试。业务系统还要负责判断交付、审批退款、准备资金和对账。TRON 的适配范围见下一节。
 
 ## 11 TRON 适配
 
-以下是待执行的移植范围，尚未完成编译、合约测试或链上部署验证。建议首版限定为 **USDT + Permit2 + 单一 delegated operator**。TVM 兼容 Solidity 有助于复用代码，但不能据此认为现有 EVM 部署可直接使用，或只复制 Escrow 就能接入。
+建议首版限定为 **USDT + Permit2 + 单一 delegated operator**。TVM 兼容 Solidity 能帮助复用代码，但现有 EVM 部署不会因此成为 TRON 上的可用合约，只复制 Escrow 也不够。
 
 ![TRON 合约与 SDK 适配范围](../assets/auth-capture/07-tron-port.png)
 
-### 11.1 要移植什么
+### 11.1 移植哪些组件
 
-| 组件 | 首版处理 | 不能省略的依赖 |
+| 组件 | 要做什么 | 配套条件 |
 | --- | --- | --- |
 | AuthCaptureEscrow | 移植并部署六种操作及账本 | 重入锁、Collector 类型、入金核对 |
 | TokenStore | 部署模板、按 operator 创建实例 | CREATE2 / clone 的预测与实际地址一致 |
@@ -238,15 +230,15 @@ USDT 的预期流程是：
 
 现有 SDK 的 [constants.ts](https://github.com/BofAI/x402/blob/main/typescript/packages/mechanisms/tron/src/constants.ts)登记了 Permit2 和 exact / upto Proxy 地址，但这些地址的链上字节码与接口尚未核实。需要确认目标 Permit2 的 permitTransferFrom、签名域、nonce 和地址处理；exact / upto Proxy 使用 witness，不能直接当作 auth-capture Collector。token 工具、注册表和交易执行适配也要核对 TRC-20 ABI、decimals、地址、allowance、模拟、回执及 pending 支持。
 
-### 11.3 三处重点
+### 11.3 地址、签名与执行环境
 
-**TokenStore 地址预测。** 资金可以先进入预测地址，首次支出时才部署实例。TRON CREATE2 使用 0x41 推导前缀，EVM 使用 0xff；需要逐项核对 LibClone 创建代码、salt、部署地址和 TVM 规则，不能只改 SDK 地址格式，否则资金可能无法按预期转出。依据见 [TRON TVM 与 EVM 差异](https://developers.tron.network/docs/tvm-vs-evm)。
+**TokenStore 地址预测。** 资金可以先进入预测地址，首次支出时才部署实例。TRON CREATE2 使用 0x41 推导前缀，EVM 使用 0xff。需要逐项核对 LibClone 创建代码、salt、部署地址和 TVM 规则；只改 SDK 地址格式，资金可能无法按预期转出。[TRON TVM 与 EVM 差异](https://developers.tron.network/docs/tvm-vs-evm)
 
-**签名与哈希。** 区分链上 20 字节地址与外部 Base58 / 41 前缀地址。合约与 SDK 的 chainId、Escrow、字段顺序和哈希规则必须一致：账本使用真实 payer，付款 nonce 使用 payer 置零后的条款哈希，不能用 exact witness 替换。Token、Permit2 和商家操作签名各自使用正确的域、类型和表示；后续 capture / refund 保留原条款和 saltNonce，重试不能另造期限或 salt。形成过程见[第 4 节](#4-客户端签什么nonce-如何绑定条款)。
+**签名与哈希。** 区分链上 20 字节地址与外部 Base58 / 41 前缀地址。合约与 SDK 的 chainId、Escrow、字段顺序和哈希规则必须一致：账本使用真实 payer，付款 nonce 使用 payer 置零后的条款哈希，不能用 exact witness 替换。Token、Permit2 和商家操作签名各自使用正确的域、类型和表示。后续 capture / refund 保留原条款和 saltNonce，重试不能另造期限或 salt。[签名构造](#4-客户端签什么nonce-如何绑定条款)
 
 **执行与恢复。** 原合约使用 Solidity ^0.8.28、Solady clone 和 transient storage 重入锁，要按目标网络实际升级配置核对编译产物和 opcode，不能笼统认为 TVM 完全兼容或不支持 transient storage。ERC-6492 / Multicall3 也要核对；限定钱包范围时，SDK 应明确准入并拒绝未支持路径。facilitator 还要处理 Energy / 费用估计、广播、回执、事件与余额对账，以及 pending 恢复。结果不明时先查原交易；refund 仍需资金协议、operator 余额和 allowance。
 
-### 11.4 验证顺序
+### 11.4 移植后怎么测试
 
 1. 核对目标 Permit2 与 USDT 的实际接口、签名和 allowance。
 2. 在目标 TVM 环境验证编译、CREATE2 预测、clone 和先入金后部署。
@@ -255,6 +247,4 @@ USDT 的预期流程是：
 5. 接入 SDK 的支付条件、用户签名和商家授权，验证原始条款持久化。
 6. 验证超时、重复请求、进程重启、回执不明、余额或 allowance 不足的恢复行为。
 
-以上工作尚待执行，不代表测试已经通过。
-
-[返回分享主稿](auth-capture-contract-analysis.md) · [查看合约实现](auth-capture-solidity-walkthrough.md) · [来源与验证范围](auth-capture-contract-analysis.md#9-源码版本与验证范围)
+[返回分享主稿](auth-capture-contract-analysis.md) · [合约测试](auth-capture-solidity-walkthrough.md#17-合约测试) · [源码版本](auth-capture-contract-analysis.md#9-源码版本)
