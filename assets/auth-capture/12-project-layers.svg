@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1130" viewBox="0 0 1440 1130" role="img" aria-labelledby="title desc">
+<title id="title">Commerce Payments 与 Coinbase Payments、x402 的关系</title>
+<desc id="desc">Coinbase Payments 是包含钱包结账和商家 API 的商业产品；x402 auth-capture 是 API 支付方案，其客户端、服务端和 facilitator 适配链上合约。二者各自使用 Commerce Payments Protocol 的支付合约，不表示 Coinbase Payments 或 Shopify 使用 x402。Commerce Payments 包含 Escrow、TokenStore 和各 Collector，使用 token、Permit2 等通用依赖，在虚拟机上运行。</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 1 L8 5 L0 9" fill="none" stroke="#657992" stroke-width="1.8"/></marker></defs>
+<style>text{font-family:'PingFang SC','Microsoft YaHei',Arial,sans-serif} .title{font-size:27px;font-weight:600;fill:#14283f} .body{font-size:23px;fill:#33465e} .small{font-size:20px;fill:#5d7087}</style>
+<rect width="1440" height="1130" fill="#f5f7fb"/><rect width="1440" height="140" fill="#14283f"/>
+<text x="60" y="62" font-size="36" font-weight="650" fill="white">项目、支付协议和底层合约，分开看</text>
+<text x="60" y="110" font-size="23" fill="#c4d3e5">Coinbase Payments 与 x402 auth-capture 各自使用 Commerce Payments 的支付合约</text>
+
+<rect x="60" y="174" width="640" height="208" rx="16" fill="#eaf0fd" stroke="#d4dff1"/>
+<rect x="730" y="174" width="650" height="208" rx="16" fill="#efedf9" stroke="#dfd9f0"/>
+<text x="84" y="220" class="title" style="fill:#315fcd">Coinbase Payments</text>
+<text x="84" y="262" class="body">商业支付产品</text>
+<text x="84" y="305" class="body">钱包结账 + 商家 API / Ecommerce Engine</text>
+<text x="84" y="348" class="small">官方介绍用于 Shopify 的 USDC 支付。</text>
+<text x="754" y="220" class="title" style="fill:#6c51ac">x402 auth-capture</text>
+<text x="754" y="262" class="body">API 等资源的支付方案</text>
+<text x="754" y="305" class="body">Client + Server + Facilitator</text>
+<text x="754" y="348" class="small">通过付款条件、签名和 /settle 接入合约。</text>
+<path d="M380 391 V442" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<path d="M1055 391 V442" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<text x="404" y="427" class="small">链上执行层</text>
+<text x="1079" y="427" class="small">合约适配</text>
+<rect x="60" y="456" width="1320" height="252" rx="16" fill="#eaf5f1" stroke="#d2e8df"/>
+<text x="84" y="502" class="title" style="fill:#167563">Commerce Payments Protocol</text>
+<text x="84" y="543" class="body">开源商业支付协议 · Escrow + TokenStore + 具体 Collectors</text>
+<rect x="84" y="563" width="1272" height="66" rx="16" fill="white" stroke="#d2e8df"/>
+<text x="106" y="605" class="title" style="fill:#167563">authorize  /  capture  /  charge  /  void  /  reclaim  /  refund</text>
+<text x="84" y="674" class="small">提供支付账本与收付规则；这些是应用合约，不是 EVM 自带的支付功能。</text>
+<path d="M720 719 V776" stroke="#657992" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+<text x="744" y="756" class="small">使用通用依赖</text>
+<rect x="60" y="790" width="1320" height="142" rx="16" fill="white" stroke="#dce4ee"/>
+<text x="84" y="833" class="title">通用合约与库</text>
+<text x="84" y="874" class="body">代币（如 USDC）、Permit2、Multicall3；SafeERC20、LibClone、重入锁等。</text>
+<text x="84" y="911" class="small">通用合约需要目标链部署；库和基类随具体合约编译。</text>
+<rect x="60" y="958" width="1320" height="96" rx="16" fill="#edf3fb" stroke="#d4dff1"/>
+<text x="84" y="999" class="title" style="fill:#315fcd">虚拟机运行能力</text>
+<text x="84" y="1035" class="small">CALL、存储、哈希、CREATE2 等负责执行代码；业务订单、扣款和退款由应用实现。</text>
+<text x="60" y="1092" class="small">左侧依据 Coinbase 产品介绍；右侧限定本次研究的 x402 auth-capture，不代表 Shopify 采用 x402。</text>
+</svg>

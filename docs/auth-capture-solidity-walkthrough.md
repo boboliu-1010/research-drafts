@@ -1,51 +1,14 @@
-# auth-capture 合约源码走读
+# auth-capture Solidity 合约源码走读
 
-> 未经评审的研究草稿。基于静态源码阅读，未执行 Foundry 测试或链上交易。
+> 未经评审的研究草稿。静态阅读官方合约与测试源码，未执行 Foundry 测试或链上交易。
 
-更新：2026 年 10 月 20 日。固定源码为 base/commerce-payments 的 `b748fdd7a830a655a19a530edcf2a94b9dc7d25f`，以 v1.1 为准。下面引用源码中的关键语句，省略部分声明、事件和检查；流程块是阅读笔记，不是可部署合约。
+更新：2026 年 10 月 20 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [基础概念](auth-capture-foundations.md) · [SDK 与接口](auth-capture-official-code-walkthrough.md) · [TRON 适配](auth-capture-tron-port.md)
 
-贯穿例子：用户同意上限 10 USDC，任务完成后实际消费 6，费用 1%。金额说明用 USDC；真实参数需乘 10⁶。
+本文解释固定 Commerce Payments v1.1 源码中的检查、调用和账本变化。条款与状态使用同一个例子：上限 10 USDC、实际消费 6、费用 1%，真实参数需乘 10⁶。代码摘录省略部分声明和检查，流程块是阅读笔记；源码版本和验证范围见[来源说明](auth-capture-foundations.md#6-源码版本与验证范围)。
 
-## 1 先区分这次新增与原有合约
+## 1 合约分工与源码阅读顺序
 
-**本文中的 Escrow、TokenStore 和具体 Collector，都是为 Commerce Payments 这套 auth-capture 支付系统实现的配套合约，不是 EVM 内置合约。** “已有”指它们在 Commerce Payments 中已经存在，x402 接入时复用；对原先只做 exact 直付的应用而言，它们仍是新接入的支付依赖。
-
-区分三个层次：EVM 提供 CALL、存储、CREATE2 等底层能力；USDC、Permit2、Multicall3 是部署在链上的通用应用合约；Escrow、TokenStore、这些 Collector 是支付系统的配套实现。EVM 兼容不代表目标链已经部署后两层合约。
-
-### 1.1 按用途分：支付专用合约与通用依赖
-
-| 类别 | 合约 | 本次接入的作用 |
-| --- | --- | --- |
-| Commerce Payments 已有业务合约 | AuthCaptureEscrow | 托管账本、capture / charge、取消和退款 |
-| Commerce Payments 已有业务合约 | TokenStore | 按 operator 保管和转出代币 |
-| Commerce Payments 已有业务合约 | ERC3009PaymentCollector | ERC-3009 签名收款 |
-| Commerce Payments 已有业务合约 | Permit2PaymentCollector | Permit2 签名收款 |
-| Commerce Payments 已有业务合约 | OperatorRefundCollector | 从 operator 收取退款资金 |
-| Commerce Payments 已有辅助基类 | TokenCollector、ERC6492SignatureHandler | 收款入口权限、nonce 和签名准备逻辑，不作为两种额外业务合约计数 |
-| 原有外部合约 | token（如 USDC）、Permit2、Multicall3 | 代币余额、授权转账和钱包准备调用 |
-| 原有通用库 / 基类 | SafeERC20、LibClone、ReentrancyGuardTransient | 安全转账、clone 地址预测及部署、重入锁；不计为新增业务合约 |
-
-因此，本路径直接使用 **5 类业务合约**。Commerce Payments 还有 PreApprovalPaymentCollector、SpendPermissionPaymentCollector 等已有收款方式，未列入当前 x402 ERC-3009 / Permit2 标准路径。
-
-### 1.2 这次新增的 Solidity：仅用于测试
-
-这里的“这次”限定为 x402 auth-capture SDK v1.1 接入改动 [#3203](https://github.com/x402-foundation/x402/pull/3203)（提交 [28376d6](https://github.com/x402-foundation/x402/commit/28376d643a6d9492e4a6cbfa5199376b90eb89dc)），不是 Commerce Payments 自身的版本升级。核对该提交的 164 个变更文件，没有生产 Solidity 合约变更；新增 .sol 为以下三个测试 operator。
-
-| 新增文件 | 测什么 | 是否生产支付合约 |
-| --- | --- | --- |
-| ForwardingOperator.sol | 将 authorize / charge 转发给 Escrow，验证 custom operator 正常路径 | 否 |
-| NoopOperator.sol | 调用成功但什么也不做，验证 facilitator 能拒绝假收款 | 否 |
-| GasWastingOperator.sol | 消耗过多 gas，验证 custom operator 的 gas 限制 | 否 |
-
-官方[测试目录说明](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/contracts/auth-capture/README.md)明确把它们限定为集成测试合约，不能当作生产 operator 模板。默认 delegated 模式也不要求新部署一个 operator 合约，operator 可以直接是 facilitator 的提交地址。
-
-### 1.3 这次新增的生产代码：主要在 SDK
-
-x402 在 client / server / facilitator 中新增或完善 auth-capture 接入逻辑：构造付款授权、绑定 nonce、组织商家操作授权、调用现有 ABI、记录生命周期状态及恢复 pending 交易。**abi.ts 中新增合约接口定义，不等于新增了对应合约实现。** 详见[SDK 代码走读](auth-capture-official-code-walkthrough.md)。
-
-Commerce Payments v1.0 → v1.1 的 feeBps → feeAmount 属于已有合约的版本变化，也要与本次 x402 SDK 接入分开看。
-
-### 1.4 源码阅读顺序：以下均为已有合约
+Escrow 管订单账和权限，Collector 适配外部收款，TokenStore 持币并按 Escrow 指令转出。TokenCollector 是抽象基类，不能当作单独收款中转地址。它们是支付系统的配套实现，由 x402 复用；项目关系及“本次新增”的两种口径见[基础概念](auth-capture-foundations.md#4-支付配套合约与通用依赖)。
 
 | 阅读顺序 | 官方源码 | 要回答的问题 |
 | --- | --- | --- |
@@ -57,7 +20,7 @@ Commerce Payments v1.0 → v1.1 的 feeBps → feeAmount 属于已有合约的�
 | 6 | [OperatorRefundCollector.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/OperatorRefundCollector.sol) | 退款实际扣谁的钱 |
 | 7 | [ERC6492SignatureHandler.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/ERC6492SignatureHandler.sol) | 未部署钱包的准备调用怎样处理 |
 
-先记住三个职责：**Escrow 管条款与订单账，Collector 负责从外部收钱，TokenStore 按 Escrow 指令付款。** ERC6492SignatureHandler 是两个付款 Collector 共用的签名准备辅助类，后文单独说明。
+ERC6492SignatureHandler 是两个付款 Collector 共用的签名准备辅助类，后文单独说明。
 
 ## 2 PaymentInfo：用户同意的固定条款
 
@@ -97,6 +60,16 @@ struct PaymentState {
 
 账本按 `paymentState[paymentInfoHash]` 存储。完整条款由调用者提供，合约重算哈希后定位三项状态。
 
+设 A 为首次入金、C 为累计 capture、V 为 void / reclaim 返回金额、R 为累计 refund，escrow 路径满足：
+
+```text
+capturableAmount = A - C - V
+refundableAmount = C - R
+A <= maxAmount
+```
+
+charge 相当于收款时直接令 C=A。refund 不恢复可扣余额，void / reclaim 不清除已经产生的可退额度。
+
 ## 4 getHash：订单编号怎样绑定条款
 
 位置：[getHash](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L383)。
@@ -120,7 +93,7 @@ return keccak256(abi.encode(block.chainid, address(this), paymentInfoHash));
 
 `onlySender(paymentInfo.operator)` 要求当前调用者就是原 operator；reclaim 则使用 payer。`validAmount(amount)` 要求金额大于零、不超过 uint120 上限，后面转成 uint120 才不会截断。
 
-六个资金操作均有 `nonReentrant`。它们先检查与更新订单状态，再进行外部代币调用；外部调用失败时，前面的写账和事件也一起回滚。
+六个资金操作均有 `nonReentrant`。它们先检查与更新订单状态，再进行外部代币调用；外部调用失败时，前面的写账和事件也一起回滚。当前实现使用 transient storage 重入锁，目标链的执行能力必须配套核对。
 
 基础 Escrow 不检查业务是否交付，也没有接收商家的 `authorizerSignature` 参数。默认 delegated 模式中，商家的操作授权由 facilitator 校验；合约只按 operator 和固定条款执行。
 
@@ -135,7 +108,7 @@ return keccak256(abi.encode(block.chainid, address(this), paymentInfoHash));
 | 3 | 写 true、capturable=amount、refundable=0 | 建立托管账本，尚未向商家付款 |
 | 4 | _collectTokens(..., CollectorType.Payment) | 通过付款 Collector 收入足额代币 |
 
-`_validatePayment` 还要求 amount≤maxAmount、preApprovalExpiry≤authorizationExpiry≤refundExpiry，以及 minFeeBps≤maxFeeBps≤10000。它检查的是现在是否早于 preApprovalExpiry，而不只是三个期限的顺序。
+[_validatePayment](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L478) 还要求 amount≤maxAmount、preApprovalExpiry≤authorizationExpiry≤refundExpiry，以及 minFeeBps≤maxFeeBps≤10000。它检查的是现在是否早于 preApprovalExpiry，而不只是三个期限的顺序。
 
 例子成功后：hasCollected=true，capturable=10，refundable=0，10 USDC 已进入 operator 对应的 TokenStore。
 
@@ -259,7 +232,7 @@ paymentState[paymentInfoHash] = state;
 
 ![capture 的逐层调用及回滚边界](../assets/auth-capture/10-capture-internal-split.png)
 
-`_distributeTokens` 先转 feeAmount 给 feeReceiver，再转 amount−feeAmount 给 receiver。amount 包含费用；6 USDC、1% 费用时对应 0.06 和 5.94。
+[_distributeTokens](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L464) 先转 feeAmount 给 feeReceiver，再转 amount−feeAmount 给 receiver。amount 包含费用；6 USDC、1% 费用时对应 0.06 和 5.94。
 
 内部函数 _distributeTokens / _sendTokens 不改变 msg.sender，仍是 operator。跨合约调用 TokenStore.sendTokens 后，TokenStore 看到的 msg.sender 是 Escrow；它再调 token.transfer，token 看到的 msg.sender 才是 TokenStore。
 
@@ -307,6 +280,8 @@ v1.1 接收绝对 feeAmount，不是在 capture 内自动选一个费率。原�
 
 ## 12 void 与 reclaim：清空尚未结算的余额
 
+![三个期限与操作边界](../assets/auth-capture/05-deadlines.png)
+
 位置：[void](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L304)、[reclaim](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L323)。
 
 两者都读取全部 capturableAmount，要求大于零，将其清零，再从 TokenStore 退给原 payer。它们没有部分退还金额参数，不改已有 refundableAmount，也不重置 hasCollectedPayment。
@@ -332,17 +307,19 @@ void 不能作废一个尚未收款的 token 签名，因为此时 capturableAmo
 → _sendTokens(...payer)：转给原付款人
 ```
 
-标准 OperatorRefundCollector 的关键动作是从 `paymentInfo.operator` 执行 transferFrom，收款地址为 TokenStore。operator 需要新资金，且 allowance 要给这个退款 Collector；不是给 TokenStore 或 Escrow。
+标准 [OperatorRefundCollector](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/OperatorRefundCollector.sol#L28) 的关键动作是从 `paymentInfo.operator` 执行 transferFrom，收款地址为 TokenStore。operator 需要新资金，且 allowance 要给这个退款 Collector；不是给 TokenStore 或 Escrow。
 
 因此，原来商家收到的 5.94、费用方收到的 0.06 不会自动被追回。全退 6，operator 就要另拿出 6。退款可分多次，累计不超过已扣未退金额，且不恢复 capturableAmount。
 
 ![官方 delegated 退款资金路径](../assets/auth-capture/09-refund-funding.png)
 
-默认 delegated 情况下，官方 SDK 示例将 refundFunding 设为 false；开放前需要商家与 facilitator 的资金安排，并准备余额和 allowance。合约存在 refund 不代表平台已经承诺垫资或用户可以强制退款。配置和调用细节见[SDK 走读](auth-capture-official-code-walkthrough.md#官方-sdk-默认如何处理-refund)。生产退款使用情况本次未核实。
+合约中的退款能力不等于平台承诺垫资，用户也不能直接调用基础 refund 强制退款。官方 SDK 的开关、资金协议与提交方式见[退款接入](auth-capture-official-code-walkthrough.md#8-退款如何接入)。
 
 ## 14 TokenStore：为什么能先收钱后部署
 
 位置：[constructor](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L185)、[getTokenStore](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L393)、[_sendTokens](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol#L433)、[TokenStore.sendTokens](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/TokenStore.sol#L33)。
+
+![TokenStore 的预测地址与按需部署](../assets/auth-capture/02-tokenstore-deployment.png)
 
 Escrow 的 constructor 先部署一个 TokenStore 实现模板，并把自身地址作为固定授权者。各 operator 使用模板 clone，getTokenStore 根据模板、operator 派生的 salt、Escrow 部署者地址预测 CREATE2 地址。
 
@@ -358,7 +335,7 @@ TokenStore 的业务入口很小：先确认 msg.sender==authCaptureEscrow，再
 
 两个付款 Collector 共用这个辅助类。它检查签名尾部 magic value：不是 ERC-6492 就原样返回；是则解出 prepareTarget、prepareData 和内部签名，通过中立 Multicall3 发起准备调用，再返回内部签名给 token / Permit2 授权流程。
 
-这里没有“钱包准备调用成功就付款”的逻辑，也不自行完成最终验签。准备调用通过 requireSuccess=false 的 tryAggregate 发出，最终能否收款仍取决于后面的授权与真实代币转移。SDK 对未部署钱包的准入、模拟规则另见[完整代码走读](auth-capture-official-code-walkthrough.md)。
+这里没有“钱包准备调用成功就付款”的逻辑，也不自行完成最终验签。准备调用通过 requireSuccess=false 的 tryAggregate 发出，最终能否收款仍取决于后面的授权与真实代币转移。SDK 对未部署钱包的准入、模拟规则另见[SDK 与接口走读](auth-capture-official-code-walkthrough.md)。
 
 ## 16 用一笔订单核对所有状态变化
 
@@ -388,18 +365,4 @@ TokenStore 的业务入口很小：先确认 msg.sender==authCaptureEscrow，再
 
 本文检查实现及相关测试源码，没有运行上述测试。TokenStore 转账、Collector 验签收款和 SDK 代办规则共同构成完整路径；基础 Escrow 不判断交付，不保证 facilitator 持续在线，也不预存退款准备金。
 
-## 18 TRON 接入时需要补哪些合约
-
-按现有 TRON SDK 的[资产配置说明](https://github.com/BofAI/x402/blob/main/typescript/packages/mechanisms/tron/src/shared/defaultAssets.ts)，USDT 不实现该 SDK 所需的 3009 风格签名转账，采用 Permit2 路径。首版若以 USDT 为主，移植重点是：
-
-| 组件 | 首版处理 |
-| --- | --- |
-| AuthCaptureEscrow、TokenStore | 移植并部署，核对 TVM 兼容性和 CREATE2 地址预测 |
-| Permit2PaymentCollector | 适配收款；验证目标 Permit2 的 permitTransferFrom 接口和签名域 |
-| OperatorRefundCollector | 适配 TRC-20 退款入金，准备 operator 的余额和 allowance |
-| TokenCollector 等基类 | 随具体合约一同编译适配，不独立部署一个基类实例 |
-| 3009PaymentCollector | 目标代币确实支持所需签名收款接口时，再加入 |
-
-写一个名为 TRC3009PaymentCollector 的合约，不会让现有 USDT 获得签名收款能力。3009 和 Permit2 是通用授权机制，Collector 才是把它们接到 auth-capture 订单与 TokenStore 的适配层。
-
-还要分清接口：官方 ERC3009 Collector 调 receiveWithAuthorization，现有 TRON exact 代码使用 transferWithAuthorization；现有 exact 的 Permit2 Proxy 使用 witness 直付路径，也不能直接当作 auth-capture Collector。需要重新核对订单绑定、资金去向和签名构造。部署兼容性尚未做链上验证，其他移植事项见[分享稿](auth-capture-contract-analysis.md#tron-上要改什么)。
+[继续阅读 SDK 与接口](auth-capture-official-code-walkthrough.md) · [TRON 适配范围](auth-capture-tron-port.md) · [返回分享主稿](auth-capture-contract-analysis.md)

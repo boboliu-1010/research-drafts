@@ -3,12 +3,11 @@ sequenceDiagram
   participant S as 商家服务端
   participant F as Facilitator / Operator
   participant E as Escrow 与收付合约
+  Note over S,F: delegated + 非零 receiverAuthorizer + sync escrow
   C->>S: 业务请求
   S-->>C: 402 + 付款条件
   C->>S: 重试请求 + 付款签名
-  S->>F: verify：检查与模拟
-  F-->>S: 验证结果，尚未托管
-  S->>F: settle 1：collect 授权
+  S->>F: settle 1：collect，验证并模拟
   F->>E: authorize，资金进入 TokenStore
   E-->>F: 成功回执
   F-->>S: 托管成功
@@ -16,8 +15,8 @@ sequenceDiagram
   S->>F: settle 2：capture 操作数据与授权
   F->>E: capture，支付货款及费用
   E-->>F: 成功回执
-  F-->>S: 扣款成功
   opt 有剩余款并请求释放
     F->>E: 另一笔 void，尽力执行
     Note over F,E: capture 成功不代表 void 成功
   end
+  F-->>S: 返回 capture 成功；不保证 void 成功
