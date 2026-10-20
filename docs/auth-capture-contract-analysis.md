@@ -8,7 +8,7 @@ auth-capture 用来处理“先准备好钱，稍后再结算”的支付。比�
 
 ![auth-capture 支付流程与资金去向](../assets/auth-capture/08-auth-capture-overview.png)
 
-上图展示 delegated escrow 路径：签名时钱还没转出，authorize 才锁定资金；capture 付给商家，剩余款另行处理。费用按 1% 举例。
+上图对比 delegated 模式的两条路径：escrow 先 authorize 托管，再 capture；authorization 直接 charge 收款并分账。两者都可 refund，但 charge 没有剩余托管款可 void 或 reclaim。费用按 1% 举例。
 
 它适合异步任务、按用量计费和一次会话内分次扣款。**每笔支付有额度和期限，不能反复充值，也不是长期自动续费。**
 
