@@ -1,0 +1,4 @@
+flowchart TB
+  A["preApprovalExpiry<br/>到达后禁止 authorize / charge"] -->|"不晚于"| B["authorizationExpiry<br/>到达后禁止 capture<br/>payer 可主动 reclaim 剩余款"]
+  B -->|"不晚于"| C["refundExpiry<br/>到达后禁止 refund"]
+  B -.-> N["没有自动转账<br/>任何退款或取回都需要调用"]

@@ -1,0 +1,8 @@
+flowchart TB
+  E["部署 Escrow"] --> I["构造函数创建 TokenStore 模板"]
+  I --> A["operator A<br/>确定地址的 clone A"]
+  I --> B["operator B<br/>确定地址的 clone B"]
+  A --> A1["多笔支付共用 A<br/>不是每个订单部署一次"]
+  B --> B1["多笔支付共用 B"]
+  A1 --> H["authorize 可先向<br/>预测地址入金"]
+  H --> D["首次需要支出<br/>Escrow 自动部署 clone 再转出"]

@@ -1,0 +1,6 @@
+flowchart TB
+  T["已托管 10 USDC"] --> C["一笔 capture 交易<br/>扣款总额 6 USDC"]
+  C -->|"内部转账 1"| F["费用接收方<br/>0.06 USDC"]
+  C -->|"内部转账 2"| M["商家<br/>5.94 USDC"]
+  T -. "尚未扣款" .-> R["剩余托管 4 USDC<br/>之后另行 void 或到期 reclaim"]
+  C -. "同成同败" .-> A["一次链上交易<br/>operator 另外支付 gas"]

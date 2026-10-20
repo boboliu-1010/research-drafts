@@ -1,0 +1,8 @@
+flowchart LR
+  A["TRON auth-capture<br/>移植范围"] --> C["合约部分"]
+  A --> S["SDK / Facilitator 部分"]
+  C --> E["Escrow + TokenStore<br/>验证 CREATE2 预测和 clone 地址"]
+  C --> P["Permit2 Collector + Refund Collector<br/>接入实际 Permit2 与 TRC-20"]
+  C --> D["编译器与依赖<br/>重入锁 / ERC-6492 / Multicall3"]
+  S --> H["TIP-712 与支付哈希<br/>签名地址和 chainId<br/>部署配置保持一致"]
+  S --> T["Energy 与交易执行<br/>模拟 / 回执 / pending / 对账"]

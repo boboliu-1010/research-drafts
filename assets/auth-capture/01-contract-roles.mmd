@@ -1,0 +1,8 @@
+flowchart TB
+  O["Operator<br/>delegated：facilitator 执行地址<br/>custom：自定义合约"] -->|"调用操作"| E["AuthCaptureEscrow<br/>规则 + 每笔支付账本"]
+  E -->|"请求收款"| C["Collectors<br/>ERC-3009 / Permit2 / Refund"]
+  C -->|"调用 token 转账"| T["对应 operator 的 TokenStore<br/>保管多笔支付资金"]
+  E -. "唯一支出指令" .-> T
+  T -->|"capture 净额"| M["商家 receiver"]
+  T -->|"capture 费用"| F["费用方 feeReceiver"]
+  T -->|"void / reclaim / refund"| P["买方 payer"]
