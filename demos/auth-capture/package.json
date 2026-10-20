@@ -1,0 +1,20 @@
+{
+  "name": "auth-capture-verification-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:deployment": "node check-deployment.mjs",
+    "demo": "node demo.mjs",
+    "report": "node render-report.mjs",
+    "verify:source": "node verify-source.mjs",
+    "test:official": "bash run-official-tests.sh",
+    "test:summary": "node summarize-tests.mjs"
+  },
+  "dependencies": {
+    "solc": "0.8.28",
+    "viem": "2.57.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

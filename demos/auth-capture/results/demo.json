@@ -1,0 +1,1218 @@
+{
+  "mode": "local-anvil-fork",
+  "generatedAt": "2026-10-20T13:06:21.749Z",
+  "clientVersion": "anvil/v1.8.5",
+  "chainId": 84532,
+  "forkBlock": "48366193",
+  "forkBlockHash": "0xadee557aba88a3ad8013a8916108f90f4b2c156d4523ceabb4102d2890984dd3",
+  "sourceCommit": "b748fdd7a830a655a19a530edcf2a94b9dc7d25f",
+  "contracts": {
+    "escrow": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c",
+    "erc3009": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+    "permit2Collector": "0xD69831Aed5bfe262067ec4c751f4F830EcdD446e",
+    "refundCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486",
+    "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+  },
+  "actors": {
+    "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+    "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+    "merchant": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+    "fee": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231"
+  },
+  "publicTransactionsSent": 0,
+  "funding": "Local fork only: impersonate USDC masterMinter, configure a temporary minter, mint test balances. Deployed payment contract code is not replaced.",
+  "setup": [
+    {
+      "hash": "0x20aaca1d9a2f49057c47f2b49e242b94a5b5068390ac3ab9263e82433ebb979d",
+      "status": "success",
+      "blockNumber": "48366194",
+      "gasUsed": "79245",
+      "transfers": [],
+      "events": []
+    },
+    {
+      "hash": "0x24089ac6895868b235d1110b80fc6d43966e732ac4aeca15f2ddcf967ddf0f35",
+      "status": "success",
+      "blockNumber": "48366195",
+      "gasUsed": "72603",
+      "transfers": [
+        {
+          "from": "0x0000000000000000000000000000000000000000",
+          "to": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+          "value": "100000000",
+          "usdc": "100"
+        }
+      ],
+      "events": []
+    },
+    {
+      "hash": "0xe61789a1cc07acadd53c5bdddf4a3f8e961ca1f0cde55c4bd815f9897b75c234",
+      "status": "success",
+      "blockNumber": "48366196",
+      "gasUsed": "65803",
+      "transfers": [
+        {
+          "from": "0x0000000000000000000000000000000000000000",
+          "to": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+          "value": "20000000",
+          "usdc": "20"
+        }
+      ],
+      "events": []
+    },
+    {
+      "hash": "0x87ec7758aaa6321963ca53b021f941c4d7f14c4247129bfa6c8699bc26ddcc7a",
+      "status": "success",
+      "blockNumber": "48366198",
+      "gasUsed": "54566",
+      "transfers": [],
+      "events": []
+    },
+    {
+      "hash": "0x8fc1cfc37ad1b7f2e7babe53ece15d3a428c2868384a87fe3ab426fbdc0f2f06",
+      "status": "success",
+      "blockNumber": "48366200",
+      "gasUsed": "32630",
+      "transfers": [],
+      "events": []
+    },
+    {
+      "hash": "0x20cd8f1c24f22a4b4bbfa69caefdb202572c51f096b72c4f8e0e4d8204e8e37e",
+      "status": "success",
+      "blockNumber": "48366203",
+      "gasUsed": "55425",
+      "transfers": [],
+      "events": []
+    }
+  ],
+  "steps": [
+    {
+      "label": "A authorize 10",
+      "operation": "authorize",
+      "paymentInfo": {
+        "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+        "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+        "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000000",
+        "preApprovalExpiry": 1792505125,
+        "authorizationExpiry": 1792508725,
+        "refundExpiry": 1792512325,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+        "salt": "1"
+      },
+      "before": {
+        "hash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+        "hasCollected": false,
+        "capturable": "0",
+        "refundable": "0",
+        "balances": {
+          "operator": "20000000",
+          "payer": "100000000",
+          "merchant": "0",
+          "fee": "0",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": false
+      },
+      "after": {
+        "hash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+        "hasCollected": true,
+        "capturable": "10000000",
+        "refundable": "0",
+        "balances": {
+          "operator": "20000000",
+          "payer": "90000000",
+          "merchant": "0",
+          "fee": "0",
+          "tokenStore": "10000000",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": false
+      },
+      "transaction": {
+        "hash": "0xe016c3161296f8ea5706efbea19bc1523a23a29288bd34afd7492d4985dc9f9a",
+        "status": "success",
+        "blockNumber": "48366197",
+        "gasUsed": "161343",
+        "transfers": [
+          {
+            "from": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+            "to": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+            "value": "10000000",
+            "usdc": "10"
+          },
+          {
+            "from": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+            "to": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "value": "10000000",
+            "usdc": "10"
+          }
+        ],
+        "events": [
+          {
+            "name": "PaymentAuthorized",
+            "args": {
+              "paymentInfoHash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+              "paymentInfo": {
+                "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+                "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+                "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+                "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+                "maxAmount": "10000000",
+                "preApprovalExpiry": 1792505125,
+                "authorizationExpiry": 1792508725,
+                "refundExpiry": 1792512325,
+                "minFeeBps": 100,
+                "maxFeeBps": 100,
+                "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+                "salt": "1"
+              },
+              "amount": "10000000",
+              "tokenCollector": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "label": "A capture 6 / fee 0.06",
+      "operation": "capture",
+      "paymentInfo": {
+        "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+        "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+        "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000000",
+        "preApprovalExpiry": 1792505125,
+        "authorizationExpiry": 1792508725,
+        "refundExpiry": 1792512325,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+        "salt": "1"
+      },
+      "before": {
+        "hash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+        "hasCollected": true,
+        "capturable": "10000000",
+        "refundable": "0",
+        "balances": {
+          "operator": "20000000",
+          "payer": "90000000",
+          "merchant": "0",
+          "fee": "0",
+          "tokenStore": "10000000",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": false
+      },
+      "after": {
+        "hash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+        "hasCollected": true,
+        "capturable": "4000000",
+        "refundable": "6000000",
+        "balances": {
+          "operator": "20000000",
+          "payer": "90000000",
+          "merchant": "5940000",
+          "fee": "60000",
+          "tokenStore": "4000000",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "transaction": {
+        "hash": "0x7cf3764f523012fc66f87777fb714b48f835e920cd42f86e6a8deb048dcdfdeb",
+        "status": "success",
+        "blockNumber": "48366201",
+        "gasUsed": "157491",
+        "transfers": [
+          {
+            "from": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "to": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+            "value": "60000",
+            "usdc": "0.06"
+          },
+          {
+            "from": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "to": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+            "value": "5940000",
+            "usdc": "5.94"
+          }
+        ],
+        "events": [
+          {
+            "name": "PaymentCaptured",
+            "args": {
+              "paymentInfoHash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+              "amount": "6000000",
+              "feeAmount": "60000",
+              "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231"
+            }
+          },
+          {
+            "name": "TokenStoreCreated",
+            "args": {
+              "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+              "tokenStore": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2"
+            }
+          }
+        ]
+      },
+      "callTrace": {
+        "from": "0xcb71da9903bbfa56e1bee04c35f43d1036a2ecf8",
+        "gas": "0x1682e4",
+        "gasUsed": "0x26733",
+        "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+        "input": "0x3efa46e1000000000000000000000000cb71da9903bbfa56e1bee04c35f43d1036a2ecf8000000000000000000000000920d152add66044d9bfd6cca1195d337a681c0750000000000000000000000004e78bf0a2491e3c1838880922b6f973a2f8265bd000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e0000000000000000000000000000000000000000000000000000000000989680000000000000000000000000000000000000000000000000000000006ad77525000000000000000000000000000000000000000000000000000000006ad78335000000000000000000000000000000000000000000000000000000006ad791450000000000000000000000000000000000000000000000000000000000000064000000000000000000000000000000000000000000000000000000000000006400000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000005b8d80000000000000000000000000000000000000000000000000000000000000ea6000000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231",
+        "calls": [
+          {
+            "from": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+            "gas": "0x15f2ac",
+            "gasUsed": "0x0",
+            "to": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+            "input": "0xe6d66ac8000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e00000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000ea60",
+            "value": "0x0",
+            "type": "CALL"
+          },
+          {
+            "from": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+            "gas": "0x15767c",
+            "gasUsed": "0x227c",
+            "to": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+            "input": "0x602c3d8160093d39f33d3d3d3d363d3d37363d73e4be44b1505d29ae640748b4cce530ece6dcd4505af43d3d93803e602a57fd5bf3",
+            "output": "0x3d3d3d3d363d3d37363d73e4be44b1505d29ae640748b4cce530ece6dcd4505af43d3d93803e602a57fd5bf3",
+            "value": "0x0",
+            "type": "CREATE2"
+          },
+          {
+            "from": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+            "gas": "0x154dfa",
+            "gasUsed": "0xb507",
+            "to": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+            "input": "0xe6d66ac8000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e00000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000ea60",
+            "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "calls": [
+              {
+                "from": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+                "gas": "0x14ee92",
+                "gasUsed": "0xaa8f",
+                "to": "0xe4be44b1505d29ae640748b4cce530ece6dcd450",
+                "input": "0xe6d66ac8000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e00000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000ea60",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "calls": [
+                  {
+                    "from": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+                    "gas": "0x148f47",
+                    "gasUsed": "0x9e73",
+                    "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+                    "input": "0xa9059cbb00000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000ea60",
+                    "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                    "calls": [
+                      {
+                        "from": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+                        "gas": "0x142183",
+                        "gasUsed": "0x8253",
+                        "to": "0xd74cc5d436923b8ba2c179b4bca2841d8a52c5b5",
+                        "input": "0xa9059cbb00000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000ea60",
+                        "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                        "value": "0x0",
+                        "type": "DELEGATECALL"
+                      }
+                    ],
+                    "value": "0x0",
+                    "type": "CALL"
+                  }
+                ],
+                "value": "0x0",
+                "type": "DELEGATECALL"
+              }
+            ],
+            "value": "0x0",
+            "type": "CALL"
+          },
+          {
+            "from": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+            "gas": "0x149846",
+            "gasUsed": "0x6d8b",
+            "to": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+            "input": "0xe6d66ac8000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e0000000000000000000000004e78bf0a2491e3c1838880922b6f973a2f8265bd00000000000000000000000000000000000000000000000000000000005aa320",
+            "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "calls": [
+              {
+                "from": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+                "gas": "0x144552",
+                "gasUsed": "0x6cd7",
+                "to": "0xe4be44b1505d29ae640748b4cce530ece6dcd450",
+                "input": "0xe6d66ac8000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e0000000000000000000000004e78bf0a2491e3c1838880922b6f973a2f8265bd00000000000000000000000000000000000000000000000000000000005aa320",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "calls": [
+                  {
+                    "from": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+                    "gas": "0x13f249",
+                    "gasUsed": "0x6a7f",
+                    "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+                    "input": "0xa9059cbb0000000000000000000000004e78bf0a2491e3c1838880922b6f973a2f8265bd00000000000000000000000000000000000000000000000000000000005aa320",
+                    "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                    "calls": [
+                      {
+                        "from": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+                        "gas": "0x139ff8",
+                        "gasUsed": "0x67c3",
+                        "to": "0xd74cc5d436923b8ba2c179b4bca2841d8a52c5b5",
+                        "input": "0xa9059cbb0000000000000000000000004e78bf0a2491e3c1838880922b6f973a2f8265bd00000000000000000000000000000000000000000000000000000000005aa320",
+                        "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                        "value": "0x0",
+                        "type": "DELEGATECALL"
+                      }
+                    ],
+                    "value": "0x0",
+                    "type": "CALL"
+                  }
+                ],
+                "value": "0x0",
+                "type": "DELEGATECALL"
+              }
+            ],
+            "value": "0x0",
+            "type": "CALL"
+          }
+        ],
+        "value": "0x0",
+        "type": "CALL"
+      }
+    },
+    {
+      "label": "A void remaining 4",
+      "operation": "void",
+      "paymentInfo": {
+        "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+        "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+        "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000000",
+        "preApprovalExpiry": 1792505125,
+        "authorizationExpiry": 1792508725,
+        "refundExpiry": 1792512325,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+        "salt": "1"
+      },
+      "before": {
+        "hash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+        "hasCollected": true,
+        "capturable": "4000000",
+        "refundable": "6000000",
+        "balances": {
+          "operator": "20000000",
+          "payer": "90000000",
+          "merchant": "5940000",
+          "fee": "60000",
+          "tokenStore": "4000000",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "after": {
+        "hash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000000",
+        "balances": {
+          "operator": "20000000",
+          "payer": "94000000",
+          "merchant": "5940000",
+          "fee": "60000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "transaction": {
+        "hash": "0xc3a9e2329efa33e923042459b4a96074b43b8a1a12a4c32675bc6489a538479e",
+        "status": "success",
+        "blockNumber": "48366202",
+        "gasUsed": "61112",
+        "transfers": [
+          {
+            "from": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "to": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+            "value": "4000000",
+            "usdc": "4"
+          }
+        ],
+        "events": [
+          {
+            "name": "PaymentVoided",
+            "args": {
+              "paymentInfoHash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+              "amount": "4000000"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "label": "A refund 2",
+      "operation": "refund",
+      "paymentInfo": {
+        "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+        "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+        "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000000",
+        "preApprovalExpiry": 1792505125,
+        "authorizationExpiry": 1792508725,
+        "refundExpiry": 1792512325,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+        "salt": "1"
+      },
+      "before": {
+        "hash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000000",
+        "balances": {
+          "operator": "20000000",
+          "payer": "94000000",
+          "merchant": "5940000",
+          "fee": "60000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "after": {
+        "hash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "4000000",
+        "balances": {
+          "operator": "18000000",
+          "payer": "96000000",
+          "merchant": "5940000",
+          "fee": "60000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "transaction": {
+        "hash": "0x1299d6580729fc9e697e14b18872c982e459ae78bb6ae18204dc36a3583727df",
+        "status": "success",
+        "blockNumber": "48366204",
+        "gasUsed": "91859",
+        "transfers": [
+          {
+            "from": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+            "to": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "value": "2000000",
+            "usdc": "2"
+          },
+          {
+            "from": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "to": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+            "value": "2000000",
+            "usdc": "2"
+          }
+        ],
+        "events": [
+          {
+            "name": "PaymentRefunded",
+            "args": {
+              "paymentInfoHash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+              "amount": "2000000",
+              "tokenCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "label": "A refund remaining 4",
+      "operation": "refund",
+      "paymentInfo": {
+        "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+        "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+        "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000000",
+        "preApprovalExpiry": 1792505125,
+        "authorizationExpiry": 1792508725,
+        "refundExpiry": 1792512325,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+        "salt": "1"
+      },
+      "before": {
+        "hash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "4000000",
+        "balances": {
+          "operator": "18000000",
+          "payer": "96000000",
+          "merchant": "5940000",
+          "fee": "60000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "after": {
+        "hash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0",
+        "balances": {
+          "operator": "14000000",
+          "payer": "100000000",
+          "merchant": "5940000",
+          "fee": "60000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "transaction": {
+        "hash": "0x279e2b23c7ccafdc296124aeb62cd0aaac4c3ad4d956a0501cceaaf74ecc6e8a",
+        "status": "success",
+        "blockNumber": "48366205",
+        "gasUsed": "91847",
+        "transfers": [
+          {
+            "from": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+            "to": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "value": "4000000",
+            "usdc": "4"
+          },
+          {
+            "from": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "to": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+            "value": "4000000",
+            "usdc": "4"
+          }
+        ],
+        "events": [
+          {
+            "name": "PaymentRefunded",
+            "args": {
+              "paymentInfoHash": "0x8a011cf527880967cfe4615797df8e43f27562d9bfdc40bfd748e38abf384dcd",
+              "amount": "4000000",
+              "tokenCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "label": "B charge 6 / cap 10",
+      "operation": "charge",
+      "paymentInfo": {
+        "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+        "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+        "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000000",
+        "preApprovalExpiry": 1792505125,
+        "authorizationExpiry": 1792508725,
+        "refundExpiry": 1792512325,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+        "salt": "2"
+      },
+      "before": {
+        "hash": "0xd35164bbd4fa5921937e0d1db9b69d6afa2d42f5ab0543c32f277a0999e152c3",
+        "hasCollected": false,
+        "capturable": "0",
+        "refundable": "0",
+        "balances": {
+          "operator": "14000000",
+          "payer": "100000000",
+          "merchant": "5940000",
+          "fee": "60000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "after": {
+        "hash": "0xd35164bbd4fa5921937e0d1db9b69d6afa2d42f5ab0543c32f277a0999e152c3",
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000000",
+        "balances": {
+          "operator": "14000000",
+          "payer": "94000000",
+          "merchant": "11880000",
+          "fee": "120000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "transaction": {
+        "hash": "0x8453a1f1f075037929b566a5afadba172a5f3e955cb6e792da2d1bb7c852923a",
+        "status": "success",
+        "blockNumber": "48366206",
+        "gasUsed": "177373",
+        "transfers": [
+          {
+            "from": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+            "to": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+            "value": "10000000",
+            "usdc": "10"
+          },
+          {
+            "from": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+            "to": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+            "value": "4000000",
+            "usdc": "4"
+          },
+          {
+            "from": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+            "to": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "value": "6000000",
+            "usdc": "6"
+          },
+          {
+            "from": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "to": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+            "value": "60000",
+            "usdc": "0.06"
+          },
+          {
+            "from": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "to": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+            "value": "5940000",
+            "usdc": "5.94"
+          }
+        ],
+        "events": [
+          {
+            "name": "PaymentCharged",
+            "args": {
+              "paymentInfoHash": "0xd35164bbd4fa5921937e0d1db9b69d6afa2d42f5ab0543c32f277a0999e152c3",
+              "paymentInfo": {
+                "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+                "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+                "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+                "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+                "maxAmount": "10000000",
+                "preApprovalExpiry": 1792505125,
+                "authorizationExpiry": 1792508725,
+                "refundExpiry": 1792512325,
+                "minFeeBps": 100,
+                "maxFeeBps": 100,
+                "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+                "salt": "2"
+              },
+              "amount": "6000000",
+              "tokenCollector": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+              "feeAmount": "60000",
+              "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "label": "B refund 6",
+      "operation": "refund",
+      "paymentInfo": {
+        "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+        "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+        "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000000",
+        "preApprovalExpiry": 1792505125,
+        "authorizationExpiry": 1792508725,
+        "refundExpiry": 1792512325,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+        "salt": "2"
+      },
+      "before": {
+        "hash": "0xd35164bbd4fa5921937e0d1db9b69d6afa2d42f5ab0543c32f277a0999e152c3",
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "6000000",
+        "balances": {
+          "operator": "14000000",
+          "payer": "94000000",
+          "merchant": "11880000",
+          "fee": "120000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "after": {
+        "hash": "0xd35164bbd4fa5921937e0d1db9b69d6afa2d42f5ab0543c32f277a0999e152c3",
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0",
+        "balances": {
+          "operator": "8000000",
+          "payer": "100000000",
+          "merchant": "11880000",
+          "fee": "120000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "transaction": {
+        "hash": "0xd23f1933a1bbef16cdca1724f6c49a4f21b24fc28fa7cef141c8c2311766870a",
+        "status": "success",
+        "blockNumber": "48366207",
+        "gasUsed": "89408",
+        "transfers": [
+          {
+            "from": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+            "to": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "value": "6000000",
+            "usdc": "6"
+          },
+          {
+            "from": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "to": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+            "value": "6000000",
+            "usdc": "6"
+          }
+        ],
+        "events": [
+          {
+            "name": "PaymentRefunded",
+            "args": {
+              "paymentInfoHash": "0xd35164bbd4fa5921937e0d1db9b69d6afa2d42f5ab0543c32f277a0999e152c3",
+              "amount": "6000000",
+              "tokenCollector": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "label": "C authorize 10",
+      "operation": "authorize",
+      "paymentInfo": {
+        "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+        "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+        "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000000",
+        "preApprovalExpiry": 1792505125,
+        "authorizationExpiry": 1792508725,
+        "refundExpiry": 1792512325,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+        "salt": "3"
+      },
+      "before": {
+        "hash": "0xbaf3d6fd3fe844f9438c5f98f43d96a072a79d0b03508b9b6d9065310f0a777d",
+        "hasCollected": false,
+        "capturable": "0",
+        "refundable": "0",
+        "balances": {
+          "operator": "8000000",
+          "payer": "100000000",
+          "merchant": "11880000",
+          "fee": "120000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "after": {
+        "hash": "0xbaf3d6fd3fe844f9438c5f98f43d96a072a79d0b03508b9b6d9065310f0a777d",
+        "hasCollected": true,
+        "capturable": "10000000",
+        "refundable": "0",
+        "balances": {
+          "operator": "8000000",
+          "payer": "90000000",
+          "merchant": "11880000",
+          "fee": "120000",
+          "tokenStore": "10000000",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "transaction": {
+        "hash": "0xce9e466b22effb539170a439c55932366f8cdcfc856eef5590aef9ee380af0b7",
+        "status": "success",
+        "blockNumber": "48366208",
+        "gasUsed": "161363",
+        "transfers": [
+          {
+            "from": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+            "to": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+            "value": "10000000",
+            "usdc": "10"
+          },
+          {
+            "from": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+            "to": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "value": "10000000",
+            "usdc": "10"
+          }
+        ],
+        "events": [
+          {
+            "name": "PaymentAuthorized",
+            "args": {
+              "paymentInfoHash": "0xbaf3d6fd3fe844f9438c5f98f43d96a072a79d0b03508b9b6d9065310f0a777d",
+              "paymentInfo": {
+                "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+                "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+                "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+                "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+                "maxAmount": "10000000",
+                "preApprovalExpiry": 1792505125,
+                "authorizationExpiry": 1792508725,
+                "refundExpiry": 1792512325,
+                "minFeeBps": 100,
+                "maxFeeBps": 100,
+                "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+                "salt": "3"
+              },
+              "amount": "10000000",
+              "tokenCollector": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "label": "C payer reclaim 10",
+      "operation": "reclaim",
+      "paymentInfo": {
+        "operator": "0xCB71DA9903BbFa56E1bEE04C35f43D1036A2EcF8",
+        "payer": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+        "receiver": "0x4e78Bf0A2491E3C1838880922B6f973a2F8265Bd",
+        "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        "maxAmount": "10000000",
+        "preApprovalExpiry": 1792505125,
+        "authorizationExpiry": 1792508725,
+        "refundExpiry": 1792512325,
+        "minFeeBps": 100,
+        "maxFeeBps": 100,
+        "feeReceiver": "0x17493e2640fB83C7Dc67Cd75c3dAc17686866231",
+        "salt": "3"
+      },
+      "before": {
+        "hash": "0xbaf3d6fd3fe844f9438c5f98f43d96a072a79d0b03508b9b6d9065310f0a777d",
+        "hasCollected": true,
+        "capturable": "10000000",
+        "refundable": "0",
+        "balances": {
+          "operator": "8000000",
+          "payer": "90000000",
+          "merchant": "11880000",
+          "fee": "120000",
+          "tokenStore": "10000000",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "after": {
+        "hash": "0xbaf3d6fd3fe844f9438c5f98f43d96a072a79d0b03508b9b6d9065310f0a777d",
+        "hasCollected": true,
+        "capturable": "0",
+        "refundable": "0",
+        "balances": {
+          "operator": "8000000",
+          "payer": "100000000",
+          "merchant": "11880000",
+          "fee": "120000",
+          "tokenStore": "0",
+          "erc3009Collector": "0"
+        },
+        "tokenStoreDeployed": true
+      },
+      "transaction": {
+        "hash": "0x13aae2d20608ac6633f314280c33cb3de645feea39d94d2389b8b989ac514580",
+        "status": "success",
+        "blockNumber": "48366210",
+        "gasUsed": "61180",
+        "transfers": [
+          {
+            "from": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+            "to": "0x920D152ADD66044d9BfD6cCA1195d337a681c075",
+            "value": "10000000",
+            "usdc": "10"
+          }
+        ],
+        "events": [
+          {
+            "name": "PaymentReclaimed",
+            "args": {
+              "paymentInfoHash": "0xbaf3d6fd3fe844f9438c5f98f43d96a072a79d0b03508b9b6d9065310f0a777d",
+              "amount": "10000000"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "negativeChecks": [
+    {
+      "label": "capture without authorize",
+      "method": "eth_call",
+      "expectedError": "InsufficientAuthorization",
+      "observedError": "InsufficientAuthorization",
+      "stateUnchanged": true
+    },
+    {
+      "label": "changed receiver invalidates nonce",
+      "method": "eth_call",
+      "expectedError": "Error: FiatTokenV2: invalid signature",
+      "observedError": "Error: FiatTokenV2: invalid signature",
+      "stateUnchanged": true
+    },
+    {
+      "label": "authorize cannot repeat",
+      "method": "eth_call",
+      "expectedError": "PaymentAlreadyCollected",
+      "observedError": "PaymentAlreadyCollected",
+      "stateUnchanged": true
+    },
+    {
+      "label": "payer cannot capture",
+      "method": "eth_call",
+      "expectedError": "InvalidSender",
+      "observedError": "InvalidSender",
+      "stateUnchanged": true
+    },
+    {
+      "label": "fee exceeds signed range",
+      "method": "eth_call",
+      "expectedError": "FeeAmountOutOfRange",
+      "observedError": "FeeAmountOutOfRange",
+      "stateUnchanged": true
+    },
+    {
+      "label": "zero capture",
+      "method": "eth_call",
+      "expectedError": "ZeroAmount",
+      "observedError": "ZeroAmount",
+      "stateUnchanged": true
+    },
+    {
+      "label": "nothing refundable before capture",
+      "method": "eth_call",
+      "expectedError": "RefundExceedsCapture",
+      "observedError": "RefundExceedsCapture",
+      "stateUnchanged": true
+    },
+    {
+      "label": "merchant transfer fails after fee transfer; entire capture rolls back",
+      "method": "local transaction",
+      "stateUnchanged": true,
+      "transaction": {
+        "hash": "0x4284f87d85b85ba00287d06c412631e9f9880b2162c9db3a087ee1c3c961ab19",
+        "status": "reverted",
+        "blockNumber": "48366199",
+        "gasUsed": "133828",
+        "transfers": [],
+        "events": []
+      },
+      "callTrace": {
+        "from": "0xcb71da9903bbfa56e1bee04c35f43d1036a2ecf8",
+        "gas": "0x1682e4",
+        "gasUsed": "0x20ac4",
+        "to": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+        "input": "0x3efa46e1000000000000000000000000cb71da9903bbfa56e1bee04c35f43d1036a2ecf8000000000000000000000000920d152add66044d9bfd6cca1195d337a681c0750000000000000000000000004e78bf0a2491e3c1838880922b6f973a2f8265bd000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e0000000000000000000000000000000000000000000000000000000000989680000000000000000000000000000000000000000000000000000000006ad77525000000000000000000000000000000000000000000000000000000006ad78335000000000000000000000000000000000000000000000000000000006ad791450000000000000000000000000000000000000000000000000000000000000064000000000000000000000000000000000000000000000000000000000000006400000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000005b8d80000000000000000000000000000000000000000000000000000000000000ea6000000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231",
+        "output": "0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000025426c61636b6c69737461626c653a206163636f756e7420697320626c61636b6c6973746564000000000000000000000000000000000000000000000000000000",
+        "error": "execution reverted",
+        "revertReason": "Blacklistable: account is blacklisted",
+        "calls": [
+          {
+            "from": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+            "gas": "0x15f2ac",
+            "gasUsed": "0x0",
+            "to": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+            "input": "0xe6d66ac8000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e00000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000ea60",
+            "value": "0x0",
+            "type": "CALL"
+          },
+          {
+            "from": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+            "gas": "0x15767c",
+            "gasUsed": "0x227c",
+            "to": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+            "input": "0x602c3d8160093d39f33d3d3d3d363d3d37363d73e4be44b1505d29ae640748b4cce530ece6dcd4505af43d3d93803e602a57fd5bf3",
+            "output": "0x3d3d3d3d363d3d37363d73e4be44b1505d29ae640748b4cce530ece6dcd4505af43d3d93803e602a57fd5bf3",
+            "value": "0x0",
+            "type": "CREATE2"
+          },
+          {
+            "from": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+            "gas": "0x154dfa",
+            "gasUsed": "0xb507",
+            "to": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+            "input": "0xe6d66ac8000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e00000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000ea60",
+            "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "calls": [
+              {
+                "from": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+                "gas": "0x14ee92",
+                "gasUsed": "0xaa8f",
+                "to": "0xe4be44b1505d29ae640748b4cce530ece6dcd450",
+                "input": "0xe6d66ac8000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e00000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000ea60",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "calls": [
+                  {
+                    "from": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+                    "gas": "0x148f47",
+                    "gasUsed": "0x9e73",
+                    "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+                    "input": "0xa9059cbb00000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000ea60",
+                    "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                    "calls": [
+                      {
+                        "from": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+                        "gas": "0x142183",
+                        "gasUsed": "0x8253",
+                        "to": "0xd74cc5d436923b8ba2c179b4bca2841d8a52c5b5",
+                        "input": "0xa9059cbb00000000000000000000000017493e2640fb83c7dc67cd75c3dac17686866231000000000000000000000000000000000000000000000000000000000000ea60",
+                        "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                        "value": "0x0",
+                        "type": "DELEGATECALL"
+                      }
+                    ],
+                    "value": "0x0",
+                    "type": "CALL"
+                  }
+                ],
+                "value": "0x0",
+                "type": "DELEGATECALL"
+              }
+            ],
+            "value": "0x0",
+            "type": "CALL"
+          },
+          {
+            "from": "0xf96815976523e00e65be8f34ca5e64b4f41eb19c",
+            "gas": "0x149846",
+            "gasUsed": "0x11c3",
+            "to": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+            "input": "0xe6d66ac8000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e0000000000000000000000004e78bf0a2491e3c1838880922b6f973a2f8265bd00000000000000000000000000000000000000000000000000000000005aa320",
+            "output": "0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000025426c61636b6c69737461626c653a206163636f756e7420697320626c61636b6c6973746564000000000000000000000000000000000000000000000000000000",
+            "error": "execution reverted",
+            "revertReason": "Blacklistable: account is blacklisted",
+            "calls": [
+              {
+                "from": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+                "gas": "0x144552",
+                "gasUsed": "0x1101",
+                "to": "0xe4be44b1505d29ae640748b4cce530ece6dcd450",
+                "input": "0xe6d66ac8000000000000000000000000036cbd53842c5426634e7929541ec2318f3dcf7e0000000000000000000000004e78bf0a2491e3c1838880922b6f973a2f8265bd00000000000000000000000000000000000000000000000000000000005aa320",
+                "output": "0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000025426c61636b6c69737461626c653a206163636f756e7420697320626c61636b6c6973746564000000000000000000000000000000000000000000000000000000",
+                "error": "execution reverted",
+                "revertReason": "Blacklistable: account is blacklisted",
+                "calls": [
+                  {
+                    "from": "0x261d4af443e977201c5598b93f11c9af90dc82b2",
+                    "gas": "0x13f249",
+                    "gasUsed": "0xec1",
+                    "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+                    "input": "0xa9059cbb0000000000000000000000004e78bf0a2491e3c1838880922b6f973a2f8265bd00000000000000000000000000000000000000000000000000000000005aa320",
+                    "output": "0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000025426c61636b6c69737461626c653a206163636f756e7420697320626c61636b6c6973746564000000000000000000000000000000000000000000000000000000",
+                    "error": "execution reverted",
+                    "revertReason": "Blacklistable: account is blacklisted",
+                    "calls": [
+                      {
+                        "from": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+                        "gas": "0x139ff8",
+                        "gasUsed": "0xbf2",
+                        "to": "0xd74cc5d436923b8ba2c179b4bca2841d8a52c5b5",
+                        "input": "0xa9059cbb0000000000000000000000004e78bf0a2491e3c1838880922b6f973a2f8265bd00000000000000000000000000000000000000000000000000000000005aa320",
+                        "output": "0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000025426c61636b6c69737461626c653a206163636f756e7420697320626c61636b6c6973746564000000000000000000000000000000000000000000000000000000",
+                        "error": "execution reverted",
+                        "revertReason": "Blacklistable: account is blacklisted",
+                        "value": "0x0",
+                        "type": "DELEGATECALL"
+                      }
+                    ],
+                    "value": "0x0",
+                    "type": "CALL"
+                  }
+                ],
+                "value": "0x0",
+                "type": "DELEGATECALL"
+              }
+            ],
+            "value": "0x0",
+            "type": "CALL"
+          }
+        ],
+        "value": "0x0",
+        "type": "CALL"
+      }
+    },
+    {
+      "label": "capture exceeds remaining 4",
+      "method": "eth_call",
+      "expectedError": "InsufficientAuthorization",
+      "observedError": "InsufficientAuthorization",
+      "stateUnchanged": true
+    },
+    {
+      "label": "refund requires operator allowance",
+      "method": "eth_call",
+      "expectedError": "Error: ERC20: transfer amount exceeds allowance",
+      "observedError": "Error: ERC20: transfer amount exceeds allowance",
+      "stateUnchanged": true
+    },
+    {
+      "label": "refund exceeds remaining quota",
+      "method": "eth_call",
+      "expectedError": "RefundExceedsCapture",
+      "observedError": "RefundExceedsCapture",
+      "stateUnchanged": true
+    },
+    {
+      "label": "fully refunded payment stays used",
+      "method": "eth_call",
+      "expectedError": "PaymentAlreadyCollected",
+      "observedError": "PaymentAlreadyCollected",
+      "stateUnchanged": true
+    },
+    {
+      "label": "charge has no voidable balance",
+      "method": "eth_call",
+      "expectedError": "ZeroAuthorization",
+      "observedError": "ZeroAuthorization",
+      "stateUnchanged": true
+    },
+    {
+      "label": "reclaim before expiry",
+      "method": "eth_call",
+      "expectedError": "BeforeAuthorizationExpiry",
+      "observedError": "BeforeAuthorizationExpiry",
+      "stateUnchanged": true
+    },
+    {
+      "label": "capture at expiry",
+      "method": "eth_call",
+      "expectedError": "AfterAuthorizationExpiry",
+      "observedError": "AfterAuthorizationExpiry",
+      "stateUnchanged": true
+    }
+  ],
+  "tokenStore": "0x261D4AF443E977201c5598b93f11c9aF90DC82b2",
+  "success": true
+}

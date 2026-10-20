@@ -1,0 +1,216 @@
+{
+  "checkedAt": "2026-10-20T13:01:36.419Z",
+  "chainId": 84532,
+  "blockNumber": "48366193",
+  "compiler": "0.8.28+commit.7893614a.Emscripten.clang",
+  "sourceCommit": "b748fdd7a830a655a19a530edcf2a94b9dc7d25f",
+  "contracts": {
+    "escrow": {
+      "address": "0xf96815976523E00e65Be8f34cA5e64b4f41EB19c",
+      "api": "https://base-sepolia.blockscout.com/api/v2/smart-contracts/0xf96815976523E00e65Be8f34cA5e64b4f41EB19c",
+      "sourceUrl": "https://raw.githubusercontent.com/base/commerce-payments/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/AuthCaptureEscrow.sol",
+      "explorerVerified": true,
+      "primarySourceExact": true,
+      "primaryExecutableTokensMatch": true,
+      "pinnedSourceSha256": "31c6a0c3efec3acacb351e9cefe72b23a56d734474f1785dbf3e4ab45ef1477d",
+      "verifiedSourceSha256": "31c6a0c3efec3acacb351e9cefe72b23a56d734474f1785dbf3e4ab45ef1477d",
+      "exactRuntimeMatchAfterImmutableNormalization": true,
+      "executableBytecodeMatchAfterImmutableNormalization": true,
+      "metadataMatches": true,
+      "compiledMetadata": "a2646970667358221220725808fe4f39f81f973ed646aec7783bda61f886f915098479638600eac99a0464736f6c634300081c0033",
+      "deployedMetadata": "a2646970667358221220725808fe4f39f81f973ed646aec7783bda61f886f915098479638600eac99a0464736f6c634300081c0033",
+      "immutableReferences": {
+        "12728": [
+          {
+            "length": 32,
+            "start": 5432
+          },
+          {
+            "length": 32,
+            "start": 9686
+          },
+          {
+            "length": 32,
+            "start": 10516
+          }
+        ]
+      },
+      "rpcRuntimeHash": "0x33558f6cb34733174fdd6ec5ca8257834a8e4302abc08a4542f73ddf07d8702a",
+      "normalizedRuntimeHash": "0xbfd80125f9b86a4dd03387687b7f607f8ef2063b182ea0a36496d5cabc778477",
+      "compilerVersion": "v0.8.28+commit.7893614a",
+      "optimizerRuns": 100000,
+      "viaIR": true,
+      "evmVersion": "cancun"
+    },
+    "erc3009": {
+      "address": "0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+      "api": "https://base-sepolia.blockscout.com/api/v2/smart-contracts/0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88",
+      "sourceUrl": "https://raw.githubusercontent.com/base/commerce-payments/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/ERC3009PaymentCollector.sol",
+      "explorerVerified": true,
+      "primarySourceExact": false,
+      "primaryExecutableTokensMatch": true,
+      "pinnedSourceSha256": "6e9ff47d2fb4ebee3029845183202cb3ff643a9d675c5260cb9d6423657c9c8f",
+      "verifiedSourceSha256": "749a4b6b53bcf173b68b74d15555982d9fbf386715c5ce14a5f6244868a83084",
+      "exactRuntimeMatchAfterImmutableNormalization": false,
+      "executableBytecodeMatchAfterImmutableNormalization": true,
+      "metadataMatches": false,
+      "compiledMetadata": "a26469706673582212208667c34f5a4d6b369930c9ef57438a788ce16466e78c480ab09045bed6fae95364736f6c634300081c0033",
+      "deployedMetadata": "a2646970667358221220f849b43f2ee7d5bbd85c00a460780b9dc2fa046f822a6d4aa95c385d46ad4f2c64736f6c634300081c0033",
+      "immutableReferences": {
+        "4482": [
+          {
+            "length": 32,
+            "start": 473
+          },
+          {
+            "length": 32,
+            "start": 3622
+          }
+        ],
+        "4624": [
+          {
+            "length": 32,
+            "start": 305
+          },
+          {
+            "length": 32,
+            "start": 590
+          },
+          {
+            "length": 32,
+            "start": 2249
+          }
+        ]
+      },
+      "rpcRuntimeHash": "0xe27322c83d2cb91d01f59fc5c86512f4ecb5e9f300ed17120d78c55fbc5fb62f",
+      "normalizedRuntimeHash": "0x10666b10d0150871459d4615b2a4d3600af7590da0b7bf244c9dc2faf3434b47",
+      "compilerVersion": "v0.8.28+commit.7893614a",
+      "optimizerRuns": 100000,
+      "viaIR": true,
+      "evmVersion": "cancun"
+    },
+    "permit2Collector": {
+      "address": "0xD69831Aed5bfe262067ec4c751f4F830EcdD446e",
+      "api": "https://base-sepolia.blockscout.com/api/v2/smart-contracts/0xD69831Aed5bfe262067ec4c751f4F830EcdD446e",
+      "sourceUrl": "https://raw.githubusercontent.com/base/commerce-payments/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/Permit2PaymentCollector.sol",
+      "explorerVerified": true,
+      "primarySourceExact": true,
+      "primaryExecutableTokensMatch": true,
+      "pinnedSourceSha256": "a4d8a98b2702a6c053e18b78fbbe22d984e922662733546490b133f8f1ac439f",
+      "verifiedSourceSha256": "a4d8a98b2702a6c053e18b78fbbe22d984e922662733546490b133f8f1ac439f",
+      "exactRuntimeMatchAfterImmutableNormalization": false,
+      "executableBytecodeMatchAfterImmutableNormalization": true,
+      "metadataMatches": false,
+      "compiledMetadata": "a26469706673582212206bb529fe96afd914856d024d34317815fd35d84184efd629c3e0a77527ab844364736f6c634300081c0033",
+      "deployedMetadata": "a2646970667358221220b4541c4ad602a9de153ab42e318de394777a81ebcc777112b220a4b3764d383564736f6c634300081c0033",
+      "immutableReferences": {
+        "4510": [
+          {
+            "length": 32,
+            "start": 604
+          },
+          {
+            "length": 32,
+            "start": 3912
+          }
+        ],
+        "4666": [
+          {
+            "length": 32,
+            "start": 169
+          },
+          {
+            "length": 32,
+            "start": 789
+          }
+        ],
+        "4751": [
+          {
+            "length": 32,
+            "start": 298
+          },
+          {
+            "length": 32,
+            "start": 722
+          },
+          {
+            "length": 32,
+            "start": 2449
+          }
+        ]
+      },
+      "rpcRuntimeHash": "0x1878e7902a9285e308c08806bab6214aba5d013a8c78e0fa2288f86e5e83e2d6",
+      "normalizedRuntimeHash": "0x376d1d811addfc093b628593f504a6bf343908c666bc5b0bc1e238db1a9d028b",
+      "compilerVersion": "v0.8.28+commit.7893614a",
+      "optimizerRuns": 100000,
+      "viaIR": true,
+      "evmVersion": "cancun"
+    },
+    "refundCollector": {
+      "address": "0x7a03443724d14798c4AB4622F1DAAcA761Fea486",
+      "api": "https://base-sepolia.blockscout.com/api/v2/smart-contracts/0x7a03443724d14798c4AB4622F1DAAcA761Fea486",
+      "sourceUrl": "https://raw.githubusercontent.com/base/commerce-payments/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/OperatorRefundCollector.sol",
+      "explorerVerified": true,
+      "primarySourceExact": false,
+      "primaryExecutableTokensMatch": true,
+      "pinnedSourceSha256": "311af89887d2e11c6c1c5c437878f7440a16962290e6c3c4fb723538a4451159",
+      "verifiedSourceSha256": "fe9f537c2b6c39f3f7e6d0f6a127b6333cf51d1a3ba9fad1f0b526864cf73d60",
+      "exactRuntimeMatchAfterImmutableNormalization": false,
+      "executableBytecodeMatchAfterImmutableNormalization": true,
+      "metadataMatches": false,
+      "compiledMetadata": "a2646970667358221220b95568a9ae61742bf2ec90674ca2e56d0708f00f3686b4d9d29c39fbc69c76cd64736f6c634300081c0033",
+      "deployedMetadata": "a2646970667358221220da104c7d88741ab3ceecc85fd5c46c791420c8cf6883459f21406bcc43d389ee64736f6c634300081c0033",
+      "immutableReferences": {
+        "4423": [
+          {
+            "length": 32,
+            "start": 297
+          },
+          {
+            "length": 32,
+            "start": 754
+          }
+        ]
+      },
+      "rpcRuntimeHash": "0x2fbd6518baaaea91574657f8b8be683e3aa72ac46f9603903ab99b6ccf4142f7",
+      "normalizedRuntimeHash": "0x257f38ae0ec1e707c855d0575051f3638f8a037a5bfaa0f58476a715ecc76c5e",
+      "compilerVersion": "v0.8.28+commit.7893614a",
+      "optimizerRuns": 100000,
+      "viaIR": true,
+      "evmVersion": "cancun"
+    },
+    "tokenStoreImplementation": {
+      "address": "0xe4be44B1505d29ae640748b4cce530ece6DcD450",
+      "api": "https://base-sepolia.blockscout.com/api/v2/smart-contracts/0xe4be44B1505d29ae640748b4cce530ece6DcD450",
+      "sourceUrl": "https://raw.githubusercontent.com/base/commerce-payments/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/TokenStore.sol",
+      "explorerVerified": true,
+      "primarySourceExact": true,
+      "primaryExecutableTokensMatch": true,
+      "pinnedSourceSha256": "86c2d4a08dca7a18bc7aaefac8796e22043367c766a238803ac872b9455e293f",
+      "verifiedSourceSha256": "86c2d4a08dca7a18bc7aaefac8796e22043367c766a238803ac872b9455e293f",
+      "exactRuntimeMatchAfterImmutableNormalization": true,
+      "executableBytecodeMatchAfterImmutableNormalization": true,
+      "metadataMatches": true,
+      "compiledMetadata": "a2646970667358221220fc6c9dd775420269ba90eb1968b00e064898846d5131997baafdbb0166a570bf64736f6c634300081c0033",
+      "deployedMetadata": "a2646970667358221220fc6c9dd775420269ba90eb1968b00e064898846d5131997baafdbb0166a570bf64736f6c634300081c0033",
+      "immutableReferences": {
+        "880": [
+          {
+            "length": 32,
+            "start": 186
+          },
+          {
+            "length": 32,
+            "start": 579
+          }
+        ]
+      },
+      "rpcRuntimeHash": "0x8ff35d5d4032deaf1cd8e71f770db006d6e1b1ade58dfcaf3cb8b99204a9600a",
+      "normalizedRuntimeHash": "0x378edc7ed8f0f3353dc5d3fd56a0804e1ff20c485d531bbe39c1ce5ad60b67ba",
+      "compilerVersion": "v0.8.29+commit.ab55807c",
+      "optimizerRuns": 100000,
+      "viaIR": true,
+      "evmVersion": "cancun"
+    }
+  }
+}

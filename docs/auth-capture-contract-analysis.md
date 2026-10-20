@@ -107,14 +107,35 @@ escrow 的 captureMode="sync" 默认在请求结束阶段扣款，"deferred" 则
 
 资料更新到 2026 年 10 月 19 日。[Shopify USDC 产品说明](https://help.shopify.com/en/manual/payments/shopify-payments/local-payment-methods/usdc-payments)当时不支持部分扣款或订阅商品。退款功能有实现，生产使用情况还需要查实际交易。
 
-## 9 源码版本
+## 9 实际验证和演示
+
+验证日期：2026 年 10 月 20 日。Base Sepolia 取区块 **48,366,193**，合约使用官方 v1.1 部署；本地演示直接 fork 这个区块，没有替换支付合约代码。
+
+| 验证 | 实际结果 |
+| --- | --- |
+| Base Sepolia 部署 | Escrow、三个 Collector、TokenStore 模板均存在代码，Collector 和模板绑定的 Escrow 正确；同时核实了测试 USDC |
+| 源码和字节码 | 五个支付合约重新编译，归一化构造时写入的 immutable 后，执行代码一致；Collector 的末尾编译元数据另有差异，原始哈希已保留 |
+| 官方合约测试 | Foundry v1.3.6、Solidity 0.8.28：112 项通过，0 项失败；其中 94 项 fuzz 测试共执行 24,064 轮，排除了上游 Base 主网 fork 集成测试 |
+| 本地 fork 演示 | authorize、capture、charge、void、refund、reclaim 六种操作，9 笔生命周期交易成功，15 项拒绝 / 回滚检查通过 |
+
+演示给 payer 100、operator 20 测试 USDC 作为初始余额。
+
+![本地 fork 实测的余额变化](../assets/auth-capture/13-validation-results.svg)
+
+演示里先锁 10，再扣 6：费用方收到 0.06，商家收到 5.94，剩余 4 经 void 退回。之后 refund 2，钱从 operator 新收，商家和费用方余额不变。另一笔订单直接 charge 6，实际 Transfer 记录是收 10、退 4、存入 6、再分账。第三笔订单等到授权截止，由 payer reclaim。
+
+回滚测试中，把商家加入测试 USDC 黑名单，第二次转账失败，前面的手续费、订单余额和 TokenStore clone 部署一起回滚。权限错误、篡改收款人、重复收款、费用越界、退款缺少 allowance、过早 reclaim 等也都验证了。
+
+本地交易没有广播到公共测试网，测试资金通过 fork 的管理接口准备。演示走 EOA + ERC-3009 和标准退款 Collector，未跑 x402 HTTP 端到端流程或 Permit2 的测试网收款。Foundry v1.8.5 下还有一个 Permit2/ERC-6492 用例失败，复现时需按官方 CI 固定 v1.3.6。[运行命令和部署地址](auth-capture-official-code-walkthrough.md#12-运行验证与演示) · [原始结果](../demos/auth-capture/results/demo.json) · [演示页面源码](../demos/auth-capture/report.html)
+
+## 10 源码版本
 
 | 项目 | 源码提交 | 内容 |
 | --- | --- | --- |
 | [x402-foundation/x402](https://github.com/x402-foundation/x402/tree/faa1c694c66a3732aaabbce93bdae140e521a67d) | faa1c694c66a3732aaabbce93bdae140e521a67d，2026-10-15 UTC | TypeScript SDK、规范、示例与测试源码 |
 | [base/commerce-payments](https://github.com/base/commerce-payments/tree/b748fdd7a830a655a19a530edcf2a94b9dc7d25f) | b748fdd7a830a655a19a530edcf2a94b9dc7d25f，2026-09-03 UTC | Commerce Payments v1.1 合约与测试源码 |
 
-文中的合约、SDK 和测试代码按上述提交阅读，函数链接指向对应版本。SDK / Foundry 测试、故障注入和链上交易尚未实测；TRON 尚未完成编译、合约测试或部署验证，生产退款交易及用量也未核实。源码 main 中的功能不一定已发布到 npm。
+合约测试和本地 fork 结果见上一节。SDK 单元测试与 HTTP 端到端流程尚未执行；TRON 尚未完成编译、合约测试或部署验证，生产退款交易及用量也未核实。函数链接指向上述源码提交，main 中的功能不一定已发布到 npm。
 
 EVM 部分以 v1.1 的 feeAmount 为准，v1.0 使用 feeBps。切换版本时，部署地址、Collector、ABI 和操作签名都要配套，不能只改参数名称。
 

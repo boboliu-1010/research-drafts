@@ -2,7 +2,7 @@
 
 更新：2026 年 10 月 20 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [SDK 与 TRON 接入](auth-capture-official-code-walkthrough.md)
 
-合约使用 Commerce Payments v1.1。示例订单上限 10 USDC、实际消费 6、费用 1%，传入真实参数时需乘 10⁶。代码摘录省略了部分声明和检查，完整实现以链接中的源码为准。[源码版本](auth-capture-contract-analysis.md#9-源码版本)
+合约使用 Commerce Payments v1.1。示例订单上限 10 USDC、实际消费 6、费用 1%，传入真实参数时需乘 10⁶。代码摘录省略了部分声明和检查，完整实现以链接中的源码为准。[源码版本](auth-capture-contract-analysis.md#10-源码版本)
 
 ## 1 合约组成
 
@@ -368,6 +368,8 @@ TokenStore 先检查 msg.sender==authCaptureEscrow，再调用 SafeERC20.safeTra
 
 ## 17 合约测试
 
+固定提交的官方测试已实际执行：**112 项通过，0 项失败**，20 个测试套件；其中 94 项 fuzz 测试各跑 256 轮。使用官方 CI 的 Foundry v1.3.6，并将 Solidity 固定为 0.8.28，EVM 为 Cancun。命令排除了 test/integration/*，这些上游集成测试依赖 Base 主网 fork。[测试原始输出](../demos/auth-capture/results/official-tests.json) · [结果汇总](../demos/auth-capture/results/official-summary.json)
+
 | 测试文件 | 覆盖内容 |
 | --- | --- |
 | [authorize.t.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/test/src/PaymentEscrow/authorize.t.sol) | 首次收款、金额与期限、重复收款 |
@@ -376,5 +378,9 @@ TokenStore 先检查 msg.sender==authCaptureEscrow，再调用 SafeERC20.safeTra
 | [void.t.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/test/src/PaymentEscrow/void.t.sol) | 退回剩余托管款 |
 | [reclaim.t.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/test/src/PaymentEscrow/reclaim.t.sol) | 付款人到期取回 |
 | [refund.t.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/test/src/PaymentEscrow/refund.t.sol) | 退款出资、额度与期限 |
+
+更换工具链也做了对照：Foundry v1.8.5 下 111 项通过、1 项失败。失败项是 Permit2PaymentCollectorTest.test_collectTokens_succeeds_withERC6492Signature，trace 显示钱包 CREATE2 出现 CreateCollision，准备调用返回失败，Permit2 随后报 InvalidSignatureLength。Solidity 0.8.37 自动选择和显式 0.8.28 均复现；同一源码在官方 CI 工具链通过。这里只记录兼容性差异，没有修改上游合约。[对照记录](../demos/auth-capture/results/toolchain-comparison.json)
+
+本地 fork 还跑了 9 笔生命周期交易和 15 项拒绝 / 回滚检查，包含商家转账失败后手续费与记账一并回滚。[实测流程](auth-capture-contract-analysis.md#9-实际验证和演示) · [复现命令](auth-capture-official-code-walkthrough.md#12-运行验证与演示)
 
 [SDK 与接口](auth-capture-official-code-walkthrough.md) · [TRON 适配范围](auth-capture-official-code-walkthrough.md#11-tron-适配) · [返回分享主稿](auth-capture-contract-analysis.md)

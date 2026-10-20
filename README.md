@@ -1,6 +1,6 @@
 # 未评审研究文档
 
-boboliu-1010 的研究与分享草稿，尚未经评审。
+boboliu-1010 的研究与分享草稿，尚未经评审。每份调研都附运行命令和实际结果，没验证的部分直接写明。
 
 ## x402 auth-capture 分享
 
@@ -14,4 +14,4 @@ boboliu-1010 的研究与分享草稿，尚未经评审。
 
 先读主稿，需要细节再看合约或 SDK。配图和可编辑图源在 [assets/auth-capture](assets/auth-capture/README.md)。
 
-源码版本和测试状态见[主稿末尾](docs/auth-capture-contract-analysis.md#9-源码版本)。
+已完成 Base Sepolia 部署核验、本地 fork 演示和官方合约测试，结果与命令见[验证与演示](docs/auth-capture-contract-analysis.md#9-实际验证和演示)。源码版本和其余测试状态见[主稿末尾](docs/auth-capture-contract-analysis.md#10-源码版本)。

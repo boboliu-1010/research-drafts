@@ -1,6 +1,6 @@
 # auth-capture 配图目录
 
-源码版本和测试状态见[分享主稿](../../docs/auth-capture-contract-analysis.md#9-源码版本)。
+源码版本和测试状态见[分享主稿](../../docs/auth-capture-contract-analysis.md#10-源码版本)。
 
 配图使用“上限 10 USDC、实际消费 6、费用 1%”这个例子，说明合约设计和调用过程。[返回分享主稿](../../docs/auth-capture-contract-analysis.md)
 
@@ -8,6 +8,7 @@
 
 | 图 | 内容 | 图源 |
 | --- | --- | --- |
+| [13 实测余额变化](13-validation-results.svg) | 从本地 fork 的真实执行记录生成；含分账、释放和退款后的余额 | [SVG](13-validation-results.svg) |
 | [12 项目关系](12-project-layers.png) | Coinbase Payments 与 x402 auth-capture 分别使用 Commerce Payments；不表示 Shopify 使用 x402 | [SVG](12-project-layers.svg) |
 | [08 三种支付方式](08-auth-capture-overview.png) | exact 以 ERC-3009 默认直付为例；另两列为 delegated 的 escrow / authorization 路径 | [SVG](08-auth-capture-overview.svg) |
 | [01 合约职责](01-contract-roles.png) | operator、Escrow、Collector、TokenStore 与收款方的职责和资金关系 | [Mermaid](01-contract-roles.mmd) |

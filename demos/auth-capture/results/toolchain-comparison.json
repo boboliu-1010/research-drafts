@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "b748fdd7a830a655a19a530edcf2a94b9dc7d25f",
+  "foundry": "1.8.5",
+  "solidity": [
+    "0.8.37 (automatic)",
+    "0.8.28 (explicit)"
+  ],
+  "counts": {
+    "passed": 111,
+    "failed": 1
+  },
+  "test": "test_collectTokens_succeeds_withERC6492Signature(uint120)",
+  "suite": "test/src/collectors/Permit2PaymentCollector.t.sol:Permit2PaymentCollectorTest",
+  "trace": [
+    "CoinbaseSmartWalletFactory.createAccount",
+    "CREATE2: CreateCollision",
+    "DeploymentFailed",
+    "Multicall3.tryAggregate(requireSuccess=false) returns success=false",
+    "Permit2.permitTransferFrom",
+    "InvalidSignatureLength (0x4be6321b)"
+  ],
+  "comparison": "Same source passes all 112 tests on the official CI Foundry v1.3.6 with Solidity 0.8.28. No upstream code changed. This records a toolchain-dependent failure, not proof of a production exploit."
+}

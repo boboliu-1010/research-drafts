@@ -2,7 +2,7 @@
 
 更新：2026 年 10 月 20 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [合约源码](auth-capture-solidity-walkthrough.md) · [TRON 适配](#11-tron-适配)
 
-服务端设置付款条件，客户端签名，facilitator 验证并提交交易，业务系统负责交付判断、退款审批、备付金和商户对账。合约内部实现见[合约走读](auth-capture-solidity-walkthrough.md)，[源码版本](auth-capture-contract-analysis.md#9-源码版本)统一列在主稿末尾。
+服务端设置付款条件，客户端签名，facilitator 验证并提交交易，业务系统负责交付判断、退款审批、备付金和商户对账。合约内部实现见[合约走读](auth-capture-solidity-walkthrough.md)，[源码版本](auth-capture-contract-analysis.md#10-源码版本)统一列在主稿末尾。
 
 ## 1 代码入口与职责
 
@@ -247,4 +247,80 @@ USDT 的预期流程是：
 5. 接入 SDK 的支付条件、用户签名和商家授权，验证原始条款持久化。
 6. 验证超时、重复请求、进程重启、回执不明、余额或 allowance 不足的恢复行为。
 
-[返回分享主稿](auth-capture-contract-analysis.md) · [合约测试](auth-capture-solidity-walkthrough.md#17-合约测试) · [源码版本](auth-capture-contract-analysis.md#9-源码版本)
+## 12 运行验证与演示
+
+### 12.1 Base Sepolia 的官方部署
+
+部署地址来自 [Commerce Payments v1.1](https://github.com/base/commerce-payments/releases/tag/v1.1.0)，USDC 使用 [Circle 的 Base Sepolia 测试地址](https://developers.circle.com/stablecoins/usdc-contract-addresses)。在区块 48,366,193 读取了代码、Collector 类型和绑定关系。
+
+| 合约 | Base Sepolia 地址 | Runtime 字节数 |
+| --- | --- | --- |
+| AuthCaptureEscrow | [0xf96815976523E00e65Be8f34cA5e64b4f41EB19c](https://sepolia.basescan.org/address/0xf96815976523E00e65Be8f34cA5e64b4f41EB19c#code) | 10978 |
+| ERC3009PaymentCollector | [0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88](https://sepolia.basescan.org/address/0x8612dfdc421f80336cd14E8EF9cb1E765dB5ab88#code) | 3982 |
+| Permit2PaymentCollector | [0xD69831Aed5bfe262067ec4c751f4F830EcdD446e](https://sepolia.basescan.org/address/0xD69831Aed5bfe262067ec4c751f4F830EcdD446e#code) | 4049 |
+| OperatorRefundCollector | [0x7a03443724d14798c4AB4622F1DAAcA761Fea486](https://sepolia.basescan.org/address/0x7a03443724d14798c4AB4622F1DAAcA761Fea486#code) | 844 |
+| TokenStore 实现模板 | [0xe4be44B1505d29ae640748b4cce530ece6DcD450](https://sepolia.basescan.org/address/0xe4be44B1505d29ae640748b4cce530ece6DcD450#code) | 669 |
+| 测试 USDC（代理） | [0x036CbD53842c5426634e7929541eC2318f3dCF7e](https://sepolia.basescan.org/address/0x036CbD53842c5426634e7929541eC2318f3dCF7e#code) | 1798 |
+
+核验包括代码是否存在、三个 Collector 和 TokenStore 模板绑定的 authCaptureEscrow、Payment / Refund 类型，以及付款 Collector 的 Multicall3 / Permit2 目标地址。随后用 Solidity 0.8.28、viaIR、optimizer runs=100000、Cancun 重新编译浏览器验证源码，与 RPC 读取的执行字节码比较。
+
+Escrow 和 TokenStore 模板只需归一化构造时写入的 immutable 即可匹配。三个 Collector 的原始 metadata 哈希不同，去掉末尾 Solidity CBOR 元数据后，执行代码匹配；主要源文件去注释与空白后也与固定源码一致。报告分别保存了精确匹配标志、immutable 位置、metadata 和运行时代码哈希。[部署读取](../demos/auth-capture/results/deployment.json) · [源码与字节码结果](../demos/auth-capture/results/verified-source.json)
+
+### 12.2 本地演示
+
+需要 Node.js 20+ 和 Anvil。进入仓库后安装演示依赖：
+
+```bash
+cd demos/auth-capture
+npm ci --ignore-scripts
+npm run check:deployment
+npm run verify:source
+```
+
+另开终端，启动固定区块的本地 fork：
+
+```bash
+anvil --fork-url https://base-sepolia-rpc.publicnode.com \
+  --fork-block-number 48366193 --chain-id 84532 \
+  --host 127.0.0.1 --port 18545 --silent
+```
+
+回到演示目录执行：
+
+```bash
+npm run demo
+npm run report
+```
+
+打开生成的 report.html，可以看每笔交易后的可扣 / 可退额度、六个地址的余额、USDC Transfer 和 capture 调用树。原始记录保存在 results/demo.json，结果图由这些记录生成。
+
+脚本只接受 localhost 的 Anvil，并检查 chainId 与 fork 区块。每次生成临时角色，私钥只在进程内使用；通过本地 impersonation 临时配置 USDC minter，给 payer 100、operator 20 测试 USDC。支付合约沿用官方部署。结束后恢复执行前的 fork 快照，没有公共测试网交易哈希。
+
+| 演示订单 | 操作 | 观察点 |
+| --- | --- | --- |
+| A | authorize 10 → capture 6 → void 4 → refund 2 → refund 4 | 先入金后部署 TokenStore；capture 两次转账；退款另扣 operator |
+| B | charge 6 → refund 6 | ERC-3009 先收上限 10、退 4；无剩余托管款可 void |
+| C | authorize 10 → 到期 → payer reclaim 10 | 过早 reclaim 被拒绝；截止时 capture 被拒绝，payer 可以取回 |
+
+15 项检查包含错误操作人、收款人被篡改、重复 authorize、零金额、费用越界、超额 capture、退款缺 allowance、超额 refund，以及到期条件。其中回滚用例通过本地 USDC blacklister 临时封禁商家，发送一笔 capture：交易失败、日志清空，费用方余额、订单余额和 clone 部署均未改变。
+
+这是合约执行演示，调用者直接扮演 operator。x402 的商家操作签名、facilitator 认证和 HTTP 请求链路尚未端到端验证；Permit2 的公共测试网收款也未验证。
+
+### 12.3 跑官方合约测试
+
+使用上游 [CI 固定的 Foundry v1.3.6](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/.github/workflows/test.yml)。在 demos/auth-capture 目录执行：
+
+```bash
+npm run test:official
+```
+
+脚本拉取固定提交及子模块，以 Solidity 0.8.28 执行官方测试，再生成 results/official-tests.json 和 results/official-summary.json。已有源码目录或独立版本的 forge 时可指定：
+
+```bash
+COMMERCE_SOURCE=/path/to/commerce-payments \
+FORGE_BIN=/path/to/foundry-v1.3.6/forge npm run test:official
+```
+
+实测 112 项全部通过。Foundry v1.8.5 的 Permit2/ERC-6492 用例有兼容性失败，复现说明见[合约测试](auth-capture-solidity-walkthrough.md#17-合约测试)。SDK 第 10 节列出的 TypeScript 单元测试尚未运行。
+
+[返回分享主稿](auth-capture-contract-analysis.md) · [合约测试](auth-capture-solidity-walkthrough.md#17-合约测试) · [源码版本](auth-capture-contract-analysis.md#10-源码版本)
