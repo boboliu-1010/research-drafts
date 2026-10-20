@@ -12,6 +12,8 @@
 
 x402 SDK 负责付款条件、签名、商户操作授权、验证、交易提交和本地记录；Commerce Payments 负责链上账本及代币移动。商户交付状态不在基础 Escrow 的判断范围内。
 
+本次 [SDK 接入改动 #3203](https://github.com/x402-foundation/x402/pull/3203)复用 Commerce Payments 已有的 Escrow、TokenStore 和三个业务 Collector，没有新增生产 Solidity 合约。新增的 ForwardingOperator、NoopOperator、GasWastingOperator 均在 test/contracts/auth-capture 下，仅用于集成测试。生产新增主要在 SDK 接入层；abi.ts 是现有合约的接口描述。完整分类见[新增与复用清单](auth-capture-solidity-walkthrough.md#1-先区分这次新增与原有合约)。
+
 ```mermaid
 flowchart TB
   subgraph SDK["x402 SDK"]

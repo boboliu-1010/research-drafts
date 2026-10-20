@@ -6,7 +6,44 @@
 
 贯穿例子：用户同意上限 10 USDC，任务完成后实际消费 6，费用 1%。金额说明用 USDC；真实参数需乘 10⁶。
 
-## 1 先打开哪些文件
+## 1 先区分这次新增与原有合约
+
+这里的“这次”指 x402 auth-capture SDK v1.1 接入改动 [#3203](https://github.com/x402-foundation/x402/pull/3203)（提交 [28376d6](https://github.com/x402-foundation/x402/commit/28376d643a6d9492e4a6cbfa5199376b90eb89dc)），不是 Commerce Payments 自身的版本升级。核对该提交的 164 个变更文件，没有生产 Solidity 合约变更；新增 .sol 为下列三个测试 operator。
+
+**这次新做的是 x402 的接入层；下面重点走读的生产支付合约，都是复用已有实现。** 对原先只用 exact 直付的应用而言，它们是新接入的合约依赖，但不代表合约源码这次才出现。
+
+### 1.1 原有支付合约：本次复用
+
+| 类别 | 合约 | 本次接入的作用 |
+| --- | --- | --- |
+| Commerce Payments 已有业务合约 | AuthCaptureEscrow | 托管账本、capture / charge、取消和退款 |
+| Commerce Payments 已有业务合约 | TokenStore | 按 operator 保管和转出代币 |
+| Commerce Payments 已有业务合约 | ERC3009PaymentCollector | ERC-3009 签名收款 |
+| Commerce Payments 已有业务合约 | Permit2PaymentCollector | Permit2 签名收款 |
+| Commerce Payments 已有业务合约 | OperatorRefundCollector | 从 operator 收取退款资金 |
+| Commerce Payments 已有辅助基类 | TokenCollector、ERC6492SignatureHandler | 收款入口权限、nonce 和签名准备逻辑，不作为两种额外业务合约计数 |
+| 原有外部合约 | token（如 USDC）、Permit2、Multicall3 | 代币余额、授权转账和钱包准备调用 |
+| 原有通用库 / 基类 | SafeERC20、LibClone、ReentrancyGuardTransient | 安全转账、clone 地址预测及部署、重入锁；不计为新增业务合约 |
+
+因此，本路径直接使用 **5 类业务合约**。Commerce Payments 还有 PreApprovalPaymentCollector、SpendPermissionPaymentCollector 等已有收款方式，未列入当前 x402 ERC-3009 / Permit2 标准路径。
+
+### 1.2 这次新增的 Solidity：仅用于测试
+
+| 新增文件 | 测什么 | 是否生产支付合约 |
+| --- | --- | --- |
+| ForwardingOperator.sol | 将 authorize / charge 转发给 Escrow，验证 custom operator 正常路径 | 否 |
+| NoopOperator.sol | 调用成功但什么也不做，验证 facilitator 能拒绝假收款 | 否 |
+| GasWastingOperator.sol | 消耗过多 gas，验证 custom operator 的 gas 限制 | 否 |
+
+官方[测试目录说明](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/typescript/packages/mechanisms/evm/test/contracts/auth-capture/README.md)明确把它们限定为集成测试合约，不能当作生产 operator 模板。默认 delegated 模式也不要求新部署一个 operator 合约，operator 可以直接是 facilitator 的提交地址。
+
+### 1.3 这次新增的生产代码：主要在 SDK
+
+x402 在 client / server / facilitator 中新增或完善 auth-capture 接入逻辑：构造付款授权、绑定 nonce、组织商家操作授权、调用现有 ABI、记录生命周期状态及恢复 pending 交易。**abi.ts 中新增合约接口定义，不等于新增了对应合约实现。** 详见[SDK 代码走读](auth-capture-official-code-walkthrough.md)。
+
+Commerce Payments v1.0 → v1.1 的 feeBps → feeAmount 属于已有合约的版本变化，也要与本次 x402 SDK 接入分开看。
+
+### 1.4 源码阅读顺序：以下均为已有合约
 
 | 阅读顺序 | 官方源码 | 要回答的问题 |
 | --- | --- | --- |
@@ -16,6 +53,7 @@
 | 4 | [ERC3009PaymentCollector.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/ERC3009PaymentCollector.sol) | USDC 等支持 ERC-3009 的 token 怎样验签收款 |
 | 5 | [Permit2PaymentCollector.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/Permit2PaymentCollector.sol) | 如何通过 Permit2 收款 |
 | 6 | [OperatorRefundCollector.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/OperatorRefundCollector.sol) | 退款实际扣谁的钱 |
+| 7 | [ERC6492SignatureHandler.sol](https://github.com/base/commerce-payments/blob/b748fdd7a830a655a19a530edcf2a94b9dc7d25f/src/collectors/ERC6492SignatureHandler.sol) | 未部署钱包的准备调用怎样处理 |
 
 先记住三个职责：**Escrow 管条款与订单账，Collector 负责从外部收钱，TokenStore 按 Escrow 指令付款。** ERC6492SignatureHandler 是两个付款 Collector 共用的签名准备辅助类，后文单独说明。
 

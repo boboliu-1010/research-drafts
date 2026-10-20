@@ -37,7 +37,7 @@ auth-capture 让用户先签一笔支付上限，再按实际金额结算。它�
 
 基础 Escrow 只检查 operator 权限和付款条款，不判断任务是否完成，也不验证商家的操作签名。delegated 模式由 facilitator 验证商家意图；需要链上验签或仲裁时，可以用自定义合约担任 operator。
 
-## 合约怎么分工
+## 合约怎么分工：本次复用已有支付合约
 
 ![合约职责与调用关系](../assets/auth-capture/01-contract-roles.png)
 
@@ -49,7 +49,9 @@ auth-capture 让用户先签一笔支付上限，再按实际金额结算。它�
 | OperatorRefundCollector | 标准退款路径从 operator 钱包收钱 |
 | TokenStore | 保管托管款，只接受 Escrow 的支出指令 |
 
-这些合约来自 Base 的 Commerce Payments，x402 负责把它们接入 HTTP 支付。
+上面 5 类业务合约都来自 Base 已有的 Commerce Payments。**本次 x402 SDK 接入没有新写一套生产支付合约，主要在 client / server / facilitator 中新增或完善接入与生命周期管理代码。** 对 exact 直付应用而言，这是新接入的依赖，不是新发明的合约。
+
+这次新增的 Solidity 是 ForwardingOperator、NoopOperator、GasWastingOperator 三个集成测试合约，不属于生产支付合约。TokenCollector、ERC6492SignatureHandler 是已有辅助基类；USDC 等 token、Permit2、Multicall3 是原有外部依赖。来源与本次变更核对见[新增与复用清单](auth-capture-solidity-walkthrough.md#1-先区分这次新增与原有合约)。
 
 **TokenStore 按 operator 地址区分，不是每笔订单一个。** 同一条链、同一 Escrow 下，多笔支付共用资金容器，Escrow 按支付编号分别记账。Escrow 部署时创建模板；实例地址可提前计算，首次需要转出资金时再自动部署。一个 facilitator 使用多个执行地址，就会对应多个 TokenStore。
 
