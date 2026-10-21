@@ -1,6 +1,6 @@
 # x402 auth-capture：支付机制与合约分享
 
-更新：2026 年 10 月 20 日。[总目录](../README.md) · [合约源码](auth-capture-solidity-walkthrough.md) · [SDK 与 TRON 接入](auth-capture-official-code-walkthrough.md)
+更新：2026 年 10 月 21 日。[总目录](../README.md) · [合约源码](auth-capture-solidity-walkthrough.md) · [SDK 与 TRON 接入](auth-capture-official-code-walkthrough.md)
 
 **auth-capture 让用户先同意一笔支付上限，再按实际金额结算。** 商家可以先锁住资金再开工，也可以先拿到签名，等业务完成后一次收款并分账。下面都用“上限 10 USDC、实际消费 6、费用 1%”这个例子。
 
@@ -10,13 +10,18 @@
 
 ![auth-capture 完整流程：HTTP 请求、两条收款路径、分账与退款](../assets/auth-capture/15-payment-lifecycle-overview.png)
 
-图中 Escrow 即 AuthCaptureEscrow。后面[第 3 节](#3-合约和参与方)说清谁负责，[第 4 节](#4-capture-怎么分账)看钱怎么分，[第 5 节](#5-voidreclaim-与-refund)看钱怎么退，[第 6 节](#6-x402-如何驱动合约)再看 SDK 如何把这些调用串起来。
+图中 Escrow 即 AuthCaptureEscrow。[第 3 节](#3-合约和参与方)讲参与方，[第 4 节](#4-capture-怎么分账)讲分账，[第 5 节](#5-voidreclaim-与-refund)讲退钱，[第 6 节](#6-x402-如何驱动合约)讲 SDK 调用和固定版本的 sync 实测问题。
 
 ## 1 Commerce Payments 与 x402
 
 Commerce Payments 是 Coinbase 与 Shopify 推出的开源商业支付协议，提供托管、扣款、取消和退款合约。实现位于 [base/commerce-payments](https://github.com/base/commerce-payments)。x402 是 API 等资源的支付协议；它的 auth-capture 方案接入这套合约。Coinbase Payments 则是包含结账和商家 API 的商业产品。[官方产品介绍](https://www.coinbase.com/en-gb/blog/powering-the-future-of-ecommerce-introducing-coinbase-payments)
 
+<details>
+<summary>展开项目关系图</summary>
+
 ![Commerce Payments、Coinbase Payments 与 x402 的关系](../assets/auth-capture/12-project-layers.png)
+
+</details>
 
 Escrow、TokenStore、Collector 是支付系统的配套合约，不是 EVM 自带的功能。x402 的[官方 EVM 规范](https://github.com/x402-foundation/x402/blob/faa1c694c66a3732aaabbce93bdae140e521a67d/specs/schemes/auth-capture/scheme_auth_capture_evm.md)复用 Commerce Payments，新增工作主要在 SDK。Shopify 使用的是这套支付合约，与是否采用 x402 HTTP 接口是两回事。[合约来源和新增代码](auth-capture-solidity-walkthrough.md#11-支付合约与通用依赖)
 
@@ -42,8 +47,6 @@ auth-capture 适合异步任务、按用量计费，以及一笔授权内分次�
 
 ## 3 合约和参与方
 
-![合约职责与资金关系](../assets/auth-capture/01-contract-roles.png)
-
 | 组件 | 职责 |
 | --- | --- |
 | AuthCaptureEscrow | 保存订单余额，限制操作人、金额、费用和期限 |
@@ -58,9 +61,11 @@ payer 是付款及退款接收人，receiver 是商家货款接收地址，对�
 
 operator 是合约认定的操作地址。除 payer 调用 reclaim 外，五个资金操作都只允许 operator 调用。默认 delegated 模式下，operator 是 facilitator 控制的提交地址，可以是 EOA 或智能账户。商家通过签名或经过认证的委托请求，告诉它要扣多少钱。
 
-**基础 Escrow 不判断业务是否交付，也不验证商家的操作签名；这层校验由 facilitator 做。** 需要链上规则或仲裁时，可以使用 custom operator，后续操作通过它自己的接口执行，不由 x402 relay 代办。当前 SDK 的 policy 类型仍未开放使用。
+**基础 Escrow 不判断业务是否交付，也不验证商家的操作签名；这层校验由 facilitator 做。** 以本次 EOA operator 为例，锁款 10 后，即使业务实际只花了 6，它仍能在金额、费用和期限允许时直接 capture 10，款项照样付给原商家。因此，delegated 模式依赖 operator 按约定执行。
 
-六种操作、参数、逐层 msg.sender 和源码行号见[Solidity 走读](auth-capture-solidity-walkthrough.md)。
+需要把额外业务规则放到链上时，可以使用 custom operator，后续操作通过它自己的接口执行。当前 SDK 的 policy 类型仍未开放使用。
+
+合约职责图、六种操作和逐层调用见[Solidity 走读](auth-capture-solidity-walkthrough.md#1-合约组成)。
 
 ## 4 capture 怎么分账
 
@@ -74,14 +79,12 @@ capture 总额为 6，手续费是 0.06，商家收到 5.94。Escrow 先把本�
 
 ## 5 void、reclaim 与 refund
 
-![退款请求与新资金来源](../assets/auth-capture/09-refund-funding.png)
-
 - **尚未花掉的 4**：operator 通过 void 全部退回；到达扣款期限后，payer 可以主动 reclaim。
 - **已经付出去的 6**：走 refund，可部分、多次退款，但不能超过已扣未退额度，必须早于退款截止时刻。
 
 标准退款要从 operator 钱包另收一笔资金，经 TokenStore 退给原 payer，因此 operator 需要有余额和 allowance。合约不会自动追回商家已经收到的 5.94 和费用方的 0.06；手续费是否返还、如何与商家对账，要另外约定。**refundableAmount 是额度，不是准备金。**
 
-官方合约和 SDK 已实现 refund，也有对应测试。facilitator 示例默认 refundFunding=false，接入方需要先约定退款资金由谁承担，再开放退款。各部署是否开启退款，要看实际配置。[退款接入](auth-capture-official-code-walkthrough.md#8-退款如何接入)
+官方合约和 SDK 已实现 refund，也有对应测试。facilitator 示例默认 refundFunding=false，接入方需要先约定退款资金由谁承担，再开放退款。各部署是否开启退款，要看实际配置。[退款资金图](auth-capture-solidity-walkthrough.md#13-refund额度减少新资金再进来) · [退款接入](auth-capture-official-code-walkthrough.md#8-退款如何接入)
 
 合约到期后不会自动转账。facilitator 不可用时，payer 只能等到期后 reclaim 尚未结算的余额，不能追回已付款。旧订单固定了 operator，换一家 facilitator 通常无法接管。交易已经广播却不知结果时，应先查原交易和链上状态。
 
@@ -91,16 +94,34 @@ capture 总额为 6，手续费是 0.06，商家收到 5.94。Escrow 先把本�
 
 | 配置 | 官方 SDK 的处理顺序 |
 | --- | --- |
-| paymentFlow="escrow"（默认） | /settle 调 authorize → 执行业务 → /settle 调 capture |
-| paymentFlow="authorization" | /verify → 执行业务 → /settle 调 charge |
+| escrow + sync（默认） | /settle 调 authorize → 执行业务 → /settle 调 capture；部分扣款时另发 void |
+| escrow + deferred | /settle 调 authorize → 执行业务并返回；稍后由服务端发起 capture / void |
+| authorization | /verify → 执行业务 → /settle 调 charge |
 
-escrow 的 captureMode="sync" 默认在请求结束阶段扣款，"deferred" 则稍后扣款；charge 不设置 captureMode。/escrow、/charge 只是示例名称，真实业务接口可以自行命名。
+paymentFlow 选择 escrow / authorization，captureMode 只用于 escrow。/escrow、/charge 是示例路由名，真实业务接口可以自行命名。
+
+**本文固定的 SDK 版本存在 sync 账本问题：链上扣款成功后，本地仍保留授权时的余额，后续退款 helper 会被拒绝。** 实测最后由 operator 直接调用 Escrow 完成该笔退款，演示使用的 SDK 保持原样，没有修复该问题。[原因与复现](auth-capture-official-code-walkthrough.md#124-公开测试网与-http-支付)
 
 /settle 也处理 capture、void、refund 等后续操作，协议没有另外规定 /refund HTTP 接口。authorize 成功表示钱已托管，capture / charge 成功才表示已经付款。接口、签名、状态存储和失败恢复见[SDK 与接口走读](auth-capture-official-code-walkthrough.md)。
 
+### 钱包里要做什么
+
+| 环节 | 谁操作、钱包确认什么 | 谁付 gas |
+| --- | --- | --- |
+| ERC-3009 每笔付款 | payer 签付款授权，无需提前 approve | 签名本身不付 gas |
+| Permit2 首次准备 | payer 将代币 approve 给 Permit2；已有足额 allowance 可跳过 | payer |
+| Permit2 每笔付款 | payer 签本笔 Permit2 授权 | 签名本身不付 gas |
+| authorize / charge / capture / void / refund | facilitator 用 operator 地址提交；payer 无需逐次确认 | operator |
+| 退款备付 | operator 备好退款币，approve 给 OperatorRefundCollector | operator 支付 approve 的 gas |
+| 到期 reclaim | payer 主动提交取回剩余托管款的交易 | payer |
+
+表按本次 EOA 演示说明；智能钱包有代付安排时，gas 可由代付方承担。签名确认的是收款条款，approve 设置的是代币额度；使用 Permit2 时两者都需要。
+
 ## 7 TRON 上要做什么
 
-建议首版限定为 USDT + Permit2 + 单一 delegated operator。需要移植 Escrow、TokenStore、Permit2PaymentCollector、OperatorRefundCollector，以及配套 SDK 和 facilitator；仅复制 Escrow 不够。
+**TRON 部分是待验证的移植方案，目前没有完成 TVM 编译、签名或部署验证。** 可先用 USDT + Permit2 + 单一 delegated operator 缩小验证范围，前提是目标 Permit2 与 USDT 接口、签名和执行环境核验通过。
+
+候选组件包括 Escrow、TokenStore、Permit2PaymentCollector、OperatorRefundCollector，以及配套 SDK 和 facilitator；仅复制 Escrow 不够。
 
 写一个 3009 Collector，不会让现有 USDT 获得签名收款能力。移植时要验证 CREATE2 地址预测、Permit2 接口与签名、TVM 编译依赖，以及 Energy、交易模拟和对账。具体步骤见[TRON 适配](auth-capture-official-code-walkthrough.md#11-tron-适配)。
 

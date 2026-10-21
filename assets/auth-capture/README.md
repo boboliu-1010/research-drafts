@@ -13,14 +13,14 @@
 | [13 实测余额变化](13-validation-results.svg) | 从本地 fork 的真实执行记录生成；含分账、释放和退款后的余额 | [SVG](13-validation-results.svg) |
 | [12 项目关系](12-project-layers.png) | Coinbase Payments 与 x402 auth-capture 分别使用 Commerce Payments；不表示 Shopify 使用 x402 | [SVG](12-project-layers.svg) |
 | [08 三种支付方式](08-auth-capture-overview.png) | exact 以 ERC-3009 默认直付为例；另两列为 delegated 的 escrow / authorization 路径 | [SVG](08-auth-capture-overview.svg) |
-| [01 合约职责](01-contract-roles.png) | operator、Escrow、Collector、TokenStore 与收款方的职责和资金关系 | [Mermaid](01-contract-roles.mmd) |
+| [01 合约职责](01-contract-roles.png) | 放在合约走读中，说明参与方和资金关系 | [Mermaid](01-contract-roles.mmd) |
 | [11 Collector 继承与调用](11-collector-inheritance-call.png) | 区分代码继承和实际调用，基类没有独立中转地址 | [SVG](11-collector-inheritance-call.svg) |
 | [10 capture 内部分账](10-capture-internal-split.png) | 一笔交易内的两个 token 转账、msg.sender 与失败回滚 | [SVG](10-capture-internal-split.svg) |
 | [09 refund 资金](09-refund-funding.png) | 标准 delegated 退款从 operator 新收资金；示例默认关闭代办 | [SVG](09-refund-funding.svg) |
 | [02 TokenStore 部署](02-tokenstore-deployment.png) | 地址可预测，先入金、首次支出时才部署实例 | [Mermaid](02-tokenstore-deployment.mmd) |
 | [05 三个期限](05-deadlines.png) | 首次收款、capture、refund 的截止与主动 reclaim | [Mermaid](05-deadlines.mmd) |
 | [03 两次 settle](03-settle-sequence.png) | 限定 delegated、有 receiverAuthorizer、sync escrow；不在业务前额外调用 /verify | [Mermaid](03-settle-sequence.mmd) |
-| [07 TRON 适配](07-tron-port.png) | USDT + Permit2 首版移植方案，兼容性待验证 | [Mermaid](07-tron-port.mmd) |
+| [07 TRON 适配](07-tron-port.png) | USDT + Permit2 候选方案；尚无 TVM 编译、签名或部署验证 | [Mermaid](07-tron-port.mmd) |
 
 ## 补充图
 

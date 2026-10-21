@@ -1,6 +1,6 @@
 # x402 auth-capture SDK、接口与 TRON 接入
 
-更新：2026 年 10 月 20 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [合约源码](auth-capture-solidity-walkthrough.md) · [TRON 适配](#11-tron-适配)
+更新：2026 年 10 月 21 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [合约源码](auth-capture-solidity-walkthrough.md) · [TRON 适配](#11-tron-适配)
 
 服务端设置付款条件，客户端签名，facilitator 验证并提交交易，业务系统负责交付判断、退款审批、备付金和商户对账。合约内部实现见[合约走读](auth-capture-solidity-walkthrough.md)，[源码版本](auth-capture-contract-analysis.md#10-源码版本)统一列在主稿末尾。
 
@@ -42,7 +42,7 @@ client、server、facilitator 都有名为 AuthCaptureEvmScheme 的类，但各�
 
 没有单独规定 /capture、/void、/refund HTTP 接口。/settle 成功也不一定表示商家已收钱：authorize 只是建立托管。/verify 不保证以后一定能收款，settle 会重新验证并模拟。
 
-图中是 delegated 模式、有非零 receiverAuthorizer 的 sync escrow 调用过程。charge 和 custom 的处理方式在后面分别说明。
+图中是 delegated 模式、有非零 receiverAuthorizer 的 sync escrow 收付调用。本文固定版本的链上收付已跑通，但 capture 后本地账本漏更新，随后退款 helper 被拒；下图未展示存储回调，实测原因与恢复见[12.4](#124-公开测试网与-http-支付)。
 
 ![sync escrow 的两次 settle](../assets/auth-capture/03-settle-sequence.png)
 
@@ -60,7 +60,7 @@ settlementHooks 的 before-handler 不追加商户扣款签名。authorize 成�
 
 after-handler 为 sync escrow 构造 capture，为 authorization 路径补齐 charge。deferred escrow 则保留已托管结果，不在请求结束时扣款。cancel 会为可代办生命周期的 escrow 路径构造 void。
 
-这些操作由 SDK 发起，合约不会到时自动执行。HTTP 实测发现 sync 后的本地账本更新遗漏，见[公开测试网验证](#124-公开测试网与-http-支付)。
+这些操作由 SDK 发起，合约不会到时自动执行。sync 的后置回调本应更新本地余额，但本文固定版本实测漏更新，后续 refund 因预期余额不符而拒绝；该笔退款由原 operator 直接调用 Escrow 完成，演示使用的 SDK 保持原样，没有修复该问题。[公开测试网验证](#124-公开测试网与-http-支付)
 
 | extra 主要参数 | 对应意义 |
 | --- | --- |
@@ -86,7 +86,7 @@ createPaymentPayload 先校验协议版本与必填 extra，解析网络和部�
 | ERC-3009 | token 合约，name/version 来自 token 域参数 | ReceiveWithAuthorization，to 为匹配部署的 ERC3009 Collector |
 | Permit2 | canonical Permit2 合约 | PermitTransferFrom，spender 为匹配部署的 Permit2 Collector |
 
-用户这次付款签名同意的是收款条款，不需要为之后的每次 capture 再签一次。后续扣款由 operator 执行，费用和时间等仍受条款限制。
+用户这次付款签名同意的是收款条款，不需要为之后的每次 capture 再签一次。后续扣款由 operator 执行，费用和时间等仍受条款限制。ERC-3009 无需提前 approve；Permit2 另需用户将代币额度授予 Permit2。[钱包操作与 gas](auth-capture-contract-analysis.md#钱包里要做什么)
 
 ### 支付哈希与签名 nonce
 
@@ -150,7 +150,7 @@ SDK 这里只检查外围合约的收款行为，自定义仲裁逻辑仍要另�
 
 buildCaptureFields 将支付 key、金额、费用、预期 capturable/refundable 余额纳入商户操作签名。verifyCapturePayload 验证签名、读取链上余额并与预期值比对，再模拟 capture。余额变化后，旧操作通常无法再次通过同一预期状态检查。
 
-基础 Escrow.capture 不接收 authorizerSignature 或 expectedBalances，只检查 operator、金额、费用和期限。商户是否同意、余额是否符合预期，由 facilitator 校验。检查后到交易上链前，余额仍可能变化，这不是合约里的原子比较交换。
+基础 Escrow.capture 不接收 authorizerSignature 或 expectedBalances，只检查 operator、金额、费用和期限。商户是否同意、余额是否符合预期，由 facilitator 校验；EOA operator 持钥方能绕过 SDK 直接调用，商家签名不会在基础 Escrow 上再验一次。检查后到交易上链前，余额仍可能变化，预期余额比对也不是合约里的原子操作。
 
 源码也支持由 facilitator 代任 receiver authorizer。这个分支仍要认证调用者：先 resolveCallerIdentity，再在收款时 bind 调用者与支付身份。后续生命周期只有匹配同一绑定身份，facilitator 才能生成操作签名。
 
@@ -182,7 +182,9 @@ settleCollect 先查 pending 交易。缓存命中后，会继续等待原交易
 
 capture 带有释放剩余款的意图时，settleVerifiedLifecycle 会先等 capture 成功，再单独 submit void。第二笔操作按 best effort 处理：即使 void 失败，仍返回 capture 成功，剩余款需要后续 void 或到期 reclaim。
 
-LifecycleManager.capture 成功后按 opts.voidRemainder 更新本地余额；sync hooks 则按是否存在 void 签名判断是否清零。因此，本地 capturable=0 不一定表示第二笔 void 已确认，还要查两笔交易和链上 paymentState。
+LifecycleManager.capture 成功后按 opts.voidRemainder 更新本地余额，但 void 是另一笔交易。因此，本地 capturable=0 不一定表示 void 已确认，还要查回执和链上 paymentState。
+
+sync 后置回调设计上按 void 签名更新余额；本文固定版本的 core 却把原始 collect payload 交给回调，使它看不到 type="capture"，漏掉了更新。本次实测链上已经是可扣 0、可退 0.006，本地仍是可扣 0.01、可退 0，随后 refund helper 被拒。[复现与直接退款记录](#124-公开测试网与-http-支付)
 
 AuthorizedPaymentStorage.update 要求原子条件修改。默认内存实现的锁只在一个 JS runtime 内生效，无法协调多个实例；存储更新是原子的，也不代表整个“读记录—发链上交易—更新记录”过程都被锁住。
 
@@ -198,7 +200,9 @@ AuthorizedPaymentStorage.update 要求原子条件修改。默认内存实现的
 
 ## 11 TRON 适配
 
-建议首版限定为 **USDT + Permit2 + 单一 delegated operator**。TVM 兼容 Solidity 能帮助复用代码，但现有 EVM 部署不会因此成为 TRON 上的可用合约，只复制 Escrow 也不够。
+**这是待验证的移植方案。已完成的是 EVM 验证，本方案在 TRON 上尚无 TVM 编译、签名、合约测试或部署结果。** 可先以 USDT + Permit2 + 单一 delegated operator 缩小验证范围，核验目标 Permit2 的接口与执行条件后，再决定是否采用。
+
+下面列出候选组件和要验证的条件。TVM 兼容 Solidity 能帮助复用代码，EVM 部署地址和验证结果仍需在 TRON 上重新核实。
 
 ![TRON 合约与 SDK 适配范围](../assets/auth-capture/07-tron-port.png)
 
@@ -213,13 +217,13 @@ AuthorizedPaymentStorage.update 要求原子条件修改。默认内存实现的
 | TokenCollector 等基类 | 随具体合约编译适配 | 不额外部署一个抽象基类中转地址 |
 | SDK / facilitator | 形成付款条件、签名、交易提交与状态恢复 | 原始 PaymentInfo、部署配置、持久化状态 |
 
-### 11.2 USDT 为什么走 Permit2
+### 11.2 USDT 的候选收款路径
 
 现有 TRON SDK 的[资产配置说明](https://github.com/BofAI/x402/blob/main/typescript/packages/mechanisms/tron/src/shared/defaultAssets.ts)为 USDT 选择 Permit2，因为它不支持所需的 3009 风格签名转账。Collector 只能使用代币已有的能力；写一个名为 TRC3009PaymentCollector 的合约，不会改变现有 USDT 的接口。
 
 等目标代币确实支持相应签名收款，再增加 3009 路径。还要核对官方 ERC3009 Collector 的 receiveWithAuthorization，与现有 TRON exact 的 transferWithAuthorization 在接口、签名类型和调用约束上有哪些差别。
 
-USDT 的预期流程是：
+候选流程是，尚未在 TRON 上执行验证：
 
 ```text
 首次准备：用户 approve USDT 给 Permit2

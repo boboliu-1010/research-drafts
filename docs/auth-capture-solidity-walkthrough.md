@@ -1,10 +1,12 @@
 # auth-capture Solidity 合约源码走读
 
-更新：2026 年 10 月 20 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [SDK 与 TRON 接入](auth-capture-official-code-walkthrough.md)
+更新：2026 年 10 月 21 日。[总目录](../README.md) · [分享主稿](auth-capture-contract-analysis.md) · [SDK 与 TRON 接入](auth-capture-official-code-walkthrough.md)
 
 合约使用 Commerce Payments v1.1。示例订单上限 10 USDC、实际消费 6、费用 1%，传入真实参数时需乘 10⁶。代码摘录省略了部分声明和检查，完整实现以链接中的源码为准。[源码版本](auth-capture-contract-analysis.md#10-源码版本)
 
 ## 1 合约组成
+
+![合约职责与资金关系](../assets/auth-capture/01-contract-roles.png)
 
 Escrow 管订单账和权限，Collector 负责接入不同收款方式，TokenStore 持币并按 Escrow 指令转出。TokenCollector 是抽象基类，没有单独的收款中转地址。这些配套合约来自 Commerce Payments，由 x402 复用。
 
@@ -109,7 +111,9 @@ canonical Collector 会把 PaymentInfo 的 payer 临时置零，调用 getHash�
 
 六个资金操作都有 `nonReentrant`。它们先检查、更新订单状态，再调用外部代币合约。外部调用失败，前面的账本修改和事件也会回滚。当前实现使用 transient storage 重入锁，移植时需要核对目标链能否执行相关指令。
 
-基础 Escrow 不检查业务是否交付，也没有接收商家的 `authorizerSignature` 参数。默认 delegated 模式中，商家的操作授权由 facilitator 校验；合约只按 operator 和固定条款执行。
+基础 Escrow 不检查业务是否交付，也没有接收商家的 `authorizerSignature` 参数。默认 delegated 模式中，商家的操作授权由 facilitator 校验；EOA operator 持钥方可以绕过 SDK 直接调用合约，但仍受原条款约束。
+
+以 EOA operator 为例，刚托管 10、业务实际只花 6，它仍能在期限内按约定费用直接 capture 10；货款仍付给原 receiver。实际消费多少，需要业务系统和 operator 按约定执行。公开测试中 sync 退款 helper 被拒后，正是用原 operator 直接调用 refund 完成恢复；合约没有额外要求商家操作签名。[交易与复现](auth-capture-official-code-walkthrough.md#124-公开测试网与-http-支付)
 
 ## 6 authorize：收款并建立托管余额
 
